@@ -1,151 +1,525 @@
 <!DOCTYPE html>
+<!--This file is based off Google VR app starter code available here: https://medium.com/r/?url=http%3A%2F%2Fvr.chromeexperiments.com%2Fcardboard.zip.
+I added a HUD and selection mechanism to the starter code with functionality from these GitHub repos:
+* Mr. Doob’s Three.js
+* Kimmo Brunfeldt’s progressbar.js
+* Sole’s tween.js
+Feel free to adapt this enhanced starter code for your own projects.
+Jason Peterson-->
 <html lang="en">
-  <head>
-    <title>Cardboard Example</title>
+<head>
+    <title>PluckyCharms Land: A Simple VR Scene with HUD and "Long-Gaze" Selections</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <style>
-      body {
+    body {
         margin: 0px;
         overflow: hidden;
-      }
-      #example {
+    }
+    #scene {
         position: absolute;
+        z-index: 1;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-      }
+    }
+    #selection_confirmation_overlay {
+        position: absolute;
+        z-index: 2;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(76, 175, 80, 0.3) /* Green background with 30% opacity */
+    }
+    #left_hud {
+        pointer-events: none;
+        position: absolute;
+        z-index: 3;
+        left: 0;
+        width: 45%;
+        height: 100%;
+        margin-left: 2.5%;
+    }
+    #right_hud {
+        pointer-events: none;
+        position: absolute;
+        z-index: 3;
+        right: 0;
+        width: 45%;
+        height: 100%;
+        margin-right: 2.5%;
+    }
+    #guide_circle_left {
+        pointer-events: none;
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%,-50%);
+        width: 2.5vw;
+        height: 2.5vw;
+        border-radius: 100%;
+    }
+    #guide_circle_right {
+        pointer-events: none;
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%,-50%);
+        width: 2.5vw;
+        height: 2.5vw;
+        border-radius: 100%;
+    }
+    @font-face {
+    font-family: cerealBoxFont;
+    src: url(fonts/RumRaisin-Regular.ttf);
+}
+    #top_hud_text_area{
+    font-family: cerealBoxFont;
+    margin-left: 10px;
+    margin-top: 10px;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-image: -webkit-gradient(linear,  left top,  left bottom,
+        color-stop(0.2, orange),
+        color-stop(0.8, yellow));
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: blue;
+
+    }
+    #bottom_hud_text_area{
+        position:absolute;
+        bottom:0;
+        margin-bottom: 20%;
+        text-shadow: 1px 1px darkgray;
+  }
+    .heading_text{
+        font-size: 125%;
+    }
+    #heading_image_left{
+        text-align: right;
+    }
+    .info_text{
+        color: white;
+        font-size: 60%;
+    }
     </style>
-  </head>
-  <body>
-    <div id="example"></div>
+</head>
+<body>
+    <div id="left_hud">
+        <div id="guide_circle_left"></div>
+        <div id="top_hud_text_area">
+            <p class="heading_text">PluckyCharms Land</p></div>
+        <div id="bottom_hud_text_area"><p class="info_text"></p></div>
 
-  <script src="js/third-party/threejs/three.js"></script>
-  <script src="js/third-party/threejs/StereoEffect.js"></script>
-  <script src="js/third-party/threejs/DeviceOrientationControls.js"></script>
-  <script src="js/third-party/threejs/OrbitControls.js"></script>
+    </div>
 
-  <script>
-    var camera, scene, renderer;
+    <div id="right_hud">
+        <div id="guide_circle_right"></div>
+        <div id="top_hud_text_area"><p class="heading_text">PluckyCharms Land</p></div>
+        <div id="bottom_hud_text_area"><p class="info_text"></p></div>
+    </div>
+
+    <div id="scene"><button id="goFS">Go fullscreen</button></div>
+    <div id="selection_confirmation_overlay"></button></div>
+
+
+    <script src="js/third-party/threejs/three.js"></script>
+    <script src="js/third-party/threejs/StereoEffect.js"></script>
+    <script src="js/third-party/threejs/DeviceOrientationControls.js"></script>
+    <script src="js/third-party/threejs/OrbitControls.js"></script>
+    <script src="js/third-party/threejs/OBJLoader.js"></script>
+    <script src="js/third-party/progressbar.js"></script>
+    <script src="js/third-party/Tween.js"></script>
+    <script>
+
+    var camera, scene, renderer, sphere, cube;
+    var left_bar, right_bar;
     var effect, controls;
     var element, container;
+    var scCube;
+    var selectableObjs = [];
+    var width = window.innerWidth, height = window.innerHeight;
 
     var clock = new THREE.Clock();
+
+    var min = { x: 100, y: 100, z: 100 }
+    var touchTweenTo = new TWEEN.Tween(min);
+    var max = { x: 120, y: 120, z: 120 };
+
+    //Set up animation cycle used on touched objects
+    touchTweenTo.to(max, 200);
+    touchTweenTo.easing(TWEEN.Easing.Bounce.InOut);
+    touchTweenTo.repeat(Infinity); // repeats forever
+    touchTweenTo.start();
+
+    var SELECTION_TIME = 2000;
+
+    //Allow for fullscreen and detect return from
+    var goFS = document.getElementById("goFS");
+    document.getElementById("goFS").style.display = 'block';
+    var doc = window.document;
+    var docEl = doc.documentElement;
+    goFS.addEventListener("click", function() {
+        fullscreen(docEl);
+
+    }, false);
+
+    document.addEventListener('webkitfullscreenchange', function(e) {
+        buttonState = document.getElementById("goFS").style.display
+        if (buttonState == 'block' || buttonState == 'undefined') {
+            document.getElementById("goFS").style.display = 'none';
+        }
+            if (buttonState == 'none') {
+            document.getElementById("goFS").style.display = 'block';
+        }
+    });
+
+    document.getElementById("selection_confirmation_overlay").style.display = 'none';
+
+
+    //Build Three.js scene
 
     init();
     animate();
 
     function init() {
-      renderer = new THREE.WebGLRenderer();
-      element = renderer.domElement;
-      container = document.getElementById('example');
-      container.appendChild(element);
 
-      effect = new THREE.StereoEffect(renderer);
+        left_bar = new ProgressBar.Circle('#guide_circle_left', {
+            strokeWidth: 10,
+            easing: 'easeInOut',
+            duration: SELECTION_TIME,
+            color: 'lime',
+            trailWidth: 2,
+            svgStyle: null
+        });
 
-      scene = new THREE.Scene();
+        right_bar = new ProgressBar.Circle('#guide_circle_right', {
+            strokeWidth: 10,
+            easing: 'easeInOut',
+            duration: SELECTION_TIME,
+            color: 'lime',
+            trailWidth: 2,
+            svgStyle: null        });
+            //right_bar.animate(1);
 
-      camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
-      camera.position.set(0, 10, 0);
-      scene.add(camera);
+        //Stereo scene
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        element = renderer.domElement;
+        container = document.getElementById('scene');
+        container.appendChild(element);
 
-      controls = new THREE.OrbitControls(camera, element);
-      controls.rotateUp(Math.PI / 4);
-      controls.target.set(
-        camera.position.x + 0.1,
-        camera.position.y,
-        camera.position.z
-      );
-      controls.noZoom = true;
-      controls.noPan = true;
+        effect = new THREE.StereoEffect(renderer);
 
-      function setOrientationControls(e) {
-        if (!e.alpha) {
-          return;
+        scene = new THREE.Scene();
+
+        camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
+        camera.position.set(0, -5, 0);
+        scene.add(camera);
+
+        controls = new THREE.OrbitControls(camera, element);
+        //controls.rotateUp(Math.PI / 4);
+        controls.target.set(
+            camera.position.x + 0.1,
+            camera.position.y,
+            camera.position.z
+        );
+        //controls.noZoom = true;
+        //controls.noPan = true;
+
+        function setOrientationControls(e) {
+            if (!e.alpha) {
+                return;
+            }
+
+            controls = new THREE.DeviceOrientationControls(camera, true);
+            controls.connect();
+            controls.update();
+
+            element.addEventListener('click', fullscreen, false);
+
+            window.removeEventListener('deviceorientation', setOrientationControls, true);
+        }
+        window.addEventListener('deviceorientation', setOrientationControls, true);
+
+
+        // Add lights
+        var ambLight = new THREE.AmbientLight( 0x808080 ); // soft white light
+        scene.add( ambLight );
+
+        var ptLight = new THREE.PointLight(0xffffff, 1.75, 1000);
+        ptLight.position.set(-100, 100, 100);
+        scene.add(ptLight);
+
+        //Add other scene elements
+        // drawSimpleSkybox();
+        drawShapes();
+        drawSkySphere();
+        window.addEventListener('resize', resize, false);
+        setTimeout(resize, 1);
+    }
+
+    function drawSkySphere()
+    {
+        // var skyGeo = new THREE.SphereGeometry(100, 25, 25);
+        //
+        // var texture = THREE.ImageUtils.loadTexture( "test_vr.jpg" );
+        //
+        // var material = new THREE.MeshPhongMaterial({
+        //     map: texture,
+        // });
+        // var sky = new THREE.Mesh(skyGeo, material);
+        // sky.material.side = THREE.BackSide;
+        // scene.add(sky);
+
+        var geometry = new THREE.SphereGeometry( 500, 60, 40 );
+		geometry.scale( - 1, 1, 1 );
+		var material = new THREE.MeshBasicMaterial( {
+			map: new THREE.TextureLoader().load( 'test_2.jpg' )
+		} );
+		mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+    }
+
+    function drawShapes() {
+
+        var manager = new THREE.LoadingManager();
+        manager.onProgress = function ( item, loaded, total ) {
+
+            console.log( item, loaded, total );
+
+        };
+
+        var objLoader = new THREE.OBJLoader( manager );
+        objLoader.load( "models/moon_charm.obj", meshloader("models/moon_charm.obj"));
+        objLoader.load( "models/heart_charm.obj", meshloader("models/heart_charm.obj"));
+        objLoader.load( "models/clover_charm.obj", meshloader("models/clover_charm.obj"));
+        objLoader.load( "models/star_charm.obj", meshloader("models/star_charm.obj"));
+
+        function meshloader(fileName){
+            return function(geometry){
+
+                //Place in scene
+                var color;
+                if (fileName.indexOf("moon") !== -1){
+                    color = 0x37FDFC;
+                    geometry.scale.set(100, 100, 100);
+                    geometry.position.z = 25;
+                    geometry.rotation.z = Math.PI / 4;
+                    geometry.position.y = 10;
+                    selectableObjs.push(geometry);
+                    geometry.userData = {name:"moon", touched:false};
+                    scene.add(geometry);
+                }
+                if (fileName.indexOf("heart") !== -1){
+                    color = 0xFA3C84;
+                    geometry.scale.set(100, 100, 100);
+                    geometry.position.x = 25;
+                    geometry.position.y = 10;
+                    selectableObjs.push(geometry);
+                    geometry.userData = {name:"heart", touched:false};
+                    scene.add(geometry);
+                }
+                if (fileName.indexOf("clover") !== -1){
+                    color = 0x3EA055;
+                    geometry.scale.set(100, 100, 100);
+                    geometry.position.x = -25;
+                    geometry.position.y = 10;
+                    selectableObjs.push(geometry);
+                    geometry.userData = {name:"clover", touched:false};
+                    scene.add(geometry);
+                }
+                if (fileName.indexOf("star") !== -1){
+                    color = 0xFF6500;
+                    geometry.scale.set(100, 100, 100);
+                    geometry.position.z = -25;
+                    geometry.position.y = 10;
+                    selectableObjs.push(geometry);
+                    geometry.userData = {name:"star", touched:false};
+                    scene.add(geometry);
+                }
+                //Apply material
+                geometry.traverse(function (child) {
+                    if (child instanceof THREE.Mesh) {
+                        var material = new THREE.MeshPhongMaterial(
+                            { color: color,
+                                side: THREE.DoubleSide,
+                                emissive: 0x000000,
+                                envMap: scCube
+                            }
+                        );
+                        child.material = material;
+                    }
+                });
+
+            }
         }
 
-        controls = new THREE.DeviceOrientationControls(camera, true);
-        controls.connect();
-        controls.update();
+    }
 
-        element.addEventListener('click', fullscreen, false);
+    //What happens after an object is selected
+    function postSelectAction(selectedObjectName){
+        console.log(
+            "The " +
+            selectedObjectName +
+             " was selected by user. Use this function to create appropriate scene transition."
+         );
 
-        window.removeEventListener('deviceorientation', setOrientationControls, true);
-      }
-      window.addEventListener('deviceorientation', setOrientationControls, true);
+         document.getElementById("selection_confirmation_overlay").style.display = 'block';
 
 
-      var light = new THREE.HemisphereLight(0x777777, 0x000000, 0.6);
-      scene.add(light);
+         setTimeout(function() {
+             document.getElementById("selection_confirmation_overlay").style.display = 'none';
+         }, 250);
 
-      var texture = THREE.ImageUtils.loadTexture(
-        'textures/patterns/checker.png'
-      );
-      texture.wrapS = THREE.RepeatWrapping;
-      texture.wrapT = THREE.RepeatWrapping;
-      texture.repeat = new THREE.Vector2(50, 50);
-      texture.anisotropy = renderer.getMaxAnisotropy();
+    }
 
-      var material = new THREE.MeshPhongMaterial({
-        color: 0xffffff,
-        specular: 0xffffff,
-        shininess: 20,
-        shading: THREE.FlatShading,
-        map: texture
-      });
+    function getIntersections(objects){
+        var raycaster = new THREE.Raycaster();
 
-      var geometry = new THREE.PlaneGeometry(1000, 1000);
+        var vector = new THREE.Vector3( 0, 0, - 1 );
+        vector.applyQuaternion( camera.quaternion );
 
-      var mesh = new THREE.Mesh(geometry, material);
-      mesh.rotation.x = -Math.PI / 2;
-      scene.add(mesh);
+        raycaster.set( camera.position, vector );
 
-      window.addEventListener('resize', resize, false);
-      setTimeout(resize, 1);
+        return raycaster.intersectObjects( objects, true );
+
+    }
+
+    function updateHUDTxt(msg){
+        x=document.getElementsByClassName("info_text");  // Find the elements
+        for(var i = 0; i < x.length; i++){
+            x[i].innerText=msg;    // Change the content
+        }
+    }
+
+    function getTouchMsg(charm){
+        var msg = "That's a " + charm + ", which has the power to ";
+
+        switch (charm) {
+            case "heart":
+                msg = msg + "bring things to life.";
+                msg = msg.replace(charm, "pink " + charm);
+                break;
+            case "moon":
+                msg = msg + "make things invisible.";
+                msg = msg.replace(charm, "blue " + charm);
+                break;
+            case "clover":
+                msg = msg + "bring luck (but you never know which kind).";
+                msg = msg.replace(charm, "green " + charm);
+                break;
+            case "star":
+                msg = msg + "make things fly (but you already have that).";
+                msg = msg.replace(charm, "orange " + charm);
+                break;
+
+            }
+
+        return msg + " Keep looking at it to select it."
     }
 
     function resize() {
-      var width = container.offsetWidth;
-      var height = container.offsetHeight;
+        var width = container.offsetWidth;
+        var height = container.offsetHeight;
 
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
 
-      renderer.setSize(width, height);
-      effect.setSize(width, height);
+        renderer.setSize(width, height);
+        effect.setSize(width, height);
     }
 
     function update(dt) {
-      resize();
+        resize();
 
-      camera.updateProjectionMatrix();
+        camera.updateProjectionMatrix();
 
-      controls.update(dt);
+        controls.update(dt);
+
     }
 
     function render(dt) {
-      effect.render(scene, camera);
+
+        updateHUDTxt(""); //Set HUD txt to blank to start render loop.
+
+        intersects = getIntersections(selectableObjs);
+
+        if (intersects.length == 0){//nothing being "touched"
+            left_bar.set(0.0);//reset any active progress bars to 0
+            right_bar.set(0.0);
+
+            //Loop over all OBJ objects (the charms)
+            scene.traverse (function (object)
+            {
+                //Set all charms touch flag to false as nothing is selected.
+                if (object instanceof THREE.Group){
+                    if (intersects.length == 0){
+                        object.userData.touched = false;
+                    }
+                }
+            });
+        } else {//something being touched
+            //Set the touched charm's touch flag to true, so we can give it special treatment in the animation function
+            intersects[0].object.parent.userData.touched = true;
+            msg = getTouchMsg(intersects[0].object.parent.userData.name); //update HUD text to register the touch
+            updateHUDTxt(msg);
+        }
+
+        effect.render(scene, camera);
+
     }
 
     function animate(t) {
-      requestAnimationFrame(animate);
 
-      update(clock.getDelta());
-      render(clock.getDelta());
+        TWEEN.update();
+
+        touchTweenTo.onUpdate(function() {
+            animScale = this;
+        });
+
+        scene.traverse (function (object)
+        {
+            if (object instanceof THREE.Group)
+            {
+                object.rotation.y = object.rotation.y + 0.01;
+
+                if (object.userData.touched){
+                    object.scale.x = animScale.x;
+                    object.scale.y = animScale.y;
+                    object.scale.z = animScale.z;
+
+
+                    if(left_bar.value() == 0){//don't restart progress bar if already progress
+                        left_bar.animate(1.0, {
+                        }, function() {
+                            postSelectAction(object.userData.name);//add callback to left side progress bar to register completed selection
+                        });
+                    }
+                    if(right_bar.value() == 0){//don't restart if in progress
+                        right_bar.animate(1.0);
+                    }
+
+                }
+            }
+        });
+
+        requestAnimationFrame(animate);
+
+        update(clock.getDelta());
+        render(clock.getDelta());
     }
 
-    function fullscreen() {
-      if (container.requestFullscreen) {
-        container.requestFullscreen();
-      } else if (container.msRequestFullscreen) {
-        container.msRequestFullscreen();
-      } else if (container.mozRequestFullScreen) {
-        container.mozRequestFullScreen();
-      } else if (container.webkitRequestFullscreen) {
-        container.webkitRequestFullscreen();
-      }
+    function fullscreen(container) {
+        if (container.requestFullscreen) {
+            container.requestFullscreen();
+        } else if (container.msRequestFullscreen) {
+            container.msRequestFullscreen();
+        } else if (container.mozRequestFullScreen) {
+            container.mozRequestFullScreen();
+        } else if (container.webkitRequestFullscreen) {
+            container.webkitRequestFullscreen();
+        }
     }
-  </script>
-  </body>
+    </script>
+</body>
 </html>
