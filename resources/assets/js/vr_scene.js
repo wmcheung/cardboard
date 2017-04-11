@@ -10,6 +10,7 @@ var OrbitControls = require('three-orbit-controls')(THREE);
 var camera, scene, renderer, sphere, cube,
     left_bar, right_bar, effect, controls,
     element, container, scCube, mesh, x, intersects, animScale;
+var buttonState;
 var selectableObjs = [];
 var width = window.innerWidth, height = window.innerHeight;
 var clock = new THREE.Clock();
@@ -107,9 +108,11 @@ function init() {
         controls.connect();
         controls.update();
 
+        console.log('im visible');
+
         element.addEventListener('click', fullscreen, false);
 
-        window.removeEventListener('deviceorientation', setOrientationControls, true);
+        // window.removeEventListener('deviceorientation', setOrientationControls, true);
     }
     window.addEventListener('deviceorientation', setOrientationControls, true);
 

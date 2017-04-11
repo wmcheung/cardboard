@@ -16432,6 +16432,7 @@ var OrbitControls = __webpack_require__(11)(__WEBPACK_IMPORTED_MODULE_0__third_p
 // OBJLoader(THREE);
 
 var camera, scene, renderer, sphere, cube, left_bar, right_bar, effect, controls, element, container, scCube, mesh, x, intersects, animScale;
+var buttonState;
 var selectableObjs = [];
 var width = window.innerWidth,
     height = window.innerHeight;
@@ -16525,9 +16526,11 @@ function init() {
         controls.connect();
         controls.update();
 
+        console.log('im visible');
+
         element.addEventListener('click', fullscreen, false);
 
-        window.removeEventListener('deviceorientation', setOrientationControls, true);
+        // window.removeEventListener('deviceorientation', setOrientationControls, true);
     }
     window.addEventListener('deviceorientation', setOrientationControls, true);
 
