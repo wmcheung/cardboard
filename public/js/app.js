@@ -13749,7 +13749,8 @@ function init() {
     // drawSimpleSkybox();
 
     drawShapes();
-    drawScene('./images/R0010065.jpg');
+    drawScene('./images/room_1.jpg');
+
     window.addEventListener('resize', resize, false);
     setTimeout(resize, 1);
 }
@@ -13819,7 +13820,7 @@ function postSelectAction(selectedObjectName) {
     setTimeout(function () {
         document.getElementById("selection_confirmation_overlay").style.display = 'none';
         if (selectedObjectName == 'objStar') {
-            drawScene('./images/R0010061.jpg');
+            drawScene('./images/room_2.jpg');
             resetCamera();
         }
     }, 250);
