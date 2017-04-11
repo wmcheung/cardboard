@@ -5,6 +5,7 @@ import * as ProgressBar from './third-party/progressbar';
 
 var THREE = THREELib(["OBJLoader", "OrbitControls"]);
 var StereoEffect = require('three-stereo-effect')(THREE);
+
 // var OrbitControls = require('three-orbit-controls')(THREE);
 // var OBJLoader = require('three-obj-loader');
 // OBJLoader(THREE);
@@ -102,7 +103,6 @@ function init() {
     //controls.noPan = true;
 
     function setOrientationControls(e) {
-        console.log(e);
         if (!e.alpha) {
             return;
         }
@@ -129,6 +129,7 @@ function init() {
 
     //Add other scene elements
     // drawSimpleSkybox();
+
     drawShapes();
     drawSkySphere();
     window.addEventListener('resize', resize, false);
@@ -137,17 +138,6 @@ function init() {
 
 function drawSkySphere()
 {
-    // var skyGeo = new THREE.SphereGeometry(100, 25, 25);
-    //
-    // var texture = THREE.ImageUtils.loadTexture( "test_vr.jpg" );
-    //
-    // var material = new THREE.MeshPhongMaterial({
-    //     map: texture,
-    // });
-    // var sky = new THREE.Mesh(skyGeo, material);
-    // sky.material.side = THREE.BackSide;
-    // scene.add(sky);
-
     var geometry = new THREE.SphereGeometry( 500, 60, 40 );
     geometry.scale( - 1, 1, 1 );
     var material = new THREE.MeshBasicMaterial( {
@@ -158,13 +148,22 @@ function drawSkySphere()
 }
 
 function drawShapes() {
-
     var manager = new THREE.LoadingManager();
     manager.onProgress = function ( item, loaded, total ) {
-
         console.log( item, loaded, total );
-
     };
+
+    // var circle_geometry = new THREE.CircleGeometry( 5, 32 );
+    // var circle_material = new THREE.MeshBasicMaterial( { color: 0x0033FF } );
+    // var circle = new THREE.Mesh( circle_geometry, circle_material );
+    // circle.position.y = 5;
+    // circle.position.x = -45;
+    // // circle.position.z = 25;
+    // circle.rotation.y = Math.PI / 2;
+    // circle.rotation.x = Math.PI / 2;
+    // selectableObjs.push(circle);
+    // circle.userData = {name:"circlee", touched:false};
+    // scene.add( circle );
 
     var objLoader = new THREE.OBJLoader( manager );
     objLoader.load( "models/moon_charm.obj", meshloader("models/moon_charm.obj"));
@@ -174,7 +173,6 @@ function drawShapes() {
 
     function meshloader(fileName){
         return function(geometry){
-
             //Place in scene
             var color;
             if (fileName.indexOf("moon") !== -1){
@@ -311,8 +309,9 @@ function update(dt) {
 
     camera.updateProjectionMatrix();
 
+    // check camera positioning
+    // console.log(camera.position);
     controls.update(dt);
-
 }
 
 function render(dt) {
