@@ -1,15 +1,17 @@
-import * as THREE from './third-party/threejs/three';
+// import * as THREE from './third-party/threejs/three';
+import THREELib from "three-js";
 import * as TWEEN from './third-party/Tween';
 import * as ProgressBar from './third-party/progressbar';
 
+var THREE = THREELib(["OBJLoader", "OrbitControls"]);
 var StereoEffect = require('three-stereo-effect')(THREE);
-var OrbitControls = require('three-orbit-controls')(THREE);
+// var OrbitControls = require('three-orbit-controls')(THREE);
 // var OBJLoader = require('three-obj-loader');
 // OBJLoader(THREE);
 
 var camera, scene, renderer, sphere, cube,
     left_bar, right_bar, effect, controls,
-    element, container, scCube, mesh, x, intersects, animScale;
+    element, container, scCube, mesh, x, intersects, animScale, msg;
 var buttonState;
 var selectableObjs = [];
 var width = window.innerWidth, height = window.innerHeight;
@@ -89,7 +91,7 @@ function init() {
     camera.position.set(0, -5, 0);
     scene.add(camera);
 
-    controls = new OrbitControls(camera, element);
+    controls = new THREE.OrbitControls(camera, element);
     //controls.rotateUp(Math.PI / 4);
     controls.target.set(
         camera.position.x + 0.1,
@@ -100,19 +102,19 @@ function init() {
     //controls.noPan = true;
 
     function setOrientationControls(e) {
+        console.log(e);
         if (!e.alpha) {
             return;
         }
 
-        controls = require('three.orientation')(camera);
+        controls = require('three.orientation')(THREE, camera);
+        // controls = new THREE.DeviceOrientationControls(camera, true);
         controls.connect();
         controls.update();
 
-        console.log('im visible');
-
         element.addEventListener('click', fullscreen, false);
 
-        // window.removeEventListener('deviceorientation', setOrientationControls, true);
+        window.removeEventListener('deviceorientation', setOrientationControls, true);
     }
     window.addEventListener('deviceorientation', setOrientationControls, true);
 
@@ -127,7 +129,7 @@ function init() {
 
     //Add other scene elements
     // drawSimpleSkybox();
-    // drawShapes();
+    drawShapes();
     drawSkySphere();
     window.addEventListener('resize', resize, false);
     setTimeout(resize, 1);
@@ -164,7 +166,7 @@ function drawShapes() {
 
     };
 
-    var objLoader = new OBJLoader( manager );
+    var objLoader = new THREE.OBJLoader( manager );
     objLoader.load( "models/moon_charm.obj", meshloader("models/moon_charm.obj"));
     objLoader.load( "models/heart_charm.obj", meshloader("models/heart_charm.obj"));
     objLoader.load( "models/clover_charm.obj", meshloader("models/clover_charm.obj"));
@@ -268,7 +270,7 @@ function updateHUDTxt(msg){
 }
 
 function getTouchMsg(charm){
-    var msg = "That's a " + charm + ", which has the power to ";
+    msg = "That's a " + charm + ", which has the power to ";
 
     switch (charm) {
         case "heart":
