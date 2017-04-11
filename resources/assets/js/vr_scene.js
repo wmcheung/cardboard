@@ -146,7 +146,7 @@ function drawSkySphere()
     var geometry = new THREE.SphereGeometry( 500, 60, 40 );
     geometry.scale( - 1, 1, 1 );
     var material = new THREE.MeshBasicMaterial( {
-        map: new THREE.TextureLoader().load( 'images/test_2.jpg' )
+        map: new THREE.TextureLoader().load( './images/test_2.jpg' )
     } );
     mesh = new THREE.Mesh( geometry, material );
     scene.add( mesh );

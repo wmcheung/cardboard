@@ -16562,7 +16562,7 @@ function drawSkySphere() {
     var geometry = new __WEBPACK_IMPORTED_MODULE_0__third_party_threejs_three__["SphereGeometry"](500, 60, 40);
     geometry.scale(-1, 1, 1);
     var material = new __WEBPACK_IMPORTED_MODULE_0__third_party_threejs_three__["MeshBasicMaterial"]({
-        map: new __WEBPACK_IMPORTED_MODULE_0__third_party_threejs_three__["TextureLoader"]().load('images/test_2.jpg')
+        map: new __WEBPACK_IMPORTED_MODULE_0__third_party_threejs_three__["TextureLoader"]().load('./images/test_2.jpg')
     });
     mesh = new __WEBPACK_IMPORTED_MODULE_0__third_party_threejs_three__["Mesh"](geometry, material);
     scene.add(mesh);
