@@ -13749,19 +13749,25 @@ function init() {
     // drawSimpleSkybox();
 
     drawShapes();
-    drawSkySphere();
+    drawScene('./images/R0010065.jpg');
     window.addEventListener('resize', resize, false);
     setTimeout(resize, 1);
 }
 
-function drawSkySphere() {
+function drawScene(load_image) {
     var geometry = new THREE.SphereGeometry(500, 60, 40);
     geometry.scale(-1, 1, 1);
+
     var material = new THREE.MeshBasicMaterial({
-        map: new THREE.TextureLoader().load('./images/test_2.jpg')
+        map: new THREE.TextureLoader().load(load_image)
     });
+
     mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
+}
+
+function resetCamera() {
+    controls.target.set(camera.position.x + 0.1, camera.position.y, camera.position.z);
 }
 
 function drawShapes() {
@@ -13770,65 +13776,25 @@ function drawShapes() {
         console.log(item, loaded, total);
     };
 
-    // var circle_geometry = new THREE.CircleGeometry( 5, 32 );
-    // var circle_material = new THREE.MeshBasicMaterial( { color: 0x0033FF } );
-    // var circle = new THREE.Mesh( circle_geometry, circle_material );
-    // circle.position.y = 5;
-    // circle.position.x = -45;
-    // // circle.position.z = 25;
-    // circle.rotation.y = Math.PI / 2;
-    // circle.rotation.x = Math.PI / 2;
-    // selectableObjs.push(circle);
-    // circle.userData = {name:"circlee", touched:false};
-    // scene.add( circle );
-
     var objLoader = new THREE.OBJLoader(manager);
-    objLoader.load("models/moon_charm.obj", meshloader("models/moon_charm.obj"));
-    objLoader.load("models/heart_charm.obj", meshloader("models/heart_charm.obj"));
-    objLoader.load("models/clover_charm.obj", meshloader("models/clover_charm.obj"));
-    objLoader.load("models/star_charm.obj", meshloader("models/star_charm.obj"));
+    objLoader.load("models/star_charm.obj", meshloader("models/star_charm.obj", -35, 5, -15, 0.5, "objStar"));
 
-    function meshloader(fileName) {
+    function meshloader(fileName, position_z, position_y, position_x, rotation, title) {
         return function (geometry) {
             //Place in scene
             var color;
-            if (fileName.indexOf("moon") !== -1) {
-                color = 0x37FDFC;
-                geometry.scale.set(100, 100, 100);
-                geometry.position.z = 25;
-                geometry.rotation.z = Math.PI / 4;
-                geometry.position.y = 10;
-                selectableObjs.push(geometry);
-                geometry.userData = { name: "moon", touched: false };
-                scene.add(geometry);
-            }
-            if (fileName.indexOf("heart") !== -1) {
-                color = 0xFA3C84;
-                geometry.scale.set(100, 100, 100);
-                geometry.position.x = 25;
-                geometry.position.y = 10;
-                selectableObjs.push(geometry);
-                geometry.userData = { name: "heart", touched: false };
-                scene.add(geometry);
-            }
-            if (fileName.indexOf("clover") !== -1) {
-                color = 0x3EA055;
-                geometry.scale.set(100, 100, 100);
-                geometry.position.x = -25;
-                geometry.position.y = 10;
-                selectableObjs.push(geometry);
-                geometry.userData = { name: "clover", touched: false };
-                scene.add(geometry);
-            }
             if (fileName.indexOf("star") !== -1) {
                 color = 0xFF6500;
-                geometry.scale.set(100, 100, 100);
-                geometry.position.z = -25;
-                geometry.position.y = 10;
+                geometry.scale.set(50, 50, 50);
+                geometry.position.z = position_z;
+                geometry.position.y = position_y;
+                geometry.position.x = position_x;
+                geometry.rotation.y = rotation;
                 selectableObjs.push(geometry);
-                geometry.userData = { name: "star", touched: false };
+                geometry.userData = { name: title, touched: false };
                 scene.add(geometry);
             }
+
             //Apply material
             geometry.traverse(function (child) {
                 if (child instanceof THREE.Mesh) {
@@ -13852,6 +13818,10 @@ function postSelectAction(selectedObjectName) {
 
     setTimeout(function () {
         document.getElementById("selection_confirmation_overlay").style.display = 'none';
+        if (selectedObjectName == 'objStar') {
+            drawScene('./images/R0010061.jpg');
+            resetCamera();
+        }
     }, 250);
 }
 
@@ -13961,12 +13931,12 @@ function animate(t) {
 
     scene.traverse(function (object) {
         if (object instanceof THREE.Group) {
-            object.rotation.y = object.rotation.y + 0.01;
+            // object.rotation.y = object.rotation.y + 0.01;
 
             if (object.userData.touched) {
-                object.scale.x = animScale.x;
-                object.scale.y = animScale.y;
-                object.scale.z = animScale.z;
+                object.scale.x = animScale.x / 1.5;
+                object.scale.y = animScale.y / 1.5;
+                object.scale.z = animScale.z / 1.5;
 
                 if (left_bar.value() == 0) {
                     //don't restart progress bar if already progress
