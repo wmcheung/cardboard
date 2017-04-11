@@ -37,7 +37,8 @@ var doc = window.document;
 var docEl = doc.documentElement;
 
 goFS.addEventListener("click", function() {
-    fullscreen(docEl);
+    document.body.requestFullscreen();
+    // fullscreen(docEl);
 }, false);
 
 document.addEventListener('webkitfullscreenchange', function(e) {
