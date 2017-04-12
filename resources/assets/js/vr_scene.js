@@ -1,44 +1,60 @@
 // import * as THREE from './third-party/threejs/three';
+
+/**
+ * WoningVR is realized with the help of an article on Medium
+ * https://medium.com/adventures-in-consumer-technology/how-to-start-building-your-own-webgl-based-vr-app-cdaf47b8132a
+ *
+ * Description : WoningVR is based on heavy javascript use, which renders a heat map and making it possible to orientate through the building.
+ * Author : Wesley Cheung <0887267@hr.nl>
+ *
+ */
+/*******************************************
+ * IMPORTS
+ ******************************************/
 import THREELib from "three-js";
 import * as TWEEN from './third-party/Tween';
 import * as ProgressBar from './third-party/progressbar';
 
-var THREE = THREELib(["OBJLoader", "OrbitControls"]);
-var StereoEffect = require('three-stereo-effect')(THREE);
+/*******************************************
+ * VARIABLES
+ ******************************************/
+let THREE = THREELib(["OBJLoader", "OrbitControls"]);
+let StereoEffect = require('three-stereo-effect')(THREE);
 
-// var OrbitControls = require('three-orbit-controls')(THREE);
-// var OBJLoader = require('three-obj-loader');
-// OBJLoader(THREE);
-
-var camera, scene, renderer, sphere, cube,
+let camera, scene, renderer,
     left_bar, right_bar, effect, controls,
-    element, container, scCube, mesh, x, intersects, animScale, msg;
-var buttonState;
-var selectableObjs = [];
-var width = window.innerWidth, height = window.innerHeight;
-var clock = new THREE.Clock();
+    element, container, scCube, mesh, x, intersects,
+    animScale, msg, buttonState;
 
-var min = { x: 100, y: 100, z: 100 }
-var touchTweenTo = new TWEEN.Tween(min);
-var max = { x: 120, y: 120, z: 120 };
+let selectableObjs = [];
 
-//Set up animation cycle used on touched objects
+let width = window.innerWidth, height = window.innerHeight;
+let clock = new THREE.Clock();
+
+let min = { x: 100, y: 100, z: 100 }
+let touchTweenTo = new TWEEN.Tween(min);
+let max = { x: 120, y: 120, z: 120 };
+
+// Set up animation cycle used on touched objects
 touchTweenTo.to(max, 200);
 touchTweenTo.easing(TWEEN.Easing.Bounce.InOut);
 touchTweenTo.repeat(Infinity); // repeats forever
 touchTweenTo.start();
 
-var SELECTION_TIME = 2000;
+// Selection time for the guiding circles
+let SELECTION_TIME = 2000;
 
-//Allow for fullscreen and detect return from
-var goFS = document.getElementById("goFS");
-document.getElementById("goFS").style.display = 'block';
-var doc = window.document;
-var docEl = doc.documentElement;
+// Full screen
+let goFS    =   document.getElementById("goFS");
+                document.getElementById("goFS").style.display = 'block';
+let doc     =   window.document;
+let docEl   =   doc.documentElement;
 
+/*******************************************
+ * EVENT LISTENERS
+ ******************************************/
 goFS.addEventListener("click", function() {
-    document.body.requestFullscreen();
-    // fullscreen(docEl);
+    fullscreen(docEl);
 }, false);
 
 document.addEventListener('webkitfullscreenchange', function(e) {
@@ -51,16 +67,46 @@ document.addEventListener('webkitfullscreenchange', function(e) {
     }
 });
 
+function setOrientationControls(e) {
+    if (!e.alpha) {
+        return;
+    }
+
+    controls = require('three.orientation')(THREE, camera);
+    controls.connect();
+    controls.update();
+
+    element.addEventListener('click', fullscreen, false);
+    window.removeEventListener('deviceorientation', setOrientationControls, true);
+}
+window.addEventListener('deviceorientation', setOrientationControls, true);
+
 document.getElementById("selection_confirmation_overlay").style.display = 'none';
 
+/*******************************************
+ * FUNCTIONS FOR BUILDING THE SCENE
+ ******************************************/
+function fullscreen(container) {
+    if (container.requestFullscreen) {
+        container.requestFullscreen();
+    } else if (container.msRequestFullscreen) {
+        container.msRequestFullscreen();
+    } else if (container.mozRequestFullScreen) {
+        container.mozRequestFullScreen();
+    } else if (container.webkitRequestFullscreen) {
+        container.webkitRequestFullscreen();
+    }
+}
 
-//Build Three.js scene
+function resetCamera() {
+    controls.target.set(
+        camera.position.x + 0.1,
+        camera.position.y,
+        camera.position.z
+    );
+}
 
-init();
-animate();
-
-function init() {
-
+function create_guide_circles() {
     left_bar = new ProgressBar.Circle('#guide_circle_left', {
         strokeWidth: 10,
         easing: 'easeInOut',
@@ -76,9 +122,11 @@ function init() {
         duration: SELECTION_TIME,
         color: 'lime',
         trailWidth: 2,
-        svgStyle: null        });
-    //right_bar.animate(1);
+        svgStyle: null
+    });
+}
 
+function create_stereo_scene() {
     //Stereo scene
     renderer = new THREE.WebGLRenderer({ antialias: true });
     element = renderer.domElement;
@@ -94,113 +142,80 @@ function init() {
     scene.add(camera);
 
     controls = new THREE.OrbitControls(camera, element);
-    //controls.rotateUp(Math.PI / 4);
     controls.target.set(
         camera.position.x + 0.1,
         camera.position.y,
         camera.position.z
     );
-    //controls.noZoom = true;
-    //controls.noPan = true;
-
-    function setOrientationControls(e) {
-        if (!e.alpha) {
-            return;
-        }
-
-        controls = require('three.orientation')(THREE, camera);
-        // controls = new THREE.DeviceOrientationControls(camera, true);
-        controls.connect();
-        controls.update();
-
-        element.addEventListener('click', fullscreen, false);
-
-        window.removeEventListener('deviceorientation', setOrientationControls, true);
-    }
-    window.addEventListener('deviceorientation', setOrientationControls, true);
-
 
     // Add lights
-    var ambLight = new THREE.AmbientLight( 0x808080 ); // soft white light
-    scene.add( ambLight );
+    let ambLight = new THREE.AmbientLight( 0x808080 ); // soft white light
 
-    var ptLight = new THREE.PointLight(0xffffff, 1.75, 1000);
+    let ptLight = new THREE.PointLight(0xffffff, 1.75, 1000);
     ptLight.position.set(-100, 100, 100);
+
+    scene.add(ambLight);
     scene.add(ptLight);
-
-    //Add other scene elements
-    // drawSimpleSkybox();
-
-    drawShapes();
-    drawScene('./images/room_1.jpg');
-
-    window.addEventListener('resize', resize, false);
-    setTimeout(resize, 1);
 }
 
-function drawScene(load_image)
-{
-    var geometry = new THREE.SphereGeometry( 500, 60, 40 );
+function drawScene(load_image) {
+    let geometry = new THREE.SphereGeometry( 50, 30, 15 );
     geometry.scale( - 1, 1, 1 );
+    // geometry.userData = {name: 'sphere_scene', touched: false };
 
-    var material = new THREE.MeshBasicMaterial( {
+    let material = new THREE.MeshBasicMaterial( {
         map: new THREE.TextureLoader().load(load_image)
     });
 
     mesh = new THREE.Mesh( geometry, material );
-    scene.add( mesh );
+    mesh.material.side = THREE.DoubleSide;
+
+    selectableObjs.push(mesh);
+    scene.add(mesh);
 }
 
-function resetCamera() {
-    controls.target.set(
-        camera.position.x + 0.1,
-        camera.position.y,
-        camera.position.z
-    );
+function meshloader(fileName, position_x, position_y, position_z, rotation, title){
+    return function(geometry){
+        //Place in scene
+        let color;
+        if (fileName.indexOf("star") !== -1){
+            color = 0xFF6500;
+            geometry.scale.set(50, 50, 50);
+            geometry.position.z = position_z;
+            geometry.position.y = position_y;
+            geometry.position.x = position_x;
+            geometry.rotation.y = rotation;
+            selectableObjs.push(geometry);
+            geometry.userData = {name: title, touched:false};
+            scene.add(geometry);
+        }
+
+        //Apply material
+        geometry.traverse(function (child) {
+            if (child instanceof THREE.Mesh) {
+                let material = new THREE.MeshPhongMaterial(
+                    { color: color,
+                        side: THREE.DoubleSide,
+                        emissive: 0x000000,
+                        envMap: scCube
+                    }
+                );
+                child.material = material;
+            }
+        });
+
+    }
 }
 
 function drawShapes() {
-    var manager = new THREE.LoadingManager();
+    let manager = new THREE.LoadingManager();
     manager.onProgress = function ( item, loaded, total ) {
         console.log( item, loaded, total );
     };
 
-    var objLoader = new THREE.OBJLoader( manager );
-    objLoader.load( "models/star_charm.obj", meshloader("models/star_charm.obj", -35, 5, -15, 0.5, "objStar"));
-    
-    function meshloader(fileName, position_z, position_y, position_x, rotation, title){
-        return function(geometry){
-            //Place in scene
-            var color;
-            if (fileName.indexOf("star") !== -1){
-                color = 0xFF6500;
-                geometry.scale.set(50, 50, 50);
-                geometry.position.z = position_z;
-                geometry.position.y = position_y;
-                geometry.position.x = position_x;
-                geometry.rotation.y = rotation;
-                selectableObjs.push(geometry);
-                geometry.userData = {name: title, touched:false};
-                scene.add(geometry);
-            }
-
-            //Apply material
-            geometry.traverse(function (child) {
-                if (child instanceof THREE.Mesh) {
-                    var material = new THREE.MeshPhongMaterial(
-                        { color: color,
-                            side: THREE.DoubleSide,
-                            emissive: 0x000000,
-                            envMap: scCube
-                        }
-                    );
-                    child.material = material;
-                }
-            });
-
-        }
-    }
-
+    let objLoader = new THREE.OBJLoader(manager);
+    objLoader.load( "models/star_charm.obj", meshloader("models/star_charm.obj", -28, -2.7, -40, 0.5, "objStar"));
+    // objLoader.load( "models/star_charm.obj", meshloader("models/star_charm.obj", -35, 5, -15, 0.5, "objStar"));
 }
 
 //What happens after an object is selected
@@ -224,20 +239,19 @@ function postSelectAction(selectedObjectName){
 }
 
 function getIntersections(objects){
-    var raycaster = new THREE.Raycaster();
+    let raycaster = new THREE.Raycaster();
 
-    var vector = new THREE.Vector3( 0, 0, - 1 );
-    vector.applyQuaternion( camera.quaternion );
+    let vector = new THREE.Vector3( 0, 0, - 1 );
+        vector.applyQuaternion( camera.quaternion );
 
     raycaster.set( camera.position, vector );
 
     return raycaster.intersectObjects( objects, true );
-
 }
 
 function updateHUDTxt(msg){
     x=document.getElementsByClassName("info_text");  // Find the elements
-    for(var i = 0; i < x.length; i++){
+    for(let i = 0; i < x.length; i++){
         x[i].innerText=msg;    // Change the content
     }
 }
@@ -269,8 +283,8 @@ function getTouchMsg(charm){
 }
 
 function resize() {
-    var width = container.offsetWidth;
-    var height = container.offsetHeight;
+    let width = container.offsetWidth;
+    let height = container.offsetHeight;
 
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
@@ -294,15 +308,16 @@ function render(dt) {
     updateHUDTxt(""); //Set HUD txt to blank to start render loop.
 
     intersects = getIntersections(selectableObjs);
+    // console.log(intersects);
 
     if (intersects.length == 0){//nothing being "touched"
         left_bar.set(0.0);//reset any active progress bars to 0
         right_bar.set(0.0);
 
-        //Loop over all OBJ objects (the charms)
+        //Loop over all OBJ objects
         scene.traverse (function (object)
         {
-            //Set all charms touch flag to false as nothing is selected.
+            //Set all touch flag to false as nothing is selected.
             if (object instanceof THREE.Group){
                 if (intersects.length == 0){
                     object.userData.touched = false;
@@ -310,14 +325,37 @@ function render(dt) {
             }
         });
     } else {//something being touched
-        //Set the touched charm's touch flag to true, so we can give it special treatment in the animation function
+        console.log(intersects[0].point);
+        let point_x = intersects[0].point.x;
+        let point_y = intersects[0].point.y
+        let point_z = intersects[0].point.z;
+
+
+        // var material = new THREE.LineBasicMaterial({
+        //     color: 0x0000ff
+        // });
+        //
+        // var geometry = new THREE.Geometry();
+        // geometry.vertices.push(
+        //     new THREE.Vector3( -10, 0, 0 ),
+        //     new THREE.Vector3( -35, 5, -15 ),
+        //     new THREE.Vector3( 10, 0, 0 )
+        // );
+        //
+        // geometry.vertices.push(
+        //     new THREE.Vector3( intersects[0].point.x, intersects[0].point.y, intersects[0].point.z ),
+        // );
+        //
+        // var line = new THREE.Line( geometry, material );
+        // scene.add( line );
+
+        //Set the touched touch flag to true, so we can give it special treatment in the animation function
         intersects[0].object.parent.userData.touched = true;
         msg = getTouchMsg(intersects[0].object.parent.userData.name); //update HUD text to register the touch
         updateHUDTxt(msg);
     }
 
     effect.render(scene, camera);
-
 }
 
 function animate(t) {
@@ -360,14 +398,21 @@ function animate(t) {
     render(clock.getDelta());
 }
 
-function fullscreen(container) {
-    if (container.requestFullscreen) {
-        container.requestFullscreen();
-    } else if (container.msRequestFullscreen) {
-        container.msRequestFullscreen();
-    } else if (container.mozRequestFullScreen) {
-        container.mozRequestFullScreen();
-    } else if (container.webkitRequestFullscreen) {
-        container.webkitRequestFullscreen();
-    }
+
+
+function initialize_vr() {
+    create_guide_circles();
+    create_stereo_scene();
+
+    drawShapes();
+    drawScene('./images/room_1.jpg');
+
+    window.addEventListener('resize', resize, false);
+    setTimeout(resize, 1);
 }
+
+/*******************************************
+ * BUILD THREE.JS SCENE
+ ******************************************/
+initialize_vr();
+animate();

@@ -70,6 +70,3714 @@
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
+
+/**
+ * First we will load all of this project's JavaScript dependencies which
+ * includes Vue and other libraries. It is a great starting point when
+ * building robust, powerful web applications using Vue and Laravel.
+ */
+
+__webpack_require__(2);
+__webpack_require__(5);
+
+/**
+ * Next, we will create a fresh Vue application instance and attach it to
+ * the page. Then, you may begin adding components to this application
+ * or customize the JavaScript scaffolding to fit your unique needs.
+ */
+
+// Vue.component('example', require('./components/Example.vue'));
+//
+// const app = new Vue({
+//     el: '#app'
+// });
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+window._ = __webpack_require__(7);
+
+/**
+ * We'll load jQuery and the Bootstrap jQuery plugin which provides support
+ * for JavaScript based Bootstrap features such as modals and tabs. This
+ * code may be modified to fit the specific needs of your application.
+ */
+
+window.$ = window.jQuery = __webpack_require__(6);
+
+// require('bootstrap-sass');
+
+/**
+ * Vue is a modern JavaScript library for building interactive web interfaces
+ * using reactive data binding and reusable components. Vue's API is clean
+ * and simple, leaving you to focus on building your next great project.
+ */
+
+// window.Vue = require('vue');
+
+/**
+ * We'll load the axios HTTP library which allows us to easily issue requests
+ * to our Laravel back-end. This library automatically handles sending the
+ * CSRF token as a header based on the value of the "XSRF" token cookie.
+ */
+
+// window.axios = require('axios');
+//
+// window.axios.defaults.headers.common = {
+//     'X-CSRF-TOKEN': window.Laravel.csrfToken,
+//     'X-Requested-With': 'XMLHttpRequest'
+// };
+
+/**
+ * Echo exposes an expressive API for subscribing to channels and listening
+ * for events that are broadcast by Laravel. Echo and event broadcasting
+ * allows your team to easily build robust real-time web applications.
+ */
+
+// import Echo from 'laravel-echo'
+
+// window.Pusher = require('pusher-js');
+
+// window.Echo = new Echo({
+//     broadcaster: 'pusher',
+//     key: 'your-pusher-key'
+// });
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(process) {var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+/**
+ * Tween.js - Licensed under the MIT license
+ * https://github.com/tweenjs/tween.js
+ * ----------------------------------------------
+ *
+ * See https://github.com/tweenjs/tween.js/graphs/contributors for the full list of contributors.
+ * Thank you all, you're awesome!
+ */
+
+var TWEEN = TWEEN || function () {
+
+	var _tweens = [];
+
+	return {
+
+		getAll: function getAll() {
+
+			return _tweens;
+		},
+
+		removeAll: function removeAll() {
+
+			_tweens = [];
+		},
+
+		add: function add(tween) {
+
+			_tweens.push(tween);
+		},
+
+		remove: function remove(tween) {
+
+			var i = _tweens.indexOf(tween);
+
+			if (i !== -1) {
+				_tweens.splice(i, 1);
+			}
+		},
+
+		update: function update(time, preserve) {
+
+			if (_tweens.length === 0) {
+				return false;
+			}
+
+			var i = 0;
+
+			time = time !== undefined ? time : TWEEN.now();
+
+			while (i < _tweens.length) {
+
+				if (_tweens[i].update(time) || preserve) {
+					i++;
+				} else {
+					_tweens.splice(i, 1);
+				}
+			}
+
+			return true;
+		}
+	};
+}();
+
+// Include a performance.now polyfill
+(function () {
+	// In node.js, use process.hrtime.
+	if (this.window === undefined && this.process !== undefined) {
+		TWEEN.now = function () {
+			var time = process.hrtime();
+
+			// Convert [seconds, nanoseconds] to milliseconds.
+			return time[0] * 1000 + time[1] / 1000000;
+		};
+	}
+	// In a browser, use window.performance.now if it is available.
+	else if (this.window !== undefined && window.performance !== undefined && window.performance.now !== undefined) {
+
+			// This must be bound, because directly assigning this function
+			// leads to an invocation exception in Chrome.
+			TWEEN.now = window.performance.now.bind(window.performance);
+		}
+		// Use Date.now if it is available.
+		else if (Date.now !== undefined) {
+				TWEEN.now = Date.now;
+			}
+			// Otherwise, use 'new Date().getTime()'.
+			else {
+					TWEEN.now = function () {
+						return new Date().getTime();
+					};
+				}
+}).bind(this)();
+
+TWEEN.Tween = function (object) {
+
+	var _object = object;
+	var _valuesStart = {};
+	var _valuesEnd = {};
+	var _valuesStartRepeat = {};
+	var _duration = 1000;
+	var _repeat = 0;
+	var _repeatDelayTime;
+	var _yoyo = false;
+	var _isPlaying = false;
+	var _reversed = false;
+	var _delayTime = 0;
+	var _startTime = null;
+	var _easingFunction = TWEEN.Easing.Linear.None;
+	var _interpolationFunction = TWEEN.Interpolation.Linear;
+	var _chainedTweens = [];
+	var _onStartCallback = null;
+	var _onStartCallbackFired = false;
+	var _onUpdateCallback = null;
+	var _onCompleteCallback = null;
+	var _onStopCallback = null;
+
+	// Set all starting values present on the target object
+	for (var field in object) {
+		_valuesStart[field] = parseFloat(object[field], 10);
+	}
+
+	this.to = function (properties, duration) {
+
+		if (duration !== undefined) {
+			_duration = duration;
+		}
+
+		_valuesEnd = properties;
+
+		return this;
+	};
+
+	this.start = function (time) {
+
+		TWEEN.add(this);
+
+		_isPlaying = true;
+
+		_onStartCallbackFired = false;
+
+		_startTime = time !== undefined ? time : TWEEN.now();
+		_startTime += _delayTime;
+
+		for (var property in _valuesEnd) {
+
+			// Check if an Array was provided as property value
+			if (_valuesEnd[property] instanceof Array) {
+
+				if (_valuesEnd[property].length === 0) {
+					continue;
+				}
+
+				// Create a local copy of the Array with the start value at the front
+				_valuesEnd[property] = [_object[property]].concat(_valuesEnd[property]);
+			}
+
+			// If `to()` specifies a property that doesn't exist in the source object,
+			// we should not set that property in the object
+			if (_valuesStart[property] === undefined) {
+				continue;
+			}
+
+			_valuesStart[property] = _object[property];
+
+			if (_valuesStart[property] instanceof Array === false) {
+				_valuesStart[property] *= 1.0; // Ensures we're using numbers, not strings
+			}
+
+			_valuesStartRepeat[property] = _valuesStart[property] || 0;
+		}
+
+		return this;
+	};
+
+	this.stop = function () {
+
+		if (!_isPlaying) {
+			return this;
+		}
+
+		TWEEN.remove(this);
+		_isPlaying = false;
+
+		if (_onStopCallback !== null) {
+			_onStopCallback.call(_object);
+		}
+
+		this.stopChainedTweens();
+		return this;
+	};
+
+	this.end = function () {
+
+		this.update(_startTime + _duration);
+		return this;
+	};
+
+	this.stopChainedTweens = function () {
+
+		for (var i = 0, numChainedTweens = _chainedTweens.length; i < numChainedTweens; i++) {
+			_chainedTweens[i].stop();
+		}
+	};
+
+	this.delay = function (amount) {
+
+		_delayTime = amount;
+		return this;
+	};
+
+	this.repeat = function (times) {
+
+		_repeat = times;
+		return this;
+	};
+
+	this.repeatDelay = function (amount) {
+
+		_repeatDelayTime = amount;
+		return this;
+	};
+
+	this.yoyo = function (yoyo) {
+
+		_yoyo = yoyo;
+		return this;
+	};
+
+	this.easing = function (easing) {
+
+		_easingFunction = easing;
+		return this;
+	};
+
+	this.interpolation = function (interpolation) {
+
+		_interpolationFunction = interpolation;
+		return this;
+	};
+
+	this.chain = function () {
+
+		_chainedTweens = arguments;
+		return this;
+	};
+
+	this.onStart = function (callback) {
+
+		_onStartCallback = callback;
+		return this;
+	};
+
+	this.onUpdate = function (callback) {
+
+		_onUpdateCallback = callback;
+		return this;
+	};
+
+	this.onComplete = function (callback) {
+
+		_onCompleteCallback = callback;
+		return this;
+	};
+
+	this.onStop = function (callback) {
+
+		_onStopCallback = callback;
+		return this;
+	};
+
+	this.update = function (time) {
+
+		var property;
+		var elapsed;
+		var value;
+
+		if (time < _startTime) {
+			return true;
+		}
+
+		if (_onStartCallbackFired === false) {
+
+			if (_onStartCallback !== null) {
+				_onStartCallback.call(_object);
+			}
+
+			_onStartCallbackFired = true;
+		}
+
+		elapsed = (time - _startTime) / _duration;
+		elapsed = elapsed > 1 ? 1 : elapsed;
+
+		value = _easingFunction(elapsed);
+
+		for (property in _valuesEnd) {
+
+			// Don't update properties that do not exist in the source object
+			if (_valuesStart[property] === undefined) {
+				continue;
+			}
+
+			var start = _valuesStart[property] || 0;
+			var end = _valuesEnd[property];
+
+			if (end instanceof Array) {
+
+				_object[property] = _interpolationFunction(end, value);
+			} else {
+
+				// Parses relative end values with start as base (e.g.: +10, -3)
+				if (typeof end === 'string') {
+
+					if (end.charAt(0) === '+' || end.charAt(0) === '-') {
+						end = start + parseFloat(end, 10);
+					} else {
+						end = parseFloat(end, 10);
+					}
+				}
+
+				// Protect against non numeric properties.
+				if (typeof end === 'number') {
+					_object[property] = start + (end - start) * value;
+				}
+			}
+		}
+
+		if (_onUpdateCallback !== null) {
+			_onUpdateCallback.call(_object, value);
+		}
+
+		if (elapsed === 1) {
+
+			if (_repeat > 0) {
+
+				if (isFinite(_repeat)) {
+					_repeat--;
+				}
+
+				// Reassign starting values, restart by making startTime = now
+				for (property in _valuesStartRepeat) {
+
+					if (typeof _valuesEnd[property] === 'string') {
+						_valuesStartRepeat[property] = _valuesStartRepeat[property] + parseFloat(_valuesEnd[property], 10);
+					}
+
+					if (_yoyo) {
+						var tmp = _valuesStartRepeat[property];
+
+						_valuesStartRepeat[property] = _valuesEnd[property];
+						_valuesEnd[property] = tmp;
+					}
+
+					_valuesStart[property] = _valuesStartRepeat[property];
+				}
+
+				if (_yoyo) {
+					_reversed = !_reversed;
+				}
+
+				if (_repeatDelayTime !== undefined) {
+					_startTime = time + _repeatDelayTime;
+				} else {
+					_startTime = time + _delayTime;
+				}
+
+				return true;
+			} else {
+
+				if (_onCompleteCallback !== null) {
+					_onCompleteCallback.call(_object);
+				}
+
+				for (var i = 0, numChainedTweens = _chainedTweens.length; i < numChainedTweens; i++) {
+					// Make the chained tweens start exactly at the time they should,
+					// even if the `update()` method was called way past the duration of the tween
+					_chainedTweens[i].start(_startTime + _duration);
+				}
+
+				return false;
+			}
+		}
+
+		return true;
+	};
+};
+
+TWEEN.Easing = {
+
+	Linear: {
+
+		None: function None(k) {
+
+			return k;
+		}
+
+	},
+
+	Quadratic: {
+
+		In: function In(k) {
+
+			return k * k;
+		},
+
+		Out: function Out(k) {
+
+			return k * (2 - k);
+		},
+
+		InOut: function InOut(k) {
+
+			if ((k *= 2) < 1) {
+				return 0.5 * k * k;
+			}
+
+			return -0.5 * (--k * (k - 2) - 1);
+		}
+
+	},
+
+	Cubic: {
+
+		In: function In(k) {
+
+			return k * k * k;
+		},
+
+		Out: function Out(k) {
+
+			return --k * k * k + 1;
+		},
+
+		InOut: function InOut(k) {
+
+			if ((k *= 2) < 1) {
+				return 0.5 * k * k * k;
+			}
+
+			return 0.5 * ((k -= 2) * k * k + 2);
+		}
+
+	},
+
+	Quartic: {
+
+		In: function In(k) {
+
+			return k * k * k * k;
+		},
+
+		Out: function Out(k) {
+
+			return 1 - --k * k * k * k;
+		},
+
+		InOut: function InOut(k) {
+
+			if ((k *= 2) < 1) {
+				return 0.5 * k * k * k * k;
+			}
+
+			return -0.5 * ((k -= 2) * k * k * k - 2);
+		}
+
+	},
+
+	Quintic: {
+
+		In: function In(k) {
+
+			return k * k * k * k * k;
+		},
+
+		Out: function Out(k) {
+
+			return --k * k * k * k * k + 1;
+		},
+
+		InOut: function InOut(k) {
+
+			if ((k *= 2) < 1) {
+				return 0.5 * k * k * k * k * k;
+			}
+
+			return 0.5 * ((k -= 2) * k * k * k * k + 2);
+		}
+
+	},
+
+	Sinusoidal: {
+
+		In: function In(k) {
+
+			return 1 - Math.cos(k * Math.PI / 2);
+		},
+
+		Out: function Out(k) {
+
+			return Math.sin(k * Math.PI / 2);
+		},
+
+		InOut: function InOut(k) {
+
+			return 0.5 * (1 - Math.cos(Math.PI * k));
+		}
+
+	},
+
+	Exponential: {
+
+		In: function In(k) {
+
+			return k === 0 ? 0 : Math.pow(1024, k - 1);
+		},
+
+		Out: function Out(k) {
+
+			return k === 1 ? 1 : 1 - Math.pow(2, -10 * k);
+		},
+
+		InOut: function InOut(k) {
+
+			if (k === 0) {
+				return 0;
+			}
+
+			if (k === 1) {
+				return 1;
+			}
+
+			if ((k *= 2) < 1) {
+				return 0.5 * Math.pow(1024, k - 1);
+			}
+
+			return 0.5 * (-Math.pow(2, -10 * (k - 1)) + 2);
+		}
+
+	},
+
+	Circular: {
+
+		In: function In(k) {
+
+			return 1 - Math.sqrt(1 - k * k);
+		},
+
+		Out: function Out(k) {
+
+			return Math.sqrt(1 - --k * k);
+		},
+
+		InOut: function InOut(k) {
+
+			if ((k *= 2) < 1) {
+				return -0.5 * (Math.sqrt(1 - k * k) - 1);
+			}
+
+			return 0.5 * (Math.sqrt(1 - (k -= 2) * k) + 1);
+		}
+
+	},
+
+	Elastic: {
+
+		In: function In(k) {
+
+			if (k === 0) {
+				return 0;
+			}
+
+			if (k === 1) {
+				return 1;
+			}
+
+			return -Math.pow(2, 10 * (k - 1)) * Math.sin((k - 1.1) * 5 * Math.PI);
+		},
+
+		Out: function Out(k) {
+
+			if (k === 0) {
+				return 0;
+			}
+
+			if (k === 1) {
+				return 1;
+			}
+
+			return Math.pow(2, -10 * k) * Math.sin((k - 0.1) * 5 * Math.PI) + 1;
+		},
+
+		InOut: function InOut(k) {
+
+			if (k === 0) {
+				return 0;
+			}
+
+			if (k === 1) {
+				return 1;
+			}
+
+			k *= 2;
+
+			if (k < 1) {
+				return -0.5 * Math.pow(2, 10 * (k - 1)) * Math.sin((k - 1.1) * 5 * Math.PI);
+			}
+
+			return 0.5 * Math.pow(2, -10 * (k - 1)) * Math.sin((k - 1.1) * 5 * Math.PI) + 1;
+		}
+
+	},
+
+	Back: {
+
+		In: function In(k) {
+
+			var s = 1.70158;
+
+			return k * k * ((s + 1) * k - s);
+		},
+
+		Out: function Out(k) {
+
+			var s = 1.70158;
+
+			return --k * k * ((s + 1) * k + s) + 1;
+		},
+
+		InOut: function InOut(k) {
+
+			var s = 1.70158 * 1.525;
+
+			if ((k *= 2) < 1) {
+				return 0.5 * (k * k * ((s + 1) * k - s));
+			}
+
+			return 0.5 * ((k -= 2) * k * ((s + 1) * k + s) + 2);
+		}
+
+	},
+
+	Bounce: {
+
+		In: function In(k) {
+
+			return 1 - TWEEN.Easing.Bounce.Out(1 - k);
+		},
+
+		Out: function Out(k) {
+
+			if (k < 1 / 2.75) {
+				return 7.5625 * k * k;
+			} else if (k < 2 / 2.75) {
+				return 7.5625 * (k -= 1.5 / 2.75) * k + 0.75;
+			} else if (k < 2.5 / 2.75) {
+				return 7.5625 * (k -= 2.25 / 2.75) * k + 0.9375;
+			} else {
+				return 7.5625 * (k -= 2.625 / 2.75) * k + 0.984375;
+			}
+		},
+
+		InOut: function InOut(k) {
+
+			if (k < 0.5) {
+				return TWEEN.Easing.Bounce.In(k * 2) * 0.5;
+			}
+
+			return TWEEN.Easing.Bounce.Out(k * 2 - 1) * 0.5 + 0.5;
+		}
+
+	}
+
+};
+
+TWEEN.Interpolation = {
+
+	Linear: function Linear(v, k) {
+
+		var m = v.length - 1;
+		var f = m * k;
+		var i = Math.floor(f);
+		var fn = TWEEN.Interpolation.Utils.Linear;
+
+		if (k < 0) {
+			return fn(v[0], v[1], f);
+		}
+
+		if (k > 1) {
+			return fn(v[m], v[m - 1], m - f);
+		}
+
+		return fn(v[i], v[i + 1 > m ? m : i + 1], f - i);
+	},
+
+	Bezier: function Bezier(v, k) {
+
+		var b = 0;
+		var n = v.length - 1;
+		var pw = Math.pow;
+		var bn = TWEEN.Interpolation.Utils.Bernstein;
+
+		for (var i = 0; i <= n; i++) {
+			b += pw(1 - k, n - i) * pw(k, i) * v[i] * bn(n, i);
+		}
+
+		return b;
+	},
+
+	CatmullRom: function CatmullRom(v, k) {
+
+		var m = v.length - 1;
+		var f = m * k;
+		var i = Math.floor(f);
+		var fn = TWEEN.Interpolation.Utils.CatmullRom;
+
+		if (v[0] === v[m]) {
+
+			if (k < 0) {
+				i = Math.floor(f = m * (1 + k));
+			}
+
+			return fn(v[(i - 1 + m) % m], v[i], v[(i + 1) % m], v[(i + 2) % m], f - i);
+		} else {
+
+			if (k < 0) {
+				return v[0] - (fn(v[0], v[0], v[1], v[1], -f) - v[0]);
+			}
+
+			if (k > 1) {
+				return v[m] - (fn(v[m], v[m], v[m - 1], v[m - 1], f - m) - v[m]);
+			}
+
+			return fn(v[i ? i - 1 : 0], v[i], v[m < i + 1 ? m : i + 1], v[m < i + 2 ? m : i + 2], f - i);
+		}
+	},
+
+	Utils: {
+
+		Linear: function Linear(p0, p1, t) {
+
+			return (p1 - p0) * t + p0;
+		},
+
+		Bernstein: function Bernstein(n, i) {
+
+			var fc = TWEEN.Interpolation.Utils.Factorial;
+
+			return fc(n) / fc(i) / fc(n - i);
+		},
+
+		Factorial: function () {
+
+			var a = [1];
+
+			return function (n) {
+
+				var s = 1;
+
+				if (a[n]) {
+					return a[n];
+				}
+
+				for (var i = n; i > 1; i--) {
+					s *= i;
+				}
+
+				a[n] = s;
+				return s;
+			};
+		}(),
+
+		CatmullRom: function CatmullRom(p0, p1, p2, p3, t) {
+
+			var v0 = (p2 - p0) * 0.5;
+			var v1 = (p3 - p1) * 0.5;
+			var t2 = t * t;
+			var t3 = t * t2;
+
+			return (2 * p1 - 2 * p2 + v0 + v1) * t3 + (-3 * p1 + 3 * p2 - 2 * v0 - v1) * t2 + v0 * t + p1;
+		}
+
+	}
+
+};
+
+// UMD (Universal Module Definition)
+(function (root) {
+
+	if (true) {
+
+		// AMD
+		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+			return TWEEN;
+		}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	} else if (typeof module !== 'undefined' && (typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object') {
+
+		// Node.js
+		module.exports = TWEEN;
+	} else if (root !== undefined) {
+
+		// Global variable
+		root.TWEEN = TWEEN;
+	}
+})(this);
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var require;var require;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+// ProgressBar.js 1.0.1
+// https://kimmobrunfeldt.github.io/progressbar.js
+// License: MIT
+
+(function (f) {
+  if (( false ? "undefined" : _typeof(exports)) === "object" && typeof module !== "undefined") {
+    module.exports = f();
+  } else if (true) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_FACTORY__ = (f),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+  } else {
+    var g;if (typeof window !== "undefined") {
+      g = window;
+    } else if (typeof global !== "undefined") {
+      g = global;
+    } else if (typeof self !== "undefined") {
+      g = self;
+    } else {
+      g = this;
+    }g.ProgressBar = f();
+  }
+})(function () {
+  var define, module, exports;return function e(t, n, r) {
+    function s(o, u) {
+      if (!n[o]) {
+        if (!t[o]) {
+          var a = typeof require == "function" && require;if (!u && a) return require(o, !0);if (i) return i(o, !0);var f = new Error("Cannot find module '" + o + "'");throw f.code = "MODULE_NOT_FOUND", f;
+        }var l = n[o] = { exports: {} };t[o][0].call(l.exports, function (e) {
+          var n = t[o][1][e];return s(n ? n : e);
+        }, l, l.exports, e, t, n, r);
+      }return n[o].exports;
+    }var i = typeof require == "function" && require;for (var o = 0; o < r.length; o++) {
+      s(r[o]);
+    }return s;
+  }({ 1: [function (require, module, exports) {
+      /* shifty - v1.5.2 - 2016-02-10 - http://jeremyckahn.github.io/shifty */
+      ;(function () {
+        var root = this || Function('return this')();
+
+        /**
+         * Shifty Core
+         * By Jeremy Kahn - jeremyckahn@gmail.com
+         */
+
+        var Tweenable = function () {
+
+          'use strict';
+
+          // Aliases that get defined later in this function
+
+          var formula;
+
+          // CONSTANTS
+          var DEFAULT_SCHEDULE_FUNCTION;
+          var DEFAULT_EASING = 'linear';
+          var DEFAULT_DURATION = 500;
+          var UPDATE_TIME = 1000 / 60;
+
+          var _now = Date.now ? Date.now : function () {
+            return +new Date();
+          };
+
+          var now = typeof SHIFTY_DEBUG_NOW !== 'undefined' ? SHIFTY_DEBUG_NOW : _now;
+
+          if (typeof window !== 'undefined') {
+            // requestAnimationFrame() shim by Paul Irish (modified for Shifty)
+            // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+            DEFAULT_SCHEDULE_FUNCTION = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || window.mozCancelRequestAnimationFrame && window.mozRequestAnimationFrame || setTimeout;
+          } else {
+            DEFAULT_SCHEDULE_FUNCTION = setTimeout;
+          }
+
+          function noop() {}
+          // NOOP!
+
+
+          /**
+           * Handy shortcut for doing a for-in loop. This is not a "normal" each
+           * function, it is optimized for Shifty.  The iterator function only receives
+           * the property name, not the value.
+           * @param {Object} obj
+           * @param {Function(string)} fn
+           * @private
+           */
+          function each(obj, fn) {
+            var key;
+            for (key in obj) {
+              if (Object.hasOwnProperty.call(obj, key)) {
+                fn(key);
+              }
+            }
+          }
+
+          /**
+           * Perform a shallow copy of Object properties.
+           * @param {Object} targetObject The object to copy into
+           * @param {Object} srcObject The object to copy from
+           * @return {Object} A reference to the augmented `targetObj` Object
+           * @private
+           */
+          function shallowCopy(targetObj, srcObj) {
+            each(srcObj, function (prop) {
+              targetObj[prop] = srcObj[prop];
+            });
+
+            return targetObj;
+          }
+
+          /**
+           * Copies each property from src onto target, but only if the property to
+           * copy to target is undefined.
+           * @param {Object} target Missing properties in this Object are filled in
+           * @param {Object} src
+           * @private
+           */
+          function defaults(target, src) {
+            each(src, function (prop) {
+              if (typeof target[prop] === 'undefined') {
+                target[prop] = src[prop];
+              }
+            });
+          }
+
+          /**
+           * Calculates the interpolated tween values of an Object for a given
+           * timestamp.
+           * @param {Number} forPosition The position to compute the state for.
+           * @param {Object} currentState Current state properties.
+           * @param {Object} originalState: The original state properties the Object is
+           * tweening from.
+           * @param {Object} targetState: The destination state properties the Object
+           * is tweening to.
+           * @param {number} duration: The length of the tween in milliseconds.
+           * @param {number} timestamp: The UNIX epoch time at which the tween began.
+           * @param {Object} easing: This Object's keys must correspond to the keys in
+           * targetState.
+           * @private
+           */
+          function tweenProps(forPosition, currentState, originalState, targetState, duration, timestamp, easing) {
+            var normalizedPosition = forPosition < timestamp ? 0 : (forPosition - timestamp) / duration;
+
+            var prop;
+            var easingObjectProp;
+            var easingFn;
+            for (prop in currentState) {
+              if (currentState.hasOwnProperty(prop)) {
+                easingObjectProp = easing[prop];
+                easingFn = typeof easingObjectProp === 'function' ? easingObjectProp : formula[easingObjectProp];
+
+                currentState[prop] = tweenProp(originalState[prop], targetState[prop], easingFn, normalizedPosition);
+              }
+            }
+
+            return currentState;
+          }
+
+          /**
+           * Tweens a single property.
+           * @param {number} start The value that the tween started from.
+           * @param {number} end The value that the tween should end at.
+           * @param {Function} easingFunc The easing curve to apply to the tween.
+           * @param {number} position The normalized position (between 0.0 and 1.0) to
+           * calculate the midpoint of 'start' and 'end' against.
+           * @return {number} The tweened value.
+           * @private
+           */
+          function tweenProp(start, end, easingFunc, position) {
+            return start + (end - start) * easingFunc(position);
+          }
+
+          /**
+           * Applies a filter to Tweenable instance.
+           * @param {Tweenable} tweenable The `Tweenable` instance to call the filter
+           * upon.
+           * @param {String} filterName The name of the filter to apply.
+           * @private
+           */
+          function applyFilter(tweenable, filterName) {
+            var filters = Tweenable.prototype.filter;
+            var args = tweenable._filterArgs;
+
+            each(filters, function (name) {
+              if (typeof filters[name][filterName] !== 'undefined') {
+                filters[name][filterName].apply(tweenable, args);
+              }
+            });
+          }
+
+          var timeoutHandler_endTime;
+          var timeoutHandler_currentTime;
+          var timeoutHandler_isEnded;
+          var timeoutHandler_offset;
+          /**
+           * Handles the update logic for one step of a tween.
+           * @param {Tweenable} tweenable
+           * @param {number} timestamp
+           * @param {number} delay
+           * @param {number} duration
+           * @param {Object} currentState
+           * @param {Object} originalState
+           * @param {Object} targetState
+           * @param {Object} easing
+           * @param {Function(Object, *, number)} step
+           * @param {Function(Function,number)}} schedule
+           * @param {number=} opt_currentTimeOverride Needed for accurate timestamp in
+           * Tweenable#seek.
+           * @private
+           */
+          function timeoutHandler(tweenable, timestamp, delay, duration, currentState, originalState, targetState, easing, step, schedule, opt_currentTimeOverride) {
+
+            timeoutHandler_endTime = timestamp + delay + duration;
+
+            timeoutHandler_currentTime = Math.min(opt_currentTimeOverride || now(), timeoutHandler_endTime);
+
+            timeoutHandler_isEnded = timeoutHandler_currentTime >= timeoutHandler_endTime;
+
+            timeoutHandler_offset = duration - (timeoutHandler_endTime - timeoutHandler_currentTime);
+
+            if (tweenable.isPlaying()) {
+              if (timeoutHandler_isEnded) {
+                step(targetState, tweenable._attachment, timeoutHandler_offset);
+                tweenable.stop(true);
+              } else {
+                tweenable._scheduleId = schedule(tweenable._timeoutHandler, UPDATE_TIME);
+
+                applyFilter(tweenable, 'beforeTween');
+
+                // If the animation has not yet reached the start point (e.g., there was
+                // delay that has not yet completed), just interpolate the starting
+                // position of the tween.
+                if (timeoutHandler_currentTime < timestamp + delay) {
+                  tweenProps(1, currentState, originalState, targetState, 1, 1, easing);
+                } else {
+                  tweenProps(timeoutHandler_currentTime, currentState, originalState, targetState, duration, timestamp + delay, easing);
+                }
+
+                applyFilter(tweenable, 'afterTween');
+
+                step(currentState, tweenable._attachment, timeoutHandler_offset);
+              }
+            }
+          }
+
+          /**
+           * Creates a usable easing Object from a string, a function or another easing
+           * Object.  If `easing` is an Object, then this function clones it and fills
+           * in the missing properties with `"linear"`.
+           * @param {Object.<string|Function>} fromTweenParams
+           * @param {Object|string|Function} easing
+           * @return {Object.<string|Function>}
+           * @private
+           */
+          function composeEasingObject(fromTweenParams, easing) {
+            var composedEasing = {};
+            var typeofEasing = typeof easing === "undefined" ? "undefined" : _typeof(easing);
+
+            if (typeofEasing === 'string' || typeofEasing === 'function') {
+              each(fromTweenParams, function (prop) {
+                composedEasing[prop] = easing;
+              });
+            } else {
+              each(fromTweenParams, function (prop) {
+                if (!composedEasing[prop]) {
+                  composedEasing[prop] = easing[prop] || DEFAULT_EASING;
+                }
+              });
+            }
+
+            return composedEasing;
+          }
+
+          /**
+           * Tweenable constructor.
+           * @class Tweenable
+           * @param {Object=} opt_initialState The values that the initial tween should
+           * start at if a `from` object is not provided to `{{#crossLink
+           * "Tweenable/tween:method"}}{{/crossLink}}` or `{{#crossLink
+           * "Tweenable/setConfig:method"}}{{/crossLink}}`.
+           * @param {Object=} opt_config Configuration object to be passed to
+           * `{{#crossLink "Tweenable/setConfig:method"}}{{/crossLink}}`.
+           * @module Tweenable
+           * @constructor
+           */
+          function Tweenable(opt_initialState, opt_config) {
+            this._currentState = opt_initialState || {};
+            this._configured = false;
+            this._scheduleFunction = DEFAULT_SCHEDULE_FUNCTION;
+
+            // To prevent unnecessary calls to setConfig do not set default
+            // configuration here.  Only set default configuration immediately before
+            // tweening if none has been set.
+            if (typeof opt_config !== 'undefined') {
+              this.setConfig(opt_config);
+            }
+          }
+
+          /**
+           * Configure and start a tween.
+           * @method tween
+           * @param {Object=} opt_config Configuration object to be passed to
+           * `{{#crossLink "Tweenable/setConfig:method"}}{{/crossLink}}`.
+           * @chainable
+           */
+          Tweenable.prototype.tween = function (opt_config) {
+            if (this._isTweening) {
+              return this;
+            }
+
+            // Only set default config if no configuration has been set previously and
+            // none is provided now.
+            if (opt_config !== undefined || !this._configured) {
+              this.setConfig(opt_config);
+            }
+
+            this._timestamp = now();
+            this._start(this.get(), this._attachment);
+            return this.resume();
+          };
+
+          /**
+           * Configure a tween that will start at some point in the future.
+           *
+           * @method setConfig
+           * @param {Object} config The following values are valid:
+           * - __from__ (_Object=_): Starting position.  If omitted, `{{#crossLink
+           *   "Tweenable/get:method"}}get(){{/crossLink}}` is used.
+           * - __to__ (_Object=_): Ending position.
+           * - __duration__ (_number=_): How many milliseconds to animate for.
+           * - __delay__ (_delay=_): How many milliseconds to wait before starting the
+           *   tween.
+           * - __start__ (_Function(Object, *)_): Function to execute when the tween
+           *   begins.  Receives the state of the tween as the first parameter and
+           *   `attachment` as the second parameter.
+           * - __step__ (_Function(Object, *, number)_): Function to execute on every
+           *   tick.  Receives `{{#crossLink
+           *   "Tweenable/get:method"}}get(){{/crossLink}}` as the first parameter,
+           *   `attachment` as the second parameter, and the time elapsed since the
+           *   start of the tween as the third. This function is not called on the
+           *   final step of the animation, but `finish` is.
+           * - __finish__ (_Function(Object, *)_): Function to execute upon tween
+           *   completion.  Receives the state of the tween as the first parameter and
+           *   `attachment` as the second parameter.
+           * - __easing__ (_Object.<string|Function>|string|Function=_): Easing curve
+           *   name(s) or function(s) to use for the tween.
+           * - __attachment__ (_*_): Cached value that is passed to the
+           *   `step`/`start`/`finish` methods.
+           * @chainable
+           */
+          Tweenable.prototype.setConfig = function (config) {
+            config = config || {};
+            this._configured = true;
+
+            // Attach something to this Tweenable instance (e.g.: a DOM element, an
+            // object, a string, etc.);
+            this._attachment = config.attachment;
+
+            // Init the internal state
+            this._pausedAtTime = null;
+            this._scheduleId = null;
+            this._delay = config.delay || 0;
+            this._start = config.start || noop;
+            this._step = config.step || noop;
+            this._finish = config.finish || noop;
+            this._duration = config.duration || DEFAULT_DURATION;
+            this._currentState = shallowCopy({}, config.from) || this.get();
+            this._originalState = this.get();
+            this._targetState = shallowCopy({}, config.to) || this.get();
+
+            var self = this;
+            this._timeoutHandler = function () {
+              timeoutHandler(self, self._timestamp, self._delay, self._duration, self._currentState, self._originalState, self._targetState, self._easing, self._step, self._scheduleFunction);
+            };
+
+            // Aliases used below
+            var currentState = this._currentState;
+            var targetState = this._targetState;
+
+            // Ensure that there is always something to tween to.
+            defaults(targetState, currentState);
+
+            this._easing = composeEasingObject(currentState, config.easing || DEFAULT_EASING);
+
+            this._filterArgs = [currentState, this._originalState, targetState, this._easing];
+
+            applyFilter(this, 'tweenCreated');
+            return this;
+          };
+
+          /**
+           * @method get
+           * @return {Object} The current state.
+           */
+          Tweenable.prototype.get = function () {
+            return shallowCopy({}, this._currentState);
+          };
+
+          /**
+           * @method set
+           * @param {Object} state The current state.
+           */
+          Tweenable.prototype.set = function (state) {
+            this._currentState = state;
+          };
+
+          /**
+           * Pause a tween.  Paused tweens can be resumed from the point at which they
+           * were paused.  This is different from `{{#crossLink
+           * "Tweenable/stop:method"}}{{/crossLink}}`, as that method
+           * causes a tween to start over when it is resumed.
+           * @method pause
+           * @chainable
+           */
+          Tweenable.prototype.pause = function () {
+            this._pausedAtTime = now();
+            this._isPaused = true;
+            return this;
+          };
+
+          /**
+           * Resume a paused tween.
+           * @method resume
+           * @chainable
+           */
+          Tweenable.prototype.resume = function () {
+            if (this._isPaused) {
+              this._timestamp += now() - this._pausedAtTime;
+            }
+
+            this._isPaused = false;
+            this._isTweening = true;
+
+            this._timeoutHandler();
+
+            return this;
+          };
+
+          /**
+           * Move the state of the animation to a specific point in the tween's
+           * timeline.  If the animation is not running, this will cause the `step`
+           * handlers to be called.
+           * @method seek
+           * @param {millisecond} millisecond The millisecond of the animation to seek
+           * to.  This must not be less than `0`.
+           * @chainable
+           */
+          Tweenable.prototype.seek = function (millisecond) {
+            millisecond = Math.max(millisecond, 0);
+            var currentTime = now();
+
+            if (this._timestamp + millisecond === 0) {
+              return this;
+            }
+
+            this._timestamp = currentTime - millisecond;
+
+            if (!this.isPlaying()) {
+              this._isTweening = true;
+              this._isPaused = false;
+
+              // If the animation is not running, call timeoutHandler to make sure that
+              // any step handlers are run.
+              timeoutHandler(this, this._timestamp, this._delay, this._duration, this._currentState, this._originalState, this._targetState, this._easing, this._step, this._scheduleFunction, currentTime);
+
+              this.pause();
+            }
+
+            return this;
+          };
+
+          /**
+           * Stops and cancels a tween.
+           * @param {boolean=} gotoEnd If `false` or omitted, the tween just stops at
+           * its current state, and the `finish` handler is not invoked.  If `true`,
+           * the tweened object's values are instantly set to the target values, and
+           * `finish` is invoked.
+           * @method stop
+           * @chainable
+           */
+          Tweenable.prototype.stop = function (gotoEnd) {
+            this._isTweening = false;
+            this._isPaused = false;
+            this._timeoutHandler = noop;
+
+            (root.cancelAnimationFrame || root.webkitCancelAnimationFrame || root.oCancelAnimationFrame || root.msCancelAnimationFrame || root.mozCancelRequestAnimationFrame || root.clearTimeout)(this._scheduleId);
+
+            if (gotoEnd) {
+              applyFilter(this, 'beforeTween');
+              tweenProps(1, this._currentState, this._originalState, this._targetState, 1, 0, this._easing);
+              applyFilter(this, 'afterTween');
+              applyFilter(this, 'afterTweenEnd');
+              this._finish.call(this, this._currentState, this._attachment);
+            }
+
+            return this;
+          };
+
+          /**
+           * @method isPlaying
+           * @return {boolean} Whether or not a tween is running.
+           */
+          Tweenable.prototype.isPlaying = function () {
+            return this._isTweening && !this._isPaused;
+          };
+
+          /**
+           * Set a custom schedule function.
+           *
+           * If a custom function is not set,
+           * [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window.requestAnimationFrame)
+           * is used if available, otherwise
+           * [`setTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/Window.setTimeout)
+           * is used.
+           * @method setScheduleFunction
+           * @param {Function(Function,number)} scheduleFunction The function to be
+           * used to schedule the next frame to be rendered.
+           */
+          Tweenable.prototype.setScheduleFunction = function (scheduleFunction) {
+            this._scheduleFunction = scheduleFunction;
+          };
+
+          /**
+           * `delete` all "own" properties.  Call this when the `Tweenable` instance
+           * is no longer needed to free memory.
+           * @method dispose
+           */
+          Tweenable.prototype.dispose = function () {
+            var prop;
+            for (prop in this) {
+              if (this.hasOwnProperty(prop)) {
+                delete this[prop];
+              }
+            }
+          };
+
+          /**
+           * Filters are used for transforming the properties of a tween at various
+           * points in a Tweenable's life cycle.  See the README for more info on this.
+           * @private
+           */
+          Tweenable.prototype.filter = {};
+
+          /**
+           * This object contains all of the tweens available to Shifty.  It is
+           * extensible - simply attach properties to the `Tweenable.prototype.formula`
+           * Object following the same format as `linear`.
+           *
+           * `pos` should be a normalized `number` (between 0 and 1).
+           * @property formula
+           * @type {Object(function)}
+           */
+          Tweenable.prototype.formula = {
+            linear: function linear(pos) {
+              return pos;
+            }
+          };
+
+          formula = Tweenable.prototype.formula;
+
+          shallowCopy(Tweenable, {
+            'now': now,
+            'each': each,
+            'tweenProps': tweenProps,
+            'tweenProp': tweenProp,
+            'applyFilter': applyFilter,
+            'shallowCopy': shallowCopy,
+            'defaults': defaults,
+            'composeEasingObject': composeEasingObject
+          });
+
+          // `root` is provided in the intro/outro files.
+
+          // A hook used for unit testing.
+          if (typeof SHIFTY_DEBUG_NOW === 'function') {
+            root.timeoutHandler = timeoutHandler;
+          }
+
+          // Bootstrap Tweenable appropriately for the environment.
+          if ((typeof exports === "undefined" ? "undefined" : _typeof(exports)) === 'object') {
+            // CommonJS
+            module.exports = Tweenable;
+          } else if (typeof define === 'function' && define.amd) {
+            // AMD
+            define(function () {
+              return Tweenable;
+            });
+          } else if (typeof root.Tweenable === 'undefined') {
+            // Browser: Make `Tweenable` globally accessible.
+            root.Tweenable = Tweenable;
+          }
+
+          return Tweenable;
+        }();
+
+        /*!
+         * All equations are adapted from Thomas Fuchs'
+         * [Scripty2](https://github.com/madrobby/scripty2/blob/master/src/effects/transitions/penner.js).
+         *
+         * Based on Easing Equations (c) 2003 [Robert
+         * Penner](http://www.robertpenner.com/), all rights reserved. This work is
+         * [subject to terms](http://www.robertpenner.com/easing_terms_of_use.html).
+         */
+
+        /*!
+         *  TERMS OF USE - EASING EQUATIONS
+         *  Open source under the BSD License.
+         *  Easing Equations (c) 2003 Robert Penner, all rights reserved.
+         */
+
+        ;(function () {
+
+          Tweenable.shallowCopy(Tweenable.prototype.formula, {
+            easeInQuad: function easeInQuad(pos) {
+              return Math.pow(pos, 2);
+            },
+
+            easeOutQuad: function easeOutQuad(pos) {
+              return -(Math.pow(pos - 1, 2) - 1);
+            },
+
+            easeInOutQuad: function easeInOutQuad(pos) {
+              if ((pos /= 0.5) < 1) {
+                return 0.5 * Math.pow(pos, 2);
+              }
+              return -0.5 * ((pos -= 2) * pos - 2);
+            },
+
+            easeInCubic: function easeInCubic(pos) {
+              return Math.pow(pos, 3);
+            },
+
+            easeOutCubic: function easeOutCubic(pos) {
+              return Math.pow(pos - 1, 3) + 1;
+            },
+
+            easeInOutCubic: function easeInOutCubic(pos) {
+              if ((pos /= 0.5) < 1) {
+                return 0.5 * Math.pow(pos, 3);
+              }
+              return 0.5 * (Math.pow(pos - 2, 3) + 2);
+            },
+
+            easeInQuart: function easeInQuart(pos) {
+              return Math.pow(pos, 4);
+            },
+
+            easeOutQuart: function easeOutQuart(pos) {
+              return -(Math.pow(pos - 1, 4) - 1);
+            },
+
+            easeInOutQuart: function easeInOutQuart(pos) {
+              if ((pos /= 0.5) < 1) {
+                return 0.5 * Math.pow(pos, 4);
+              }
+              return -0.5 * ((pos -= 2) * Math.pow(pos, 3) - 2);
+            },
+
+            easeInQuint: function easeInQuint(pos) {
+              return Math.pow(pos, 5);
+            },
+
+            easeOutQuint: function easeOutQuint(pos) {
+              return Math.pow(pos - 1, 5) + 1;
+            },
+
+            easeInOutQuint: function easeInOutQuint(pos) {
+              if ((pos /= 0.5) < 1) {
+                return 0.5 * Math.pow(pos, 5);
+              }
+              return 0.5 * (Math.pow(pos - 2, 5) + 2);
+            },
+
+            easeInSine: function easeInSine(pos) {
+              return -Math.cos(pos * (Math.PI / 2)) + 1;
+            },
+
+            easeOutSine: function easeOutSine(pos) {
+              return Math.sin(pos * (Math.PI / 2));
+            },
+
+            easeInOutSine: function easeInOutSine(pos) {
+              return -0.5 * (Math.cos(Math.PI * pos) - 1);
+            },
+
+            easeInExpo: function easeInExpo(pos) {
+              return pos === 0 ? 0 : Math.pow(2, 10 * (pos - 1));
+            },
+
+            easeOutExpo: function easeOutExpo(pos) {
+              return pos === 1 ? 1 : -Math.pow(2, -10 * pos) + 1;
+            },
+
+            easeInOutExpo: function easeInOutExpo(pos) {
+              if (pos === 0) {
+                return 0;
+              }
+              if (pos === 1) {
+                return 1;
+              }
+              if ((pos /= 0.5) < 1) {
+                return 0.5 * Math.pow(2, 10 * (pos - 1));
+              }
+              return 0.5 * (-Math.pow(2, -10 * --pos) + 2);
+            },
+
+            easeInCirc: function easeInCirc(pos) {
+              return -(Math.sqrt(1 - pos * pos) - 1);
+            },
+
+            easeOutCirc: function easeOutCirc(pos) {
+              return Math.sqrt(1 - Math.pow(pos - 1, 2));
+            },
+
+            easeInOutCirc: function easeInOutCirc(pos) {
+              if ((pos /= 0.5) < 1) {
+                return -0.5 * (Math.sqrt(1 - pos * pos) - 1);
+              }
+              return 0.5 * (Math.sqrt(1 - (pos -= 2) * pos) + 1);
+            },
+
+            easeOutBounce: function easeOutBounce(pos) {
+              if (pos < 1 / 2.75) {
+                return 7.5625 * pos * pos;
+              } else if (pos < 2 / 2.75) {
+                return 7.5625 * (pos -= 1.5 / 2.75) * pos + 0.75;
+              } else if (pos < 2.5 / 2.75) {
+                return 7.5625 * (pos -= 2.25 / 2.75) * pos + 0.9375;
+              } else {
+                return 7.5625 * (pos -= 2.625 / 2.75) * pos + 0.984375;
+              }
+            },
+
+            easeInBack: function easeInBack(pos) {
+              var s = 1.70158;
+              return pos * pos * ((s + 1) * pos - s);
+            },
+
+            easeOutBack: function easeOutBack(pos) {
+              var s = 1.70158;
+              return (pos = pos - 1) * pos * ((s + 1) * pos + s) + 1;
+            },
+
+            easeInOutBack: function easeInOutBack(pos) {
+              var s = 1.70158;
+              if ((pos /= 0.5) < 1) {
+                return 0.5 * (pos * pos * (((s *= 1.525) + 1) * pos - s));
+              }
+              return 0.5 * ((pos -= 2) * pos * (((s *= 1.525) + 1) * pos + s) + 2);
+            },
+
+            elastic: function elastic(pos) {
+              // jshint maxlen:90
+              return -1 * Math.pow(4, -8 * pos) * Math.sin((pos * 6 - 1) * (2 * Math.PI) / 2) + 1;
+            },
+
+            swingFromTo: function swingFromTo(pos) {
+              var s = 1.70158;
+              return (pos /= 0.5) < 1 ? 0.5 * (pos * pos * (((s *= 1.525) + 1) * pos - s)) : 0.5 * ((pos -= 2) * pos * (((s *= 1.525) + 1) * pos + s) + 2);
+            },
+
+            swingFrom: function swingFrom(pos) {
+              var s = 1.70158;
+              return pos * pos * ((s + 1) * pos - s);
+            },
+
+            swingTo: function swingTo(pos) {
+              var s = 1.70158;
+              return (pos -= 1) * pos * ((s + 1) * pos + s) + 1;
+            },
+
+            bounce: function bounce(pos) {
+              if (pos < 1 / 2.75) {
+                return 7.5625 * pos * pos;
+              } else if (pos < 2 / 2.75) {
+                return 7.5625 * (pos -= 1.5 / 2.75) * pos + 0.75;
+              } else if (pos < 2.5 / 2.75) {
+                return 7.5625 * (pos -= 2.25 / 2.75) * pos + 0.9375;
+              } else {
+                return 7.5625 * (pos -= 2.625 / 2.75) * pos + 0.984375;
+              }
+            },
+
+            bouncePast: function bouncePast(pos) {
+              if (pos < 1 / 2.75) {
+                return 7.5625 * pos * pos;
+              } else if (pos < 2 / 2.75) {
+                return 2 - (7.5625 * (pos -= 1.5 / 2.75) * pos + 0.75);
+              } else if (pos < 2.5 / 2.75) {
+                return 2 - (7.5625 * (pos -= 2.25 / 2.75) * pos + 0.9375);
+              } else {
+                return 2 - (7.5625 * (pos -= 2.625 / 2.75) * pos + 0.984375);
+              }
+            },
+
+            easeFromTo: function easeFromTo(pos) {
+              if ((pos /= 0.5) < 1) {
+                return 0.5 * Math.pow(pos, 4);
+              }
+              return -0.5 * ((pos -= 2) * Math.pow(pos, 3) - 2);
+            },
+
+            easeFrom: function easeFrom(pos) {
+              return Math.pow(pos, 4);
+            },
+
+            easeTo: function easeTo(pos) {
+              return Math.pow(pos, 0.25);
+            }
+          });
+        })();
+
+        // jshint maxlen:100
+        /**
+         * The Bezier magic in this file is adapted/copied almost wholesale from
+         * [Scripty2](https://github.com/madrobby/scripty2/blob/master/src/effects/transitions/cubic-bezier.js),
+         * which was adapted from Apple code (which probably came from
+         * [here](http://opensource.apple.com/source/WebCore/WebCore-955.66/platform/graphics/UnitBezier.h)).
+         * Special thanks to Apple and Thomas Fuchs for much of this code.
+         */
+
+        /**
+         *  Copyright (c) 2006 Apple Computer, Inc. All rights reserved.
+         *
+         *  Redistribution and use in source and binary forms, with or without
+         *  modification, are permitted provided that the following conditions are met:
+         *
+         *  1. Redistributions of source code must retain the above copyright notice,
+         *  this list of conditions and the following disclaimer.
+         *
+         *  2. Redistributions in binary form must reproduce the above copyright notice,
+         *  this list of conditions and the following disclaimer in the documentation
+         *  and/or other materials provided with the distribution.
+         *
+         *  3. Neither the name of the copyright holder(s) nor the names of any
+         *  contributors may be used to endorse or promote products derived from
+         *  this software without specific prior written permission.
+         *
+         *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+         *  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+         *  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+         *  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+         *  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+         *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+         *  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+         *  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+         *  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+         *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+         *  POSSIBILITY OF SUCH DAMAGE.
+         */
+        ;(function () {
+          // port of webkit cubic bezier handling by http://www.netzgesta.de/dev/
+          function cubicBezierAtTime(t, p1x, p1y, p2x, p2y, duration) {
+            var ax = 0,
+                bx = 0,
+                cx = 0,
+                ay = 0,
+                by = 0,
+                cy = 0;
+            function sampleCurveX(t) {
+              return ((ax * t + bx) * t + cx) * t;
+            }
+            function sampleCurveY(t) {
+              return ((ay * t + by) * t + cy) * t;
+            }
+            function sampleCurveDerivativeX(t) {
+              return (3.0 * ax * t + 2.0 * bx) * t + cx;
+            }
+            function solveEpsilon(duration) {
+              return 1.0 / (200.0 * duration);
+            }
+            function solve(x, epsilon) {
+              return sampleCurveY(solveCurveX(x, epsilon));
+            }
+            function fabs(n) {
+              if (n >= 0) {
+                return n;
+              } else {
+                return 0 - n;
+              }
+            }
+            function solveCurveX(x, epsilon) {
+              var t0, t1, t2, x2, d2, i;
+              for (t2 = x, i = 0; i < 8; i++) {
+                x2 = sampleCurveX(t2) - x;
+                if (fabs(x2) < epsilon) {
+                  return t2;
+                }
+                d2 = sampleCurveDerivativeX(t2);
+                if (fabs(d2) < 1e-6) {
+                  break;
+                }
+                t2 = t2 - x2 / d2;
+              }
+              t0 = 0.0;
+              t1 = 1.0;
+              t2 = x;
+              if (t2 < t0) {
+                return t0;
+              }
+              if (t2 > t1) {
+                return t1;
+              }
+              while (t0 < t1) {
+                x2 = sampleCurveX(t2);
+                if (fabs(x2 - x) < epsilon) {
+                  return t2;
+                }
+                if (x > x2) {
+                  t0 = t2;
+                } else {
+                  t1 = t2;
+                }
+                t2 = (t1 - t0) * 0.5 + t0;
+              }
+              return t2; // Failure.
+            }
+            cx = 3.0 * p1x;
+            bx = 3.0 * (p2x - p1x) - cx;
+            ax = 1.0 - cx - bx;
+            cy = 3.0 * p1y;
+            by = 3.0 * (p2y - p1y) - cy;
+            ay = 1.0 - cy - by;
+            return solve(t, solveEpsilon(duration));
+          }
+          /**
+           *  getCubicBezierTransition(x1, y1, x2, y2) -> Function
+           *
+           *  Generates a transition easing function that is compatible
+           *  with WebKit's CSS transitions `-webkit-transition-timing-function`
+           *  CSS property.
+           *
+           *  The W3C has more information about CSS3 transition timing functions:
+           *  http://www.w3.org/TR/css3-transitions/#transition-timing-function_tag
+           *
+           *  @param {number} x1
+           *  @param {number} y1
+           *  @param {number} x2
+           *  @param {number} y2
+           *  @return {function}
+           *  @private
+           */
+          function getCubicBezierTransition(x1, y1, x2, y2) {
+            return function (pos) {
+              return cubicBezierAtTime(pos, x1, y1, x2, y2, 1);
+            };
+          }
+          // End ported code
+
+          /**
+           * Create a Bezier easing function and attach it to `{{#crossLink
+           * "Tweenable/formula:property"}}Tweenable#formula{{/crossLink}}`.  This
+           * function gives you total control over the easing curve.  Matthew Lein's
+           * [Ceaser](http://matthewlein.com/ceaser/) is a useful tool for visualizing
+           * the curves you can make with this function.
+           * @method setBezierFunction
+           * @param {string} name The name of the easing curve.  Overwrites the old
+           * easing function on `{{#crossLink
+           * "Tweenable/formula:property"}}Tweenable#formula{{/crossLink}}` if it
+           * exists.
+           * @param {number} x1
+           * @param {number} y1
+           * @param {number} x2
+           * @param {number} y2
+           * @return {function} The easing function that was attached to
+           * Tweenable.prototype.formula.
+           */
+          Tweenable.setBezierFunction = function (name, x1, y1, x2, y2) {
+            var cubicBezierTransition = getCubicBezierTransition(x1, y1, x2, y2);
+            cubicBezierTransition.displayName = name;
+            cubicBezierTransition.x1 = x1;
+            cubicBezierTransition.y1 = y1;
+            cubicBezierTransition.x2 = x2;
+            cubicBezierTransition.y2 = y2;
+
+            return Tweenable.prototype.formula[name] = cubicBezierTransition;
+          };
+
+          /**
+           * `delete` an easing function from `{{#crossLink
+           * "Tweenable/formula:property"}}Tweenable#formula{{/crossLink}}`.  Be
+           * careful with this method, as it `delete`s whatever easing formula matches
+           * `name` (which means you can delete standard Shifty easing functions).
+           * @method unsetBezierFunction
+           * @param {string} name The name of the easing function to delete.
+           * @return {function}
+           */
+          Tweenable.unsetBezierFunction = function (name) {
+            delete Tweenable.prototype.formula[name];
+          };
+        })();
+
+        ;(function () {
+
+          function getInterpolatedValues(from, current, targetState, position, easing, delay) {
+            return Tweenable.tweenProps(position, current, from, targetState, 1, delay, easing);
+          }
+
+          // Fake a Tweenable and patch some internals.  This approach allows us to
+          // skip uneccessary processing and object recreation, cutting down on garbage
+          // collection pauses.
+          var mockTweenable = new Tweenable();
+          mockTweenable._filterArgs = [];
+
+          /**
+           * Compute the midpoint of two Objects.  This method effectively calculates a
+           * specific frame of animation that `{{#crossLink
+           * "Tweenable/tween:method"}}{{/crossLink}}` does many times over the course
+           * of a full tween.
+           *
+           *     var interpolatedValues = Tweenable.interpolate({
+           *       width: '100px',
+           *       opacity: 0,
+           *       color: '#fff'
+           *     }, {
+           *       width: '200px',
+           *       opacity: 1,
+           *       color: '#000'
+           *     }, 0.5);
+           *
+           *     console.log(interpolatedValues);
+           *     // {opacity: 0.5, width: "150px", color: "rgb(127,127,127)"}
+           *
+           * @static
+           * @method interpolate
+           * @param {Object} from The starting values to tween from.
+           * @param {Object} targetState The ending values to tween to.
+           * @param {number} position The normalized position value (between `0.0` and
+           * `1.0`) to interpolate the values between `from` and `to` for.  `from`
+           * represents `0` and `to` represents `1`.
+           * @param {Object.<string|Function>|string|Function} easing The easing
+           * curve(s) to calculate the midpoint against.  You can reference any easing
+           * function attached to `Tweenable.prototype.formula`, or provide the easing
+           * function(s) directly.  If omitted, this defaults to "linear".
+           * @param {number=} opt_delay Optional delay to pad the beginning of the
+           * interpolated tween with.  This increases the range of `position` from (`0`
+           * through `1`) to (`0` through `1 + opt_delay`).  So, a delay of `0.5` would
+           * increase all valid values of `position` to numbers between `0` and `1.5`.
+           * @return {Object}
+           */
+          Tweenable.interpolate = function (from, targetState, position, easing, opt_delay) {
+
+            var current = Tweenable.shallowCopy({}, from);
+            var delay = opt_delay || 0;
+            var easingObject = Tweenable.composeEasingObject(from, easing || 'linear');
+
+            mockTweenable.set({});
+
+            // Alias and reuse the _filterArgs array instead of recreating it.
+            var filterArgs = mockTweenable._filterArgs;
+            filterArgs.length = 0;
+            filterArgs[0] = current;
+            filterArgs[1] = from;
+            filterArgs[2] = targetState;
+            filterArgs[3] = easingObject;
+
+            // Any defined value transformation must be applied
+            Tweenable.applyFilter(mockTweenable, 'tweenCreated');
+            Tweenable.applyFilter(mockTweenable, 'beforeTween');
+
+            var interpolatedValues = getInterpolatedValues(from, current, targetState, position, easingObject, delay);
+
+            // Transform values back into their original format
+            Tweenable.applyFilter(mockTweenable, 'afterTween');
+
+            return interpolatedValues;
+          };
+        })();
+
+        /**
+         * This module adds string interpolation support to Shifty.
+         *
+         * The Token extension allows Shifty to tween numbers inside of strings.  Among
+         * other things, this allows you to animate CSS properties.  For example, you
+         * can do this:
+         *
+         *     var tweenable = new Tweenable();
+         *     tweenable.tween({
+         *       from: { transform: 'translateX(45px)' },
+         *       to: { transform: 'translateX(90xp)' }
+         *     });
+         *
+         * `translateX(45)` will be tweened to `translateX(90)`.  To demonstrate:
+         *
+         *     var tweenable = new Tweenable();
+         *     tweenable.tween({
+         *       from: { transform: 'translateX(45px)' },
+         *       to: { transform: 'translateX(90px)' },
+         *       step: function (state) {
+         *         console.log(state.transform);
+         *       }
+         *     });
+         *
+         * The above snippet will log something like this in the console:
+         *
+         *     translateX(60.3px)
+         *     ...
+         *     translateX(76.05px)
+         *     ...
+         *     translateX(90px)
+         *
+         * Another use for this is animating colors:
+         *
+         *     var tweenable = new Tweenable();
+         *     tweenable.tween({
+         *       from: { color: 'rgb(0,255,0)' },
+         *       to: { color: 'rgb(255,0,255)' },
+         *       step: function (state) {
+         *         console.log(state.color);
+         *       }
+         *     });
+         *
+         * The above snippet will log something like this:
+         *
+         *     rgb(84,170,84)
+         *     ...
+         *     rgb(170,84,170)
+         *     ...
+         *     rgb(255,0,255)
+         *
+         * This extension also supports hexadecimal colors, in both long (`#ff00ff`)
+         * and short (`#f0f`) forms.  Be aware that hexadecimal input values will be
+         * converted into the equivalent RGB output values.  This is done to optimize
+         * for performance.
+         *
+         *     var tweenable = new Tweenable();
+         *     tweenable.tween({
+         *       from: { color: '#0f0' },
+         *       to: { color: '#f0f' },
+         *       step: function (state) {
+         *         console.log(state.color);
+         *       }
+         *     });
+         *
+         * This snippet will generate the same output as the one before it because
+         * equivalent values were supplied (just in hexadecimal form rather than RGB):
+         *
+         *     rgb(84,170,84)
+         *     ...
+         *     rgb(170,84,170)
+         *     ...
+         *     rgb(255,0,255)
+         *
+         * ## Easing support
+         *
+         * Easing works somewhat differently in the Token extension.  This is because
+         * some CSS properties have multiple values in them, and you might need to
+         * tween each value along its own easing curve.  A basic example:
+         *
+         *     var tweenable = new Tweenable();
+         *     tweenable.tween({
+         *       from: { transform: 'translateX(0px) translateY(0px)' },
+         *       to: { transform:   'translateX(100px) translateY(100px)' },
+         *       easing: { transform: 'easeInQuad' },
+         *       step: function (state) {
+         *         console.log(state.transform);
+         *       }
+         *     });
+         *
+         * The above snippet will create values like this:
+         *
+         *     translateX(11.56px) translateY(11.56px)
+         *     ...
+         *     translateX(46.24px) translateY(46.24px)
+         *     ...
+         *     translateX(100px) translateY(100px)
+         *
+         * In this case, the values for `translateX` and `translateY` are always the
+         * same for each step of the tween, because they have the same start and end
+         * points and both use the same easing curve.  We can also tween `translateX`
+         * and `translateY` along independent curves:
+         *
+         *     var tweenable = new Tweenable();
+         *     tweenable.tween({
+         *       from: { transform: 'translateX(0px) translateY(0px)' },
+         *       to: { transform:   'translateX(100px) translateY(100px)' },
+         *       easing: { transform: 'easeInQuad bounce' },
+         *       step: function (state) {
+         *         console.log(state.transform);
+         *       }
+         *     });
+         *
+         * The above snippet will create values like this:
+         *
+         *     translateX(10.89px) translateY(82.35px)
+         *     ...
+         *     translateX(44.89px) translateY(86.73px)
+         *     ...
+         *     translateX(100px) translateY(100px)
+         *
+         * `translateX` and `translateY` are not in sync anymore, because `easeInQuad`
+         * was specified for `translateX` and `bounce` for `translateY`.  Mixing and
+         * matching easing curves can make for some interesting motion in your
+         * animations.
+         *
+         * The order of the space-separated easing curves correspond the token values
+         * they apply to.  If there are more token values than easing curves listed,
+         * the last easing curve listed is used.
+         * @submodule Tweenable.token
+         */
+
+        // token function is defined above only so that dox-foundation sees it as
+        // documentation and renders it.  It is never used, and is optimized away at
+        // build time.
+
+        ;(function (Tweenable) {
+
+          /**
+           * @typedef {{
+           *   formatString: string
+           *   chunkNames: Array.<string>
+           * }}
+           * @private
+           */
+          var formatManifest;
+
+          // CONSTANTS
+
+          var R_NUMBER_COMPONENT = /(\d|\-|\.)/;
+          var R_FORMAT_CHUNKS = /([^\-0-9\.]+)/g;
+          var R_UNFORMATTED_VALUES = /[0-9.\-]+/g;
+          var R_RGB = new RegExp('rgb\\(' + R_UNFORMATTED_VALUES.source + /,\s*/.source + R_UNFORMATTED_VALUES.source + /,\s*/.source + R_UNFORMATTED_VALUES.source + '\\)', 'g');
+          var R_RGB_PREFIX = /^.*\(/;
+          var R_HEX = /#([0-9]|[a-f]){3,6}/gi;
+          var VALUE_PLACEHOLDER = 'VAL';
+
+          // HELPERS
+
+          /**
+           * @param {Array.number} rawValues
+           * @param {string} prefix
+           *
+           * @return {Array.<string>}
+           * @private
+           */
+          function getFormatChunksFrom(rawValues, prefix) {
+            var accumulator = [];
+
+            var rawValuesLength = rawValues.length;
+            var i;
+
+            for (i = 0; i < rawValuesLength; i++) {
+              accumulator.push('_' + prefix + '_' + i);
+            }
+
+            return accumulator;
+          }
+
+          /**
+           * @param {string} formattedString
+           *
+           * @return {string}
+           * @private
+           */
+          function getFormatStringFrom(formattedString) {
+            var chunks = formattedString.match(R_FORMAT_CHUNKS);
+
+            if (!chunks) {
+              // chunks will be null if there were no tokens to parse in
+              // formattedString (for example, if formattedString is '2').  Coerce
+              // chunks to be useful here.
+              chunks = ['', ''];
+
+              // If there is only one chunk, assume that the string is a number
+              // followed by a token...
+              // NOTE: This may be an unwise assumption.
+            } else if (chunks.length === 1 ||
+            // ...or if the string starts with a number component (".", "-", or a
+            // digit)...
+            formattedString[0].match(R_NUMBER_COMPONENT)) {
+              // ...prepend an empty string here to make sure that the formatted number
+              // is properly replaced by VALUE_PLACEHOLDER
+              chunks.unshift('');
+            }
+
+            return chunks.join(VALUE_PLACEHOLDER);
+          }
+
+          /**
+           * Convert all hex color values within a string to an rgb string.
+           *
+           * @param {Object} stateObject
+           *
+           * @return {Object} The modified obj
+           * @private
+           */
+          function sanitizeObjectForHexProps(stateObject) {
+            Tweenable.each(stateObject, function (prop) {
+              var currentProp = stateObject[prop];
+
+              if (typeof currentProp === 'string' && currentProp.match(R_HEX)) {
+                stateObject[prop] = sanitizeHexChunksToRGB(currentProp);
+              }
+            });
+          }
+
+          /**
+           * @param {string} str
+           *
+           * @return {string}
+           * @private
+           */
+          function sanitizeHexChunksToRGB(str) {
+            return filterStringChunks(R_HEX, str, convertHexToRGB);
+          }
+
+          /**
+           * @param {string} hexString
+           *
+           * @return {string}
+           * @private
+           */
+          function convertHexToRGB(hexString) {
+            var rgbArr = hexToRGBArray(hexString);
+            return 'rgb(' + rgbArr[0] + ',' + rgbArr[1] + ',' + rgbArr[2] + ')';
+          }
+
+          var hexToRGBArray_returnArray = [];
+          /**
+           * Convert a hexadecimal string to an array with three items, one each for
+           * the red, blue, and green decimal values.
+           *
+           * @param {string} hex A hexadecimal string.
+           *
+           * @returns {Array.<number>} The converted Array of RGB values if `hex` is a
+           * valid string, or an Array of three 0's.
+           * @private
+           */
+          function hexToRGBArray(hex) {
+
+            hex = hex.replace(/#/, '');
+
+            // If the string is a shorthand three digit hex notation, normalize it to
+            // the standard six digit notation
+            if (hex.length === 3) {
+              hex = hex.split('');
+              hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+            }
+
+            hexToRGBArray_returnArray[0] = hexToDec(hex.substr(0, 2));
+            hexToRGBArray_returnArray[1] = hexToDec(hex.substr(2, 2));
+            hexToRGBArray_returnArray[2] = hexToDec(hex.substr(4, 2));
+
+            return hexToRGBArray_returnArray;
+          }
+
+          /**
+           * Convert a base-16 number to base-10.
+           *
+           * @param {Number|String} hex The value to convert
+           *
+           * @returns {Number} The base-10 equivalent of `hex`.
+           * @private
+           */
+          function hexToDec(hex) {
+            return parseInt(hex, 16);
+          }
+
+          /**
+           * Runs a filter operation on all chunks of a string that match a RegExp
+           *
+           * @param {RegExp} pattern
+           * @param {string} unfilteredString
+           * @param {function(string)} filter
+           *
+           * @return {string}
+           * @private
+           */
+          function filterStringChunks(pattern, unfilteredString, filter) {
+            var pattenMatches = unfilteredString.match(pattern);
+            var filteredString = unfilteredString.replace(pattern, VALUE_PLACEHOLDER);
+
+            if (pattenMatches) {
+              var pattenMatchesLength = pattenMatches.length;
+              var currentChunk;
+
+              for (var i = 0; i < pattenMatchesLength; i++) {
+                currentChunk = pattenMatches.shift();
+                filteredString = filteredString.replace(VALUE_PLACEHOLDER, filter(currentChunk));
+              }
+            }
+
+            return filteredString;
+          }
+
+          /**
+           * Check for floating point values within rgb strings and rounds them.
+           *
+           * @param {string} formattedString
+           *
+           * @return {string}
+           * @private
+           */
+          function sanitizeRGBChunks(formattedString) {
+            return filterStringChunks(R_RGB, formattedString, sanitizeRGBChunk);
+          }
+
+          /**
+           * @param {string} rgbChunk
+           *
+           * @return {string}
+           * @private
+           */
+          function sanitizeRGBChunk(rgbChunk) {
+            var numbers = rgbChunk.match(R_UNFORMATTED_VALUES);
+            var numbersLength = numbers.length;
+            var sanitizedString = rgbChunk.match(R_RGB_PREFIX)[0];
+
+            for (var i = 0; i < numbersLength; i++) {
+              sanitizedString += parseInt(numbers[i], 10) + ',';
+            }
+
+            sanitizedString = sanitizedString.slice(0, -1) + ')';
+
+            return sanitizedString;
+          }
+
+          /**
+           * @param {Object} stateObject
+           *
+           * @return {Object} An Object of formatManifests that correspond to
+           * the string properties of stateObject
+           * @private
+           */
+          function getFormatManifests(stateObject) {
+            var manifestAccumulator = {};
+
+            Tweenable.each(stateObject, function (prop) {
+              var currentProp = stateObject[prop];
+
+              if (typeof currentProp === 'string') {
+                var rawValues = getValuesFrom(currentProp);
+
+                manifestAccumulator[prop] = {
+                  'formatString': getFormatStringFrom(currentProp),
+                  'chunkNames': getFormatChunksFrom(rawValues, prop)
+                };
+              }
+            });
+
+            return manifestAccumulator;
+          }
+
+          /**
+           * @param {Object} stateObject
+           * @param {Object} formatManifests
+           * @private
+           */
+          function expandFormattedProperties(stateObject, formatManifests) {
+            Tweenable.each(formatManifests, function (prop) {
+              var currentProp = stateObject[prop];
+              var rawValues = getValuesFrom(currentProp);
+              var rawValuesLength = rawValues.length;
+
+              for (var i = 0; i < rawValuesLength; i++) {
+                stateObject[formatManifests[prop].chunkNames[i]] = +rawValues[i];
+              }
+
+              delete stateObject[prop];
+            });
+          }
+
+          /**
+           * @param {Object} stateObject
+           * @param {Object} formatManifests
+           * @private
+           */
+          function collapseFormattedProperties(stateObject, formatManifests) {
+            Tweenable.each(formatManifests, function (prop) {
+              var currentProp = stateObject[prop];
+              var formatChunks = extractPropertyChunks(stateObject, formatManifests[prop].chunkNames);
+              var valuesList = getValuesList(formatChunks, formatManifests[prop].chunkNames);
+              currentProp = getFormattedValues(formatManifests[prop].formatString, valuesList);
+              stateObject[prop] = sanitizeRGBChunks(currentProp);
+            });
+          }
+
+          /**
+           * @param {Object} stateObject
+           * @param {Array.<string>} chunkNames
+           *
+           * @return {Object} The extracted value chunks.
+           * @private
+           */
+          function extractPropertyChunks(stateObject, chunkNames) {
+            var extractedValues = {};
+            var currentChunkName,
+                chunkNamesLength = chunkNames.length;
+
+            for (var i = 0; i < chunkNamesLength; i++) {
+              currentChunkName = chunkNames[i];
+              extractedValues[currentChunkName] = stateObject[currentChunkName];
+              delete stateObject[currentChunkName];
+            }
+
+            return extractedValues;
+          }
+
+          var getValuesList_accumulator = [];
+          /**
+           * @param {Object} stateObject
+           * @param {Array.<string>} chunkNames
+           *
+           * @return {Array.<number>}
+           * @private
+           */
+          function getValuesList(stateObject, chunkNames) {
+            getValuesList_accumulator.length = 0;
+            var chunkNamesLength = chunkNames.length;
+
+            for (var i = 0; i < chunkNamesLength; i++) {
+              getValuesList_accumulator.push(stateObject[chunkNames[i]]);
+            }
+
+            return getValuesList_accumulator;
+          }
+
+          /**
+           * @param {string} formatString
+           * @param {Array.<number>} rawValues
+           *
+           * @return {string}
+           * @private
+           */
+          function getFormattedValues(formatString, rawValues) {
+            var formattedValueString = formatString;
+            var rawValuesLength = rawValues.length;
+
+            for (var i = 0; i < rawValuesLength; i++) {
+              formattedValueString = formattedValueString.replace(VALUE_PLACEHOLDER, +rawValues[i].toFixed(4));
+            }
+
+            return formattedValueString;
+          }
+
+          /**
+           * Note: It's the duty of the caller to convert the Array elements of the
+           * return value into numbers.  This is a performance optimization.
+           *
+           * @param {string} formattedString
+           *
+           * @return {Array.<string>|null}
+           * @private
+           */
+          function getValuesFrom(formattedString) {
+            return formattedString.match(R_UNFORMATTED_VALUES);
+          }
+
+          /**
+           * @param {Object} easingObject
+           * @param {Object} tokenData
+           * @private
+           */
+          function expandEasingObject(easingObject, tokenData) {
+            Tweenable.each(tokenData, function (prop) {
+              var currentProp = tokenData[prop];
+              var chunkNames = currentProp.chunkNames;
+              var chunkLength = chunkNames.length;
+
+              var easing = easingObject[prop];
+              var i;
+
+              if (typeof easing === 'string') {
+                var easingChunks = easing.split(' ');
+                var lastEasingChunk = easingChunks[easingChunks.length - 1];
+
+                for (i = 0; i < chunkLength; i++) {
+                  easingObject[chunkNames[i]] = easingChunks[i] || lastEasingChunk;
+                }
+              } else {
+                for (i = 0; i < chunkLength; i++) {
+                  easingObject[chunkNames[i]] = easing;
+                }
+              }
+
+              delete easingObject[prop];
+            });
+          }
+
+          /**
+           * @param {Object} easingObject
+           * @param {Object} tokenData
+           * @private
+           */
+          function collapseEasingObject(easingObject, tokenData) {
+            Tweenable.each(tokenData, function (prop) {
+              var currentProp = tokenData[prop];
+              var chunkNames = currentProp.chunkNames;
+              var chunkLength = chunkNames.length;
+
+              var firstEasing = easingObject[chunkNames[0]];
+              var typeofEasings = typeof firstEasing === "undefined" ? "undefined" : _typeof(firstEasing);
+
+              if (typeofEasings === 'string') {
+                var composedEasingString = '';
+
+                for (var i = 0; i < chunkLength; i++) {
+                  composedEasingString += ' ' + easingObject[chunkNames[i]];
+                  delete easingObject[chunkNames[i]];
+                }
+
+                easingObject[prop] = composedEasingString.substr(1);
+              } else {
+                easingObject[prop] = firstEasing;
+              }
+            });
+          }
+
+          Tweenable.prototype.filter.token = {
+            'tweenCreated': function tweenCreated(currentState, fromState, toState, easingObject) {
+              sanitizeObjectForHexProps(currentState);
+              sanitizeObjectForHexProps(fromState);
+              sanitizeObjectForHexProps(toState);
+              this._tokenData = getFormatManifests(currentState);
+            },
+
+            'beforeTween': function beforeTween(currentState, fromState, toState, easingObject) {
+              expandEasingObject(easingObject, this._tokenData);
+              expandFormattedProperties(currentState, this._tokenData);
+              expandFormattedProperties(fromState, this._tokenData);
+              expandFormattedProperties(toState, this._tokenData);
+            },
+
+            'afterTween': function afterTween(currentState, fromState, toState, easingObject) {
+              collapseFormattedProperties(currentState, this._tokenData);
+              collapseFormattedProperties(fromState, this._tokenData);
+              collapseFormattedProperties(toState, this._tokenData);
+              collapseEasingObject(easingObject, this._tokenData);
+            }
+          };
+        })(Tweenable);
+      }).call(null);
+    }, {}], 2: [function (require, module, exports) {
+      // Circle shaped progress bar
+
+      var Shape = require('./shape');
+      var utils = require('./utils');
+
+      var Circle = function Circle(container, options) {
+        // Use two arcs to form a circle
+        // See this answer http://stackoverflow.com/a/10477334/1446092
+        this._pathTemplate = 'M 50,50 m 0,-{radius}' + ' a {radius},{radius} 0 1 1 0,{2radius}' + ' a {radius},{radius} 0 1 1 0,-{2radius}';
+
+        this.containerAspectRatio = 1;
+
+        Shape.apply(this, arguments);
+      };
+
+      Circle.prototype = new Shape();
+      Circle.prototype.constructor = Circle;
+
+      Circle.prototype._pathString = function _pathString(opts) {
+        var widthOfWider = opts.strokeWidth;
+        if (opts.trailWidth && opts.trailWidth > opts.strokeWidth) {
+          widthOfWider = opts.trailWidth;
+        }
+
+        var r = 50 - widthOfWider / 2;
+
+        return utils.render(this._pathTemplate, {
+          radius: r,
+          '2radius': r * 2
+        });
+      };
+
+      Circle.prototype._trailString = function _trailString(opts) {
+        return this._pathString(opts);
+      };
+
+      module.exports = Circle;
+    }, { "./shape": 7, "./utils": 8 }], 3: [function (require, module, exports) {
+      // Line shaped progress bar
+
+      var Shape = require('./shape');
+      var utils = require('./utils');
+
+      var Line = function Line(container, options) {
+        this._pathTemplate = 'M 0,{center} L 100,{center}';
+        Shape.apply(this, arguments);
+      };
+
+      Line.prototype = new Shape();
+      Line.prototype.constructor = Line;
+
+      Line.prototype._initializeSvg = function _initializeSvg(svg, opts) {
+        svg.setAttribute('viewBox', '0 0 100 ' + opts.strokeWidth);
+        svg.setAttribute('preserveAspectRatio', 'none');
+      };
+
+      Line.prototype._pathString = function _pathString(opts) {
+        return utils.render(this._pathTemplate, {
+          center: opts.strokeWidth / 2
+        });
+      };
+
+      Line.prototype._trailString = function _trailString(opts) {
+        return this._pathString(opts);
+      };
+
+      module.exports = Line;
+    }, { "./shape": 7, "./utils": 8 }], 4: [function (require, module, exports) {
+      module.exports = {
+        // Higher level API, different shaped progress bars
+        Line: require('./line'),
+        Circle: require('./circle'),
+        SemiCircle: require('./semicircle'),
+
+        // Lower level API to use any SVG path
+        Path: require('./path'),
+
+        // Base-class for creating new custom shapes
+        // to be in line with the API of built-in shapes
+        // Undocumented.
+        Shape: require('./shape'),
+
+        // Internal utils, undocumented.
+        utils: require('./utils')
+      };
+    }, { "./circle": 2, "./line": 3, "./path": 5, "./semicircle": 6, "./shape": 7, "./utils": 8 }], 5: [function (require, module, exports) {
+      // Lower level API to animate any kind of svg path
+
+      var Tweenable = require('shifty');
+      var utils = require('./utils');
+
+      var EASING_ALIASES = {
+        easeIn: 'easeInCubic',
+        easeOut: 'easeOutCubic',
+        easeInOut: 'easeInOutCubic'
+      };
+
+      var Path = function Path(path, opts) {
+        // Throw a better error if not initialized with `new` keyword
+        if (!(this instanceof Path)) {
+          throw new Error('Constructor was called without new keyword');
+        }
+
+        // Default parameters for animation
+        opts = utils.extend({
+          duration: 800,
+          easing: 'linear',
+          from: {},
+          to: {},
+          step: function step() {}
+        }, opts);
+
+        var element;
+        if (utils.isString(path)) {
+          element = document.querySelector(path);
+        } else {
+          element = path;
+        }
+
+        // Reveal .path as public attribute
+        this.path = element;
+        this._opts = opts;
+        this._tweenable = null;
+
+        // Set up the starting positions
+        var length = this.path.getTotalLength();
+        this.path.style.strokeDasharray = length + ' ' + length;
+        this.set(0);
+      };
+
+      Path.prototype.value = function value() {
+        var offset = this._getComputedDashOffset();
+        var length = this.path.getTotalLength();
+
+        var progress = 1 - offset / length;
+        // Round number to prevent returning very small number like 1e-30, which
+        // is practically 0
+        return parseFloat(progress.toFixed(6), 10);
+      };
+
+      Path.prototype.set = function set(progress) {
+        this.stop();
+
+        this.path.style.strokeDashoffset = this._progressToOffset(progress);
+
+        var step = this._opts.step;
+        if (utils.isFunction(step)) {
+          var easing = this._easing(this._opts.easing);
+          var values = this._calculateTo(progress, easing);
+          var reference = this._opts.shape || this;
+          step(values, reference, this._opts.attachment);
+        }
+      };
+
+      Path.prototype.stop = function stop() {
+        this._stopTween();
+        this.path.style.strokeDashoffset = this._getComputedDashOffset();
+      };
+
+      // Method introduced here:
+      // http://jakearchibald.com/2013/animated-line-drawing-svg/
+      Path.prototype.animate = function animate(progress, opts, cb) {
+        opts = opts || {};
+
+        if (utils.isFunction(opts)) {
+          cb = opts;
+          opts = {};
+        }
+
+        var passedOpts = utils.extend({}, opts);
+
+        // Copy default opts to new object so defaults are not modified
+        var defaultOpts = utils.extend({}, this._opts);
+        opts = utils.extend(defaultOpts, opts);
+
+        var shiftyEasing = this._easing(opts.easing);
+        var values = this._resolveFromAndTo(progress, shiftyEasing, passedOpts);
+
+        this.stop();
+
+        // Trigger a layout so styles are calculated & the browser
+        // picks up the starting position before animating
+        this.path.getBoundingClientRect();
+
+        var offset = this._getComputedDashOffset();
+        var newOffset = this._progressToOffset(progress);
+
+        var self = this;
+        this._tweenable = new Tweenable();
+        this._tweenable.tween({
+          from: utils.extend({ offset: offset }, values.from),
+          to: utils.extend({ offset: newOffset }, values.to),
+          duration: opts.duration,
+          easing: shiftyEasing,
+          step: function step(state) {
+            self.path.style.strokeDashoffset = state.offset;
+            var reference = opts.shape || self;
+            opts.step(state, reference, opts.attachment);
+          },
+          finish: function finish(state) {
+            if (utils.isFunction(cb)) {
+              cb();
+            }
+          }
+        });
+      };
+
+      Path.prototype._getComputedDashOffset = function _getComputedDashOffset() {
+        var computedStyle = window.getComputedStyle(this.path, null);
+        return parseFloat(computedStyle.getPropertyValue('stroke-dashoffset'), 10);
+      };
+
+      Path.prototype._progressToOffset = function _progressToOffset(progress) {
+        var length = this.path.getTotalLength();
+        return length - progress * length;
+      };
+
+      // Resolves from and to values for animation.
+      Path.prototype._resolveFromAndTo = function _resolveFromAndTo(progress, easing, opts) {
+        if (opts.from && opts.to) {
+          return {
+            from: opts.from,
+            to: opts.to
+          };
+        }
+
+        return {
+          from: this._calculateFrom(easing),
+          to: this._calculateTo(progress, easing)
+        };
+      };
+
+      // Calculate `from` values from options passed at initialization
+      Path.prototype._calculateFrom = function _calculateFrom(easing) {
+        return Tweenable.interpolate(this._opts.from, this._opts.to, this.value(), easing);
+      };
+
+      // Calculate `to` values from options passed at initialization
+      Path.prototype._calculateTo = function _calculateTo(progress, easing) {
+        return Tweenable.interpolate(this._opts.from, this._opts.to, progress, easing);
+      };
+
+      Path.prototype._stopTween = function _stopTween() {
+        if (this._tweenable !== null) {
+          this._tweenable.stop();
+          this._tweenable = null;
+        }
+      };
+
+      Path.prototype._easing = function _easing(easing) {
+        if (EASING_ALIASES.hasOwnProperty(easing)) {
+          return EASING_ALIASES[easing];
+        }
+
+        return easing;
+      };
+
+      module.exports = Path;
+    }, { "./utils": 8, "shifty": 1 }], 6: [function (require, module, exports) {
+      // Semi-SemiCircle shaped progress bar
+
+      var Shape = require('./shape');
+      var Circle = require('./circle');
+      var utils = require('./utils');
+
+      var SemiCircle = function SemiCircle(container, options) {
+        // Use one arc to form a SemiCircle
+        // See this answer http://stackoverflow.com/a/10477334/1446092
+        this._pathTemplate = 'M 50,50 m -{radius},0' + ' a {radius},{radius} 0 1 1 {2radius},0';
+
+        this.containerAspectRatio = 2;
+
+        Shape.apply(this, arguments);
+      };
+
+      SemiCircle.prototype = new Shape();
+      SemiCircle.prototype.constructor = SemiCircle;
+
+      SemiCircle.prototype._initializeSvg = function _initializeSvg(svg, opts) {
+        svg.setAttribute('viewBox', '0 0 100 50');
+      };
+
+      SemiCircle.prototype._initializeTextContainer = function _initializeTextContainer(opts, container, textContainer) {
+        if (opts.text.style) {
+          // Reset top style
+          textContainer.style.top = 'auto';
+          textContainer.style.bottom = '0';
+
+          if (opts.text.alignToBottom) {
+            utils.setStyle(textContainer, 'transform', 'translate(-50%, 0)');
+          } else {
+            utils.setStyle(textContainer, 'transform', 'translate(-50%, 50%)');
+          }
+        }
+      };
+
+      // Share functionality with Circle, just have different path
+      SemiCircle.prototype._pathString = Circle.prototype._pathString;
+      SemiCircle.prototype._trailString = Circle.prototype._trailString;
+
+      module.exports = SemiCircle;
+    }, { "./circle": 2, "./shape": 7, "./utils": 8 }], 7: [function (require, module, exports) {
+      // Base object for different progress bar shapes
+
+      var Path = require('./path');
+      var utils = require('./utils');
+
+      var DESTROYED_ERROR = 'Object is destroyed';
+
+      var Shape = function Shape(container, opts) {
+        // Throw a better error if progress bars are not initialized with `new`
+        // keyword
+        if (!(this instanceof Shape)) {
+          throw new Error('Constructor was called without new keyword');
+        }
+
+        // Prevent calling constructor without parameters so inheritance
+        // works correctly. To understand, this is how Shape is inherited:
+        //
+        //   Line.prototype = new Shape();
+        //
+        // We just want to set the prototype for Line.
+        if (arguments.length === 0) {
+          return;
+        }
+
+        // Default parameters for progress bar creation
+        this._opts = utils.extend({
+          color: '#555',
+          strokeWidth: 1.0,
+          trailColor: null,
+          trailWidth: null,
+          fill: null,
+          text: {
+            style: {
+              color: null,
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              padding: 0,
+              margin: 0,
+              transform: {
+                prefix: true,
+                value: 'translate(-50%, -50%)'
+              }
+            },
+            autoStyleContainer: true,
+            alignToBottom: true,
+            value: null,
+            className: 'progressbar-text'
+          },
+          svgStyle: {
+            display: 'block',
+            width: '100%'
+          },
+          warnings: false
+        }, opts, true); // Use recursive extend
+
+        // If user specifies e.g. svgStyle or text style, the whole object
+        // should replace the defaults to make working with styles easier
+        if (utils.isObject(opts) && opts.svgStyle !== undefined) {
+          this._opts.svgStyle = opts.svgStyle;
+        }
+        if (utils.isObject(opts) && utils.isObject(opts.text) && opts.text.style !== undefined) {
+          this._opts.text.style = opts.text.style;
+        }
+
+        var svgView = this._createSvgView(this._opts);
+
+        var element;
+        if (utils.isString(container)) {
+          element = document.querySelector(container);
+        } else {
+          element = container;
+        }
+
+        if (!element) {
+          throw new Error('Container does not exist: ' + container);
+        }
+
+        this._container = element;
+        this._container.appendChild(svgView.svg);
+        if (this._opts.warnings) {
+          this._warnContainerAspectRatio(this._container);
+        }
+
+        if (this._opts.svgStyle) {
+          utils.setStyles(svgView.svg, this._opts.svgStyle);
+        }
+
+        // Expose public attributes before Path initialization
+        this.svg = svgView.svg;
+        this.path = svgView.path;
+        this.trail = svgView.trail;
+        this.text = null;
+
+        var newOpts = utils.extend({
+          attachment: undefined,
+          shape: this
+        }, this._opts);
+        this._progressPath = new Path(svgView.path, newOpts);
+
+        if (utils.isObject(this._opts.text) && this._opts.text.value !== null) {
+          this.setText(this._opts.text.value);
+        }
+      };
+
+      Shape.prototype.animate = function animate(progress, opts, cb) {
+        if (this._progressPath === null) {
+          throw new Error(DESTROYED_ERROR);
+        }
+
+        this._progressPath.animate(progress, opts, cb);
+      };
+
+      Shape.prototype.stop = function stop() {
+        if (this._progressPath === null) {
+          throw new Error(DESTROYED_ERROR);
+        }
+
+        // Don't crash if stop is called inside step function
+        if (this._progressPath === undefined) {
+          return;
+        }
+
+        this._progressPath.stop();
+      };
+
+      Shape.prototype.destroy = function destroy() {
+        if (this._progressPath === null) {
+          throw new Error(DESTROYED_ERROR);
+        }
+
+        this.stop();
+        this.svg.parentNode.removeChild(this.svg);
+        this.svg = null;
+        this.path = null;
+        this.trail = null;
+        this._progressPath = null;
+
+        if (this.text !== null) {
+          this.text.parentNode.removeChild(this.text);
+          this.text = null;
+        }
+      };
+
+      Shape.prototype.set = function set(progress) {
+        if (this._progressPath === null) {
+          throw new Error(DESTROYED_ERROR);
+        }
+
+        this._progressPath.set(progress);
+      };
+
+      Shape.prototype.value = function value() {
+        if (this._progressPath === null) {
+          throw new Error(DESTROYED_ERROR);
+        }
+
+        if (this._progressPath === undefined) {
+          return 0;
+        }
+
+        return this._progressPath.value();
+      };
+
+      Shape.prototype.setText = function setText(newText) {
+        if (this._progressPath === null) {
+          throw new Error(DESTROYED_ERROR);
+        }
+
+        if (this.text === null) {
+          // Create new text node
+          this.text = this._createTextContainer(this._opts, this._container);
+          this._container.appendChild(this.text);
+        }
+
+        // Remove previous text and add new
+        if (utils.isObject(newText)) {
+          utils.removeChildren(this.text);
+          this.text.appendChild(newText);
+        } else {
+          this.text.innerHTML = newText;
+        }
+      };
+
+      Shape.prototype._createSvgView = function _createSvgView(opts) {
+        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        this._initializeSvg(svg, opts);
+
+        var trailPath = null;
+        // Each option listed in the if condition are 'triggers' for creating
+        // the trail path
+        if (opts.trailColor || opts.trailWidth) {
+          trailPath = this._createTrail(opts);
+          svg.appendChild(trailPath);
+        }
+
+        var path = this._createPath(opts);
+        svg.appendChild(path);
+
+        return {
+          svg: svg,
+          path: path,
+          trail: trailPath
+        };
+      };
+
+      Shape.prototype._initializeSvg = function _initializeSvg(svg, opts) {
+        svg.setAttribute('viewBox', '0 0 100 100');
+      };
+
+      Shape.prototype._createPath = function _createPath(opts) {
+        var pathString = this._pathString(opts);
+        return this._createPathElement(pathString, opts);
+      };
+
+      Shape.prototype._createTrail = function _createTrail(opts) {
+        // Create path string with original passed options
+        var pathString = this._trailString(opts);
+
+        // Prevent modifying original
+        var newOpts = utils.extend({}, opts);
+
+        // Defaults for parameters which modify trail path
+        if (!newOpts.trailColor) {
+          newOpts.trailColor = '#eee';
+        }
+        if (!newOpts.trailWidth) {
+          newOpts.trailWidth = newOpts.strokeWidth;
+        }
+
+        newOpts.color = newOpts.trailColor;
+        newOpts.strokeWidth = newOpts.trailWidth;
+
+        // When trail path is set, fill must be set for it instead of the
+        // actual path to prevent trail stroke from clipping
+        newOpts.fill = null;
+
+        return this._createPathElement(pathString, newOpts);
+      };
+
+      Shape.prototype._createPathElement = function _createPathElement(pathString, opts) {
+        var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', pathString);
+        path.setAttribute('stroke', opts.color);
+        path.setAttribute('stroke-width', opts.strokeWidth);
+
+        if (opts.fill) {
+          path.setAttribute('fill', opts.fill);
+        } else {
+          path.setAttribute('fill-opacity', '0');
+        }
+
+        return path;
+      };
+
+      Shape.prototype._createTextContainer = function _createTextContainer(opts, container) {
+        var textContainer = document.createElement('div');
+        textContainer.className = opts.text.className;
+
+        var textStyle = opts.text.style;
+        if (textStyle) {
+          if (opts.text.autoStyleContainer) {
+            container.style.position = 'relative';
+          }
+
+          utils.setStyles(textContainer, textStyle);
+          // Default text color to progress bar's color
+          if (!textStyle.color) {
+            textContainer.style.color = opts.color;
+          }
+        }
+
+        this._initializeTextContainer(opts, container, textContainer);
+        return textContainer;
+      };
+
+      // Give custom shapes possibility to modify text element
+      Shape.prototype._initializeTextContainer = function (opts, container, element) {
+        // By default, no-op
+        // Custom shapes should respect API options, such as text.style
+      };
+
+      Shape.prototype._pathString = function _pathString(opts) {
+        throw new Error('Override this function for each progress bar');
+      };
+
+      Shape.prototype._trailString = function _trailString(opts) {
+        throw new Error('Override this function for each progress bar');
+      };
+
+      Shape.prototype._warnContainerAspectRatio = function _warnContainerAspectRatio(container) {
+        if (!this.containerAspectRatio) {
+          return;
+        }
+
+        var computedStyle = window.getComputedStyle(container, null);
+        var width = parseFloat(computedStyle.getPropertyValue('width'), 10);
+        var height = parseFloat(computedStyle.getPropertyValue('height'), 10);
+        if (!utils.floatEquals(this.containerAspectRatio, width / height)) {
+          console.warn('Incorrect aspect ratio of container', '#' + container.id, 'detected:', computedStyle.getPropertyValue('width') + '(width)', '/', computedStyle.getPropertyValue('height') + '(height)', '=', width / height);
+
+          console.warn('Aspect ratio of should be', this.containerAspectRatio);
+        }
+      };
+
+      module.exports = Shape;
+    }, { "./path": 5, "./utils": 8 }], 8: [function (require, module, exports) {
+      // Utility functions
+
+      var PREFIXES = 'Webkit Moz O ms'.split(' ');
+      var FLOAT_COMPARISON_EPSILON = 0.001;
+
+      // Copy all attributes from source object to destination object.
+      // destination object is mutated.
+      function extend(destination, source, recursive) {
+        destination = destination || {};
+        source = source || {};
+        recursive = recursive || false;
+
+        for (var attrName in source) {
+          if (source.hasOwnProperty(attrName)) {
+            var destVal = destination[attrName];
+            var sourceVal = source[attrName];
+            if (recursive && isObject(destVal) && isObject(sourceVal)) {
+              destination[attrName] = extend(destVal, sourceVal, recursive);
+            } else {
+              destination[attrName] = sourceVal;
+            }
+          }
+        }
+
+        return destination;
+      }
+
+      // Renders templates with given variables. Variables must be surrounded with
+      // braces without any spaces, e.g. {variable}
+      // All instances of variable placeholders will be replaced with given content
+      // Example:
+      // render('Hello, {message}!', {message: 'world'})
+      function render(template, vars) {
+        var rendered = template;
+
+        for (var key in vars) {
+          if (vars.hasOwnProperty(key)) {
+            var val = vars[key];
+            var regExpString = '\\{' + key + '\\}';
+            var regExp = new RegExp(regExpString, 'g');
+
+            rendered = rendered.replace(regExp, val);
+          }
+        }
+
+        return rendered;
+      }
+
+      function setStyle(element, style, value) {
+        var elStyle = element.style; // cache for performance
+
+        for (var i = 0; i < PREFIXES.length; ++i) {
+          var prefix = PREFIXES[i];
+          elStyle[prefix + capitalize(style)] = value;
+        }
+
+        elStyle[style] = value;
+      }
+
+      function setStyles(element, styles) {
+        forEachObject(styles, function (styleValue, styleName) {
+          // Allow disabling some individual styles by setting them
+          // to null or undefined
+          if (styleValue === null || styleValue === undefined) {
+            return;
+          }
+
+          // If style's value is {prefix: true, value: '50%'},
+          // Set also browser prefixed styles
+          if (isObject(styleValue) && styleValue.prefix === true) {
+            setStyle(element, styleName, styleValue.value);
+          } else {
+            element.style[styleName] = styleValue;
+          }
+        });
+      }
+
+      function capitalize(text) {
+        return text.charAt(0).toUpperCase() + text.slice(1);
+      }
+
+      function isString(obj) {
+        return typeof obj === 'string' || obj instanceof String;
+      }
+
+      function isFunction(obj) {
+        return typeof obj === 'function';
+      }
+
+      function isArray(obj) {
+        return Object.prototype.toString.call(obj) === '[object Array]';
+      }
+
+      // Returns true if `obj` is object as in {a: 1, b: 2}, not if it's function or
+      // array
+      function isObject(obj) {
+        if (isArray(obj)) {
+          return false;
+        }
+
+        var type = typeof obj === "undefined" ? "undefined" : _typeof(obj);
+        return type === 'object' && !!obj;
+      }
+
+      function forEachObject(object, callback) {
+        for (var key in object) {
+          if (object.hasOwnProperty(key)) {
+            var val = object[key];
+            callback(val, key);
+          }
+        }
+      }
+
+      function floatEquals(a, b) {
+        return Math.abs(a - b) < FLOAT_COMPARISON_EPSILON;
+      }
+
+      // https://coderwall.com/p/nygghw/don-t-use-innerhtml-to-empty-dom-elements
+      function removeChildren(el) {
+        while (el.firstChild) {
+          el.removeChild(el.firstChild);
+        }
+      }
+
+      module.exports = {
+        extend: extend,
+        render: render,
+        setStyle: setStyle,
+        setStyles: setStyles,
+        capitalize: capitalize,
+        isString: isString,
+        isFunction: isFunction,
+        isObject: isObject,
+        forEachObject: forEachObject,
+        floatEquals: floatEquals,
+        removeChildren: removeChildren
+      };
+    }, {}] }, {}, [4])(4);
+});
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_three_js__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_three_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_three_js__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__third_party_Tween__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__third_party_Tween___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__third_party_Tween__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__third_party_progressbar__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__third_party_progressbar___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__third_party_progressbar__);
+// import * as THREE from './third-party/threejs/three';
+
+/**
+ * WoningVR is realized with the help of an article on Medium
+ * https://medium.com/adventures-in-consumer-technology/how-to-start-building-your-own-webgl-based-vr-app-cdaf47b8132a
+ *
+ * Description : WoningVR is based on heavy javascript use, which renders a heat map and making it possible to orientate through the building.
+ * Author : Wesley Cheung <0887267@hr.nl>
+ *
+ */
+/*******************************************
+ * IMPORTS
+ ******************************************/
+
+
+
+
+/*******************************************
+ * VARIABLES
+ ******************************************/
+var THREE = __WEBPACK_IMPORTED_MODULE_0_three_js___default()(["OBJLoader", "OrbitControls"]);
+var StereoEffect = __webpack_require__(72)(THREE);
+
+var camera = void 0,
+    scene = void 0,
+    renderer = void 0,
+    left_bar = void 0,
+    right_bar = void 0,
+    effect = void 0,
+    controls = void 0,
+    element = void 0,
+    container = void 0,
+    scCube = void 0,
+    mesh = void 0,
+    x = void 0,
+    intersects = void 0,
+    animScale = void 0,
+    msg = void 0,
+    buttonState = void 0;
+
+var selectableObjs = [];
+
+var width = window.innerWidth,
+    height = window.innerHeight;
+var clock = new THREE.Clock();
+
+var min = { x: 100, y: 100, z: 100 };
+var touchTweenTo = new __WEBPACK_IMPORTED_MODULE_1__third_party_Tween__["Tween"](min);
+var max = { x: 120, y: 120, z: 120 };
+
+// Set up animation cycle used on touched objects
+touchTweenTo.to(max, 200);
+touchTweenTo.easing(__WEBPACK_IMPORTED_MODULE_1__third_party_Tween__["Easing"].Bounce.InOut);
+touchTweenTo.repeat(Infinity); // repeats forever
+touchTweenTo.start();
+
+// Selection time for the guiding circles
+var SELECTION_TIME = 2000;
+
+// Full screen
+var goFS = document.getElementById("goFS");
+document.getElementById("goFS").style.display = 'block';
+var doc = window.document;
+var docEl = doc.documentElement;
+
+/*******************************************
+ * EVENT LISTENERS
+ ******************************************/
+goFS.addEventListener("click", function () {
+    fullscreen(docEl);
+}, false);
+
+document.addEventListener('webkitfullscreenchange', function (e) {
+    buttonState = document.getElementById("goFS").style.display;
+    if (buttonState == 'block' || buttonState == 'undefined') {
+        document.getElementById("goFS").style.display = 'none';
+    }
+    if (buttonState == 'none') {
+        document.getElementById("goFS").style.display = 'block';
+    }
+});
+
+function setOrientationControls(e) {
+    if (!e.alpha) {
+        return;
+    }
+
+    controls = __webpack_require__(73)(THREE, camera);
+    controls.connect();
+    controls.update();
+
+    element.addEventListener('click', fullscreen, false);
+    window.removeEventListener('deviceorientation', setOrientationControls, true);
+}
+window.addEventListener('deviceorientation', setOrientationControls, true);
+
+document.getElementById("selection_confirmation_overlay").style.display = 'none';
+
+/*******************************************
+ * FUNCTIONS FOR BUILDING THE SCENE
+ ******************************************/
+function fullscreen(container) {
+    if (container.requestFullscreen) {
+        container.requestFullscreen();
+    } else if (container.msRequestFullscreen) {
+        container.msRequestFullscreen();
+    } else if (container.mozRequestFullScreen) {
+        container.mozRequestFullScreen();
+    } else if (container.webkitRequestFullscreen) {
+        container.webkitRequestFullscreen();
+    }
+}
+
+function resetCamera() {
+    controls.target.set(camera.position.x + 0.1, camera.position.y, camera.position.z);
+}
+
+function create_guide_circles() {
+    left_bar = new __WEBPACK_IMPORTED_MODULE_2__third_party_progressbar__["Circle"]('#guide_circle_left', {
+        strokeWidth: 10,
+        easing: 'easeInOut',
+        duration: SELECTION_TIME,
+        color: 'lime',
+        trailWidth: 2,
+        svgStyle: null
+    });
+
+    right_bar = new __WEBPACK_IMPORTED_MODULE_2__third_party_progressbar__["Circle"]('#guide_circle_right', {
+        strokeWidth: 10,
+        easing: 'easeInOut',
+        duration: SELECTION_TIME,
+        color: 'lime',
+        trailWidth: 2,
+        svgStyle: null
+    });
+}
+
+function create_stereo_scene() {
+    //Stereo scene
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    element = renderer.domElement;
+    container = document.getElementById('scene');
+    container.appendChild(element);
+
+    effect = new StereoEffect(renderer);
+
+    scene = new THREE.Scene();
+
+    camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
+    camera.position.set(0, -5, 0);
+    scene.add(camera);
+
+    controls = new THREE.OrbitControls(camera, element);
+    controls.target.set(camera.position.x + 0.1, camera.position.y, camera.position.z);
+
+    // Add lights
+    var ambLight = new THREE.AmbientLight(0x808080); // soft white light
+
+    var ptLight = new THREE.PointLight(0xffffff, 1.75, 1000);
+    ptLight.position.set(-100, 100, 100);
+
+    scene.add(ambLight);
+    scene.add(ptLight);
+}
+
+function drawScene(load_image) {
+    var geometry = new THREE.SphereGeometry(50, 30, 15);
+    geometry.scale(-1, 1, 1);
+    // geometry.userData = {name: 'sphere_scene', touched: false };
+
+    var material = new THREE.MeshBasicMaterial({
+        map: new THREE.TextureLoader().load(load_image)
+    });
+
+    mesh = new THREE.Mesh(geometry, material);
+    mesh.material.side = THREE.DoubleSide;
+
+    selectableObjs.push(mesh);
+    scene.add(mesh);
+}
+
+function meshloader(fileName, position_x, position_y, position_z, rotation, title) {
+    return function (geometry) {
+        //Place in scene
+        var color = void 0;
+        if (fileName.indexOf("star") !== -1) {
+            color = 0xFF6500;
+            geometry.scale.set(50, 50, 50);
+            geometry.position.z = position_z;
+            geometry.position.y = position_y;
+            geometry.position.x = position_x;
+            geometry.rotation.y = rotation;
+            selectableObjs.push(geometry);
+            geometry.userData = { name: title, touched: false };
+            scene.add(geometry);
+        }
+
+        //Apply material
+        geometry.traverse(function (child) {
+            if (child instanceof THREE.Mesh) {
+                var material = new THREE.MeshPhongMaterial({ color: color,
+                    side: THREE.DoubleSide,
+                    emissive: 0x000000,
+                    envMap: scCube
+                });
+                child.material = material;
+            }
+        });
+    };
+}
+
+function drawShapes() {
+    var manager = new THREE.LoadingManager();
+    manager.onProgress = function (item, loaded, total) {
+        console.log(item, loaded, total);
+    };
+
+    var objLoader = new THREE.OBJLoader(manager);
+    objLoader.load("models/star_charm.obj", meshloader("models/star_charm.obj", -28, -2.7, -40, 0.5, "objStar"));
+    // objLoader.load( "models/star_charm.obj", meshloader("models/star_charm.obj", -35, 5, -15, 0.5, "objStar"));
+}
+
+//What happens after an object is selected
+function postSelectAction(selectedObjectName) {
+    console.log("The " + selectedObjectName + " was selected by user. Use this function to create appropriate scene transition.");
+
+    document.getElementById("selection_confirmation_overlay").style.display = 'block';
+
+    setTimeout(function () {
+        document.getElementById("selection_confirmation_overlay").style.display = 'none';
+        if (selectedObjectName == 'objStar') {
+            drawScene('./images/room_2.jpg');
+            resetCamera();
+        }
+    }, 250);
+}
+
+function getIntersections(objects) {
+    var raycaster = new THREE.Raycaster();
+
+    var vector = new THREE.Vector3(0, 0, -1);
+    vector.applyQuaternion(camera.quaternion);
+
+    raycaster.set(camera.position, vector);
+
+    return raycaster.intersectObjects(objects, true);
+}
+
+function updateHUDTxt(msg) {
+    x = document.getElementsByClassName("info_text"); // Find the elements
+    for (var i = 0; i < x.length; i++) {
+        x[i].innerText = msg; // Change the content
+    }
+}
+
+function getTouchMsg(charm) {
+    msg = "That's a " + charm + ", which has the power to ";
+
+    switch (charm) {
+        case "heart":
+            msg = msg + "bring things to life.";
+            msg = msg.replace(charm, "pink " + charm);
+            break;
+        case "moon":
+            msg = msg + "make things invisible.";
+            msg = msg.replace(charm, "blue " + charm);
+            break;
+        case "clover":
+            msg = msg + "bring luck (but you never know which kind).";
+            msg = msg.replace(charm, "green " + charm);
+            break;
+        case "star":
+            msg = msg + "make things fly (but you already have that).";
+            msg = msg.replace(charm, "orange " + charm);
+            break;
+
+    }
+
+    return msg + " Keep looking at it to select it.";
+}
+
+function resize() {
+    var width = container.offsetWidth;
+    var height = container.offsetHeight;
+
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(width, height);
+    effect.setSize(width, height);
+}
+
+function update(dt) {
+    resize();
+
+    camera.updateProjectionMatrix();
+
+    // check camera positioning
+    // console.log(camera.position);
+    controls.update(dt);
+}
+
+function render(dt) {
+
+    updateHUDTxt(""); //Set HUD txt to blank to start render loop.
+
+    intersects = getIntersections(selectableObjs);
+    // console.log(intersects);
+
+    if (intersects.length == 0) {
+        //nothing being "touched"
+        left_bar.set(0.0); //reset any active progress bars to 0
+        right_bar.set(0.0);
+
+        //Loop over all OBJ objects
+        scene.traverse(function (object) {
+            //Set all touch flag to false as nothing is selected.
+            if (object instanceof THREE.Group) {
+                if (intersects.length == 0) {
+                    object.userData.touched = false;
+                }
+            }
+        });
+    } else {
+        //something being touched
+        console.log(intersects[0].point);
+        var point_x = intersects[0].point.x;
+        var point_y = intersects[0].point.y;
+        var point_z = intersects[0].point.z;
+
+        // var material = new THREE.LineBasicMaterial({
+        //     color: 0x0000ff
+        // });
+        //
+        // var geometry = new THREE.Geometry();
+        // geometry.vertices.push(
+        //     new THREE.Vector3( -10, 0, 0 ),
+        //     new THREE.Vector3( -35, 5, -15 ),
+        //     new THREE.Vector3( 10, 0, 0 )
+        // );
+        //
+        // geometry.vertices.push(
+        //     new THREE.Vector3( intersects[0].point.x, intersects[0].point.y, intersects[0].point.z ),
+        // );
+        //
+        // var line = new THREE.Line( geometry, material );
+        // scene.add( line );
+
+        //Set the touched touch flag to true, so we can give it special treatment in the animation function
+        intersects[0].object.parent.userData.touched = true;
+        msg = getTouchMsg(intersects[0].object.parent.userData.name); //update HUD text to register the touch
+        updateHUDTxt(msg);
+    }
+
+    effect.render(scene, camera);
+}
+
+function animate(t) {
+
+    __WEBPACK_IMPORTED_MODULE_1__third_party_Tween__["update"]();
+
+    touchTweenTo.onUpdate(function () {
+        animScale = this;
+    });
+
+    scene.traverse(function (object) {
+        if (object instanceof THREE.Group) {
+            // object.rotation.y = object.rotation.y + 0.01;
+
+            if (object.userData.touched) {
+                object.scale.x = animScale.x / 1.5;
+                object.scale.y = animScale.y / 1.5;
+                object.scale.z = animScale.z / 1.5;
+
+                if (left_bar.value() == 0) {
+                    //don't restart progress bar if already progress
+                    left_bar.animate(1.0, {}, function () {
+                        postSelectAction(object.userData.name); //add callback to left side progress bar to register completed selection
+                    });
+                }
+                if (right_bar.value() == 0) {
+                    //don't restart if in progress
+                    right_bar.animate(1.0);
+                }
+            }
+        }
+    });
+
+    requestAnimationFrame(animate);
+
+    update(clock.getDelta());
+    render(clock.getDelta());
+}
+
+function initialize_vr() {
+    create_guide_circles();
+    create_stereo_scene();
+
+    drawShapes();
+    drawScene('./images/room_1.jpg');
+
+    window.addEventListener('resize', resize, false);
+    setTimeout(resize, 1);
+}
+
+/*******************************************
+ * BUILD THREE.JS SCENE
+ ******************************************/
+initialize_vr();
+animate();
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
  * jQuery JavaScript Library v3.2.1
  * https://jquery.com/
@@ -10327,6037 +14035,7 @@ return jQuery;
 
 
 /***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-
-/**
- * First we will load all of this project's JavaScript dependencies which
- * includes Vue and other libraries. It is a great starting point when
- * building robust, powerful web applications using Vue and Laravel.
- */
-
-__webpack_require__(3);
-__webpack_require__(6);
-
-/**
- * Next, we will create a fresh Vue application instance and attach it to
- * the page. Then, you may begin adding components to this application
- * or customize the JavaScript scaffolding to fit your unique needs.
- */
-
-// Vue.component('example', require('./components/Example.vue'));
-//
-// const app = new Vue({
-//     el: '#app'
-// });
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-
-window._ = __webpack_require__(8);
-
-/**
- * We'll load jQuery and the Bootstrap jQuery plugin which provides support
- * for JavaScript based Bootstrap features such as modals and tabs. This
- * code may be modified to fit the specific needs of your application.
- */
-
-window.$ = window.jQuery = __webpack_require__(0);
-
-__webpack_require__(7);
-
-/**
- * Vue is a modern JavaScript library for building interactive web interfaces
- * using reactive data binding and reusable components. Vue's API is clean
- * and simple, leaving you to focus on building your next great project.
- */
-
-// window.Vue = require('vue');
-
-/**
- * We'll load the axios HTTP library which allows us to easily issue requests
- * to our Laravel back-end. This library automatically handles sending the
- * CSRF token as a header based on the value of the "XSRF" token cookie.
- */
-
-// window.axios = require('axios');
-//
-// window.axios.defaults.headers.common = {
-//     'X-CSRF-TOKEN': window.Laravel.csrfToken,
-//     'X-Requested-With': 'XMLHttpRequest'
-// };
-
-/**
- * Echo exposes an expressive API for subscribing to channels and listening
- * for events that are broadcast by Laravel. Echo and event broadcasting
- * allows your team to easily build robust real-time web applications.
- */
-
-// import Echo from 'laravel-echo'
-
-// window.Pusher = require('pusher-js');
-
-// window.Echo = new Echo({
-//     broadcaster: 'pusher',
-//     key: 'your-pusher-key'
-// });
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(process) {var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-/**
- * Tween.js - Licensed under the MIT license
- * https://github.com/tweenjs/tween.js
- * ----------------------------------------------
- *
- * See https://github.com/tweenjs/tween.js/graphs/contributors for the full list of contributors.
- * Thank you all, you're awesome!
- */
-
-var TWEEN = TWEEN || function () {
-
-	var _tweens = [];
-
-	return {
-
-		getAll: function getAll() {
-
-			return _tweens;
-		},
-
-		removeAll: function removeAll() {
-
-			_tweens = [];
-		},
-
-		add: function add(tween) {
-
-			_tweens.push(tween);
-		},
-
-		remove: function remove(tween) {
-
-			var i = _tweens.indexOf(tween);
-
-			if (i !== -1) {
-				_tweens.splice(i, 1);
-			}
-		},
-
-		update: function update(time, preserve) {
-
-			if (_tweens.length === 0) {
-				return false;
-			}
-
-			var i = 0;
-
-			time = time !== undefined ? time : TWEEN.now();
-
-			while (i < _tweens.length) {
-
-				if (_tweens[i].update(time) || preserve) {
-					i++;
-				} else {
-					_tweens.splice(i, 1);
-				}
-			}
-
-			return true;
-		}
-	};
-}();
-
-// Include a performance.now polyfill
-(function () {
-	// In node.js, use process.hrtime.
-	if (this.window === undefined && this.process !== undefined) {
-		TWEEN.now = function () {
-			var time = process.hrtime();
-
-			// Convert [seconds, nanoseconds] to milliseconds.
-			return time[0] * 1000 + time[1] / 1000000;
-		};
-	}
-	// In a browser, use window.performance.now if it is available.
-	else if (this.window !== undefined && window.performance !== undefined && window.performance.now !== undefined) {
-
-			// This must be bound, because directly assigning this function
-			// leads to an invocation exception in Chrome.
-			TWEEN.now = window.performance.now.bind(window.performance);
-		}
-		// Use Date.now if it is available.
-		else if (Date.now !== undefined) {
-				TWEEN.now = Date.now;
-			}
-			// Otherwise, use 'new Date().getTime()'.
-			else {
-					TWEEN.now = function () {
-						return new Date().getTime();
-					};
-				}
-}).bind(this)();
-
-TWEEN.Tween = function (object) {
-
-	var _object = object;
-	var _valuesStart = {};
-	var _valuesEnd = {};
-	var _valuesStartRepeat = {};
-	var _duration = 1000;
-	var _repeat = 0;
-	var _repeatDelayTime;
-	var _yoyo = false;
-	var _isPlaying = false;
-	var _reversed = false;
-	var _delayTime = 0;
-	var _startTime = null;
-	var _easingFunction = TWEEN.Easing.Linear.None;
-	var _interpolationFunction = TWEEN.Interpolation.Linear;
-	var _chainedTweens = [];
-	var _onStartCallback = null;
-	var _onStartCallbackFired = false;
-	var _onUpdateCallback = null;
-	var _onCompleteCallback = null;
-	var _onStopCallback = null;
-
-	// Set all starting values present on the target object
-	for (var field in object) {
-		_valuesStart[field] = parseFloat(object[field], 10);
-	}
-
-	this.to = function (properties, duration) {
-
-		if (duration !== undefined) {
-			_duration = duration;
-		}
-
-		_valuesEnd = properties;
-
-		return this;
-	};
-
-	this.start = function (time) {
-
-		TWEEN.add(this);
-
-		_isPlaying = true;
-
-		_onStartCallbackFired = false;
-
-		_startTime = time !== undefined ? time : TWEEN.now();
-		_startTime += _delayTime;
-
-		for (var property in _valuesEnd) {
-
-			// Check if an Array was provided as property value
-			if (_valuesEnd[property] instanceof Array) {
-
-				if (_valuesEnd[property].length === 0) {
-					continue;
-				}
-
-				// Create a local copy of the Array with the start value at the front
-				_valuesEnd[property] = [_object[property]].concat(_valuesEnd[property]);
-			}
-
-			// If `to()` specifies a property that doesn't exist in the source object,
-			// we should not set that property in the object
-			if (_valuesStart[property] === undefined) {
-				continue;
-			}
-
-			_valuesStart[property] = _object[property];
-
-			if (_valuesStart[property] instanceof Array === false) {
-				_valuesStart[property] *= 1.0; // Ensures we're using numbers, not strings
-			}
-
-			_valuesStartRepeat[property] = _valuesStart[property] || 0;
-		}
-
-		return this;
-	};
-
-	this.stop = function () {
-
-		if (!_isPlaying) {
-			return this;
-		}
-
-		TWEEN.remove(this);
-		_isPlaying = false;
-
-		if (_onStopCallback !== null) {
-			_onStopCallback.call(_object);
-		}
-
-		this.stopChainedTweens();
-		return this;
-	};
-
-	this.end = function () {
-
-		this.update(_startTime + _duration);
-		return this;
-	};
-
-	this.stopChainedTweens = function () {
-
-		for (var i = 0, numChainedTweens = _chainedTweens.length; i < numChainedTweens; i++) {
-			_chainedTweens[i].stop();
-		}
-	};
-
-	this.delay = function (amount) {
-
-		_delayTime = amount;
-		return this;
-	};
-
-	this.repeat = function (times) {
-
-		_repeat = times;
-		return this;
-	};
-
-	this.repeatDelay = function (amount) {
-
-		_repeatDelayTime = amount;
-		return this;
-	};
-
-	this.yoyo = function (yoyo) {
-
-		_yoyo = yoyo;
-		return this;
-	};
-
-	this.easing = function (easing) {
-
-		_easingFunction = easing;
-		return this;
-	};
-
-	this.interpolation = function (interpolation) {
-
-		_interpolationFunction = interpolation;
-		return this;
-	};
-
-	this.chain = function () {
-
-		_chainedTweens = arguments;
-		return this;
-	};
-
-	this.onStart = function (callback) {
-
-		_onStartCallback = callback;
-		return this;
-	};
-
-	this.onUpdate = function (callback) {
-
-		_onUpdateCallback = callback;
-		return this;
-	};
-
-	this.onComplete = function (callback) {
-
-		_onCompleteCallback = callback;
-		return this;
-	};
-
-	this.onStop = function (callback) {
-
-		_onStopCallback = callback;
-		return this;
-	};
-
-	this.update = function (time) {
-
-		var property;
-		var elapsed;
-		var value;
-
-		if (time < _startTime) {
-			return true;
-		}
-
-		if (_onStartCallbackFired === false) {
-
-			if (_onStartCallback !== null) {
-				_onStartCallback.call(_object);
-			}
-
-			_onStartCallbackFired = true;
-		}
-
-		elapsed = (time - _startTime) / _duration;
-		elapsed = elapsed > 1 ? 1 : elapsed;
-
-		value = _easingFunction(elapsed);
-
-		for (property in _valuesEnd) {
-
-			// Don't update properties that do not exist in the source object
-			if (_valuesStart[property] === undefined) {
-				continue;
-			}
-
-			var start = _valuesStart[property] || 0;
-			var end = _valuesEnd[property];
-
-			if (end instanceof Array) {
-
-				_object[property] = _interpolationFunction(end, value);
-			} else {
-
-				// Parses relative end values with start as base (e.g.: +10, -3)
-				if (typeof end === 'string') {
-
-					if (end.charAt(0) === '+' || end.charAt(0) === '-') {
-						end = start + parseFloat(end, 10);
-					} else {
-						end = parseFloat(end, 10);
-					}
-				}
-
-				// Protect against non numeric properties.
-				if (typeof end === 'number') {
-					_object[property] = start + (end - start) * value;
-				}
-			}
-		}
-
-		if (_onUpdateCallback !== null) {
-			_onUpdateCallback.call(_object, value);
-		}
-
-		if (elapsed === 1) {
-
-			if (_repeat > 0) {
-
-				if (isFinite(_repeat)) {
-					_repeat--;
-				}
-
-				// Reassign starting values, restart by making startTime = now
-				for (property in _valuesStartRepeat) {
-
-					if (typeof _valuesEnd[property] === 'string') {
-						_valuesStartRepeat[property] = _valuesStartRepeat[property] + parseFloat(_valuesEnd[property], 10);
-					}
-
-					if (_yoyo) {
-						var tmp = _valuesStartRepeat[property];
-
-						_valuesStartRepeat[property] = _valuesEnd[property];
-						_valuesEnd[property] = tmp;
-					}
-
-					_valuesStart[property] = _valuesStartRepeat[property];
-				}
-
-				if (_yoyo) {
-					_reversed = !_reversed;
-				}
-
-				if (_repeatDelayTime !== undefined) {
-					_startTime = time + _repeatDelayTime;
-				} else {
-					_startTime = time + _delayTime;
-				}
-
-				return true;
-			} else {
-
-				if (_onCompleteCallback !== null) {
-					_onCompleteCallback.call(_object);
-				}
-
-				for (var i = 0, numChainedTweens = _chainedTweens.length; i < numChainedTweens; i++) {
-					// Make the chained tweens start exactly at the time they should,
-					// even if the `update()` method was called way past the duration of the tween
-					_chainedTweens[i].start(_startTime + _duration);
-				}
-
-				return false;
-			}
-		}
-
-		return true;
-	};
-};
-
-TWEEN.Easing = {
-
-	Linear: {
-
-		None: function None(k) {
-
-			return k;
-		}
-
-	},
-
-	Quadratic: {
-
-		In: function In(k) {
-
-			return k * k;
-		},
-
-		Out: function Out(k) {
-
-			return k * (2 - k);
-		},
-
-		InOut: function InOut(k) {
-
-			if ((k *= 2) < 1) {
-				return 0.5 * k * k;
-			}
-
-			return -0.5 * (--k * (k - 2) - 1);
-		}
-
-	},
-
-	Cubic: {
-
-		In: function In(k) {
-
-			return k * k * k;
-		},
-
-		Out: function Out(k) {
-
-			return --k * k * k + 1;
-		},
-
-		InOut: function InOut(k) {
-
-			if ((k *= 2) < 1) {
-				return 0.5 * k * k * k;
-			}
-
-			return 0.5 * ((k -= 2) * k * k + 2);
-		}
-
-	},
-
-	Quartic: {
-
-		In: function In(k) {
-
-			return k * k * k * k;
-		},
-
-		Out: function Out(k) {
-
-			return 1 - --k * k * k * k;
-		},
-
-		InOut: function InOut(k) {
-
-			if ((k *= 2) < 1) {
-				return 0.5 * k * k * k * k;
-			}
-
-			return -0.5 * ((k -= 2) * k * k * k - 2);
-		}
-
-	},
-
-	Quintic: {
-
-		In: function In(k) {
-
-			return k * k * k * k * k;
-		},
-
-		Out: function Out(k) {
-
-			return --k * k * k * k * k + 1;
-		},
-
-		InOut: function InOut(k) {
-
-			if ((k *= 2) < 1) {
-				return 0.5 * k * k * k * k * k;
-			}
-
-			return 0.5 * ((k -= 2) * k * k * k * k + 2);
-		}
-
-	},
-
-	Sinusoidal: {
-
-		In: function In(k) {
-
-			return 1 - Math.cos(k * Math.PI / 2);
-		},
-
-		Out: function Out(k) {
-
-			return Math.sin(k * Math.PI / 2);
-		},
-
-		InOut: function InOut(k) {
-
-			return 0.5 * (1 - Math.cos(Math.PI * k));
-		}
-
-	},
-
-	Exponential: {
-
-		In: function In(k) {
-
-			return k === 0 ? 0 : Math.pow(1024, k - 1);
-		},
-
-		Out: function Out(k) {
-
-			return k === 1 ? 1 : 1 - Math.pow(2, -10 * k);
-		},
-
-		InOut: function InOut(k) {
-
-			if (k === 0) {
-				return 0;
-			}
-
-			if (k === 1) {
-				return 1;
-			}
-
-			if ((k *= 2) < 1) {
-				return 0.5 * Math.pow(1024, k - 1);
-			}
-
-			return 0.5 * (-Math.pow(2, -10 * (k - 1)) + 2);
-		}
-
-	},
-
-	Circular: {
-
-		In: function In(k) {
-
-			return 1 - Math.sqrt(1 - k * k);
-		},
-
-		Out: function Out(k) {
-
-			return Math.sqrt(1 - --k * k);
-		},
-
-		InOut: function InOut(k) {
-
-			if ((k *= 2) < 1) {
-				return -0.5 * (Math.sqrt(1 - k * k) - 1);
-			}
-
-			return 0.5 * (Math.sqrt(1 - (k -= 2) * k) + 1);
-		}
-
-	},
-
-	Elastic: {
-
-		In: function In(k) {
-
-			if (k === 0) {
-				return 0;
-			}
-
-			if (k === 1) {
-				return 1;
-			}
-
-			return -Math.pow(2, 10 * (k - 1)) * Math.sin((k - 1.1) * 5 * Math.PI);
-		},
-
-		Out: function Out(k) {
-
-			if (k === 0) {
-				return 0;
-			}
-
-			if (k === 1) {
-				return 1;
-			}
-
-			return Math.pow(2, -10 * k) * Math.sin((k - 0.1) * 5 * Math.PI) + 1;
-		},
-
-		InOut: function InOut(k) {
-
-			if (k === 0) {
-				return 0;
-			}
-
-			if (k === 1) {
-				return 1;
-			}
-
-			k *= 2;
-
-			if (k < 1) {
-				return -0.5 * Math.pow(2, 10 * (k - 1)) * Math.sin((k - 1.1) * 5 * Math.PI);
-			}
-
-			return 0.5 * Math.pow(2, -10 * (k - 1)) * Math.sin((k - 1.1) * 5 * Math.PI) + 1;
-		}
-
-	},
-
-	Back: {
-
-		In: function In(k) {
-
-			var s = 1.70158;
-
-			return k * k * ((s + 1) * k - s);
-		},
-
-		Out: function Out(k) {
-
-			var s = 1.70158;
-
-			return --k * k * ((s + 1) * k + s) + 1;
-		},
-
-		InOut: function InOut(k) {
-
-			var s = 1.70158 * 1.525;
-
-			if ((k *= 2) < 1) {
-				return 0.5 * (k * k * ((s + 1) * k - s));
-			}
-
-			return 0.5 * ((k -= 2) * k * ((s + 1) * k + s) + 2);
-		}
-
-	},
-
-	Bounce: {
-
-		In: function In(k) {
-
-			return 1 - TWEEN.Easing.Bounce.Out(1 - k);
-		},
-
-		Out: function Out(k) {
-
-			if (k < 1 / 2.75) {
-				return 7.5625 * k * k;
-			} else if (k < 2 / 2.75) {
-				return 7.5625 * (k -= 1.5 / 2.75) * k + 0.75;
-			} else if (k < 2.5 / 2.75) {
-				return 7.5625 * (k -= 2.25 / 2.75) * k + 0.9375;
-			} else {
-				return 7.5625 * (k -= 2.625 / 2.75) * k + 0.984375;
-			}
-		},
-
-		InOut: function InOut(k) {
-
-			if (k < 0.5) {
-				return TWEEN.Easing.Bounce.In(k * 2) * 0.5;
-			}
-
-			return TWEEN.Easing.Bounce.Out(k * 2 - 1) * 0.5 + 0.5;
-		}
-
-	}
-
-};
-
-TWEEN.Interpolation = {
-
-	Linear: function Linear(v, k) {
-
-		var m = v.length - 1;
-		var f = m * k;
-		var i = Math.floor(f);
-		var fn = TWEEN.Interpolation.Utils.Linear;
-
-		if (k < 0) {
-			return fn(v[0], v[1], f);
-		}
-
-		if (k > 1) {
-			return fn(v[m], v[m - 1], m - f);
-		}
-
-		return fn(v[i], v[i + 1 > m ? m : i + 1], f - i);
-	},
-
-	Bezier: function Bezier(v, k) {
-
-		var b = 0;
-		var n = v.length - 1;
-		var pw = Math.pow;
-		var bn = TWEEN.Interpolation.Utils.Bernstein;
-
-		for (var i = 0; i <= n; i++) {
-			b += pw(1 - k, n - i) * pw(k, i) * v[i] * bn(n, i);
-		}
-
-		return b;
-	},
-
-	CatmullRom: function CatmullRom(v, k) {
-
-		var m = v.length - 1;
-		var f = m * k;
-		var i = Math.floor(f);
-		var fn = TWEEN.Interpolation.Utils.CatmullRom;
-
-		if (v[0] === v[m]) {
-
-			if (k < 0) {
-				i = Math.floor(f = m * (1 + k));
-			}
-
-			return fn(v[(i - 1 + m) % m], v[i], v[(i + 1) % m], v[(i + 2) % m], f - i);
-		} else {
-
-			if (k < 0) {
-				return v[0] - (fn(v[0], v[0], v[1], v[1], -f) - v[0]);
-			}
-
-			if (k > 1) {
-				return v[m] - (fn(v[m], v[m], v[m - 1], v[m - 1], f - m) - v[m]);
-			}
-
-			return fn(v[i ? i - 1 : 0], v[i], v[m < i + 1 ? m : i + 1], v[m < i + 2 ? m : i + 2], f - i);
-		}
-	},
-
-	Utils: {
-
-		Linear: function Linear(p0, p1, t) {
-
-			return (p1 - p0) * t + p0;
-		},
-
-		Bernstein: function Bernstein(n, i) {
-
-			var fc = TWEEN.Interpolation.Utils.Factorial;
-
-			return fc(n) / fc(i) / fc(n - i);
-		},
-
-		Factorial: function () {
-
-			var a = [1];
-
-			return function (n) {
-
-				var s = 1;
-
-				if (a[n]) {
-					return a[n];
-				}
-
-				for (var i = n; i > 1; i--) {
-					s *= i;
-				}
-
-				a[n] = s;
-				return s;
-			};
-		}(),
-
-		CatmullRom: function CatmullRom(p0, p1, p2, p3, t) {
-
-			var v0 = (p2 - p0) * 0.5;
-			var v1 = (p3 - p1) * 0.5;
-			var t2 = t * t;
-			var t3 = t * t2;
-
-			return (2 * p1 - 2 * p2 + v0 + v1) * t3 + (-3 * p1 + 3 * p2 - 2 * v0 - v1) * t2 + v0 * t + p1;
-		}
-
-	}
-
-};
-
-// UMD (Universal Module Definition)
-(function (root) {
-
-	if (true) {
-
-		// AMD
-		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-			return TWEEN;
-		}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	} else if (typeof module !== 'undefined' && (typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object') {
-
-		// Node.js
-		module.exports = TWEEN;
-	} else if (root !== undefined) {
-
-		// Global variable
-		root.TWEEN = TWEEN;
-	}
-})(this);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var require;var require;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-// ProgressBar.js 1.0.1
-// https://kimmobrunfeldt.github.io/progressbar.js
-// License: MIT
-
-(function (f) {
-  if (( false ? "undefined" : _typeof(exports)) === "object" && typeof module !== "undefined") {
-    module.exports = f();
-  } else if (true) {
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_FACTORY__ = (f),
-				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
-				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-  } else {
-    var g;if (typeof window !== "undefined") {
-      g = window;
-    } else if (typeof global !== "undefined") {
-      g = global;
-    } else if (typeof self !== "undefined") {
-      g = self;
-    } else {
-      g = this;
-    }g.ProgressBar = f();
-  }
-})(function () {
-  var define, module, exports;return function e(t, n, r) {
-    function s(o, u) {
-      if (!n[o]) {
-        if (!t[o]) {
-          var a = typeof require == "function" && require;if (!u && a) return require(o, !0);if (i) return i(o, !0);var f = new Error("Cannot find module '" + o + "'");throw f.code = "MODULE_NOT_FOUND", f;
-        }var l = n[o] = { exports: {} };t[o][0].call(l.exports, function (e) {
-          var n = t[o][1][e];return s(n ? n : e);
-        }, l, l.exports, e, t, n, r);
-      }return n[o].exports;
-    }var i = typeof require == "function" && require;for (var o = 0; o < r.length; o++) {
-      s(r[o]);
-    }return s;
-  }({ 1: [function (require, module, exports) {
-      /* shifty - v1.5.2 - 2016-02-10 - http://jeremyckahn.github.io/shifty */
-      ;(function () {
-        var root = this || Function('return this')();
-
-        /**
-         * Shifty Core
-         * By Jeremy Kahn - jeremyckahn@gmail.com
-         */
-
-        var Tweenable = function () {
-
-          'use strict';
-
-          // Aliases that get defined later in this function
-
-          var formula;
-
-          // CONSTANTS
-          var DEFAULT_SCHEDULE_FUNCTION;
-          var DEFAULT_EASING = 'linear';
-          var DEFAULT_DURATION = 500;
-          var UPDATE_TIME = 1000 / 60;
-
-          var _now = Date.now ? Date.now : function () {
-            return +new Date();
-          };
-
-          var now = typeof SHIFTY_DEBUG_NOW !== 'undefined' ? SHIFTY_DEBUG_NOW : _now;
-
-          if (typeof window !== 'undefined') {
-            // requestAnimationFrame() shim by Paul Irish (modified for Shifty)
-            // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-            DEFAULT_SCHEDULE_FUNCTION = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || window.mozCancelRequestAnimationFrame && window.mozRequestAnimationFrame || setTimeout;
-          } else {
-            DEFAULT_SCHEDULE_FUNCTION = setTimeout;
-          }
-
-          function noop() {}
-          // NOOP!
-
-
-          /**
-           * Handy shortcut for doing a for-in loop. This is not a "normal" each
-           * function, it is optimized for Shifty.  The iterator function only receives
-           * the property name, not the value.
-           * @param {Object} obj
-           * @param {Function(string)} fn
-           * @private
-           */
-          function each(obj, fn) {
-            var key;
-            for (key in obj) {
-              if (Object.hasOwnProperty.call(obj, key)) {
-                fn(key);
-              }
-            }
-          }
-
-          /**
-           * Perform a shallow copy of Object properties.
-           * @param {Object} targetObject The object to copy into
-           * @param {Object} srcObject The object to copy from
-           * @return {Object} A reference to the augmented `targetObj` Object
-           * @private
-           */
-          function shallowCopy(targetObj, srcObj) {
-            each(srcObj, function (prop) {
-              targetObj[prop] = srcObj[prop];
-            });
-
-            return targetObj;
-          }
-
-          /**
-           * Copies each property from src onto target, but only if the property to
-           * copy to target is undefined.
-           * @param {Object} target Missing properties in this Object are filled in
-           * @param {Object} src
-           * @private
-           */
-          function defaults(target, src) {
-            each(src, function (prop) {
-              if (typeof target[prop] === 'undefined') {
-                target[prop] = src[prop];
-              }
-            });
-          }
-
-          /**
-           * Calculates the interpolated tween values of an Object for a given
-           * timestamp.
-           * @param {Number} forPosition The position to compute the state for.
-           * @param {Object} currentState Current state properties.
-           * @param {Object} originalState: The original state properties the Object is
-           * tweening from.
-           * @param {Object} targetState: The destination state properties the Object
-           * is tweening to.
-           * @param {number} duration: The length of the tween in milliseconds.
-           * @param {number} timestamp: The UNIX epoch time at which the tween began.
-           * @param {Object} easing: This Object's keys must correspond to the keys in
-           * targetState.
-           * @private
-           */
-          function tweenProps(forPosition, currentState, originalState, targetState, duration, timestamp, easing) {
-            var normalizedPosition = forPosition < timestamp ? 0 : (forPosition - timestamp) / duration;
-
-            var prop;
-            var easingObjectProp;
-            var easingFn;
-            for (prop in currentState) {
-              if (currentState.hasOwnProperty(prop)) {
-                easingObjectProp = easing[prop];
-                easingFn = typeof easingObjectProp === 'function' ? easingObjectProp : formula[easingObjectProp];
-
-                currentState[prop] = tweenProp(originalState[prop], targetState[prop], easingFn, normalizedPosition);
-              }
-            }
-
-            return currentState;
-          }
-
-          /**
-           * Tweens a single property.
-           * @param {number} start The value that the tween started from.
-           * @param {number} end The value that the tween should end at.
-           * @param {Function} easingFunc The easing curve to apply to the tween.
-           * @param {number} position The normalized position (between 0.0 and 1.0) to
-           * calculate the midpoint of 'start' and 'end' against.
-           * @return {number} The tweened value.
-           * @private
-           */
-          function tweenProp(start, end, easingFunc, position) {
-            return start + (end - start) * easingFunc(position);
-          }
-
-          /**
-           * Applies a filter to Tweenable instance.
-           * @param {Tweenable} tweenable The `Tweenable` instance to call the filter
-           * upon.
-           * @param {String} filterName The name of the filter to apply.
-           * @private
-           */
-          function applyFilter(tweenable, filterName) {
-            var filters = Tweenable.prototype.filter;
-            var args = tweenable._filterArgs;
-
-            each(filters, function (name) {
-              if (typeof filters[name][filterName] !== 'undefined') {
-                filters[name][filterName].apply(tweenable, args);
-              }
-            });
-          }
-
-          var timeoutHandler_endTime;
-          var timeoutHandler_currentTime;
-          var timeoutHandler_isEnded;
-          var timeoutHandler_offset;
-          /**
-           * Handles the update logic for one step of a tween.
-           * @param {Tweenable} tweenable
-           * @param {number} timestamp
-           * @param {number} delay
-           * @param {number} duration
-           * @param {Object} currentState
-           * @param {Object} originalState
-           * @param {Object} targetState
-           * @param {Object} easing
-           * @param {Function(Object, *, number)} step
-           * @param {Function(Function,number)}} schedule
-           * @param {number=} opt_currentTimeOverride Needed for accurate timestamp in
-           * Tweenable#seek.
-           * @private
-           */
-          function timeoutHandler(tweenable, timestamp, delay, duration, currentState, originalState, targetState, easing, step, schedule, opt_currentTimeOverride) {
-
-            timeoutHandler_endTime = timestamp + delay + duration;
-
-            timeoutHandler_currentTime = Math.min(opt_currentTimeOverride || now(), timeoutHandler_endTime);
-
-            timeoutHandler_isEnded = timeoutHandler_currentTime >= timeoutHandler_endTime;
-
-            timeoutHandler_offset = duration - (timeoutHandler_endTime - timeoutHandler_currentTime);
-
-            if (tweenable.isPlaying()) {
-              if (timeoutHandler_isEnded) {
-                step(targetState, tweenable._attachment, timeoutHandler_offset);
-                tweenable.stop(true);
-              } else {
-                tweenable._scheduleId = schedule(tweenable._timeoutHandler, UPDATE_TIME);
-
-                applyFilter(tweenable, 'beforeTween');
-
-                // If the animation has not yet reached the start point (e.g., there was
-                // delay that has not yet completed), just interpolate the starting
-                // position of the tween.
-                if (timeoutHandler_currentTime < timestamp + delay) {
-                  tweenProps(1, currentState, originalState, targetState, 1, 1, easing);
-                } else {
-                  tweenProps(timeoutHandler_currentTime, currentState, originalState, targetState, duration, timestamp + delay, easing);
-                }
-
-                applyFilter(tweenable, 'afterTween');
-
-                step(currentState, tweenable._attachment, timeoutHandler_offset);
-              }
-            }
-          }
-
-          /**
-           * Creates a usable easing Object from a string, a function or another easing
-           * Object.  If `easing` is an Object, then this function clones it and fills
-           * in the missing properties with `"linear"`.
-           * @param {Object.<string|Function>} fromTweenParams
-           * @param {Object|string|Function} easing
-           * @return {Object.<string|Function>}
-           * @private
-           */
-          function composeEasingObject(fromTweenParams, easing) {
-            var composedEasing = {};
-            var typeofEasing = typeof easing === "undefined" ? "undefined" : _typeof(easing);
-
-            if (typeofEasing === 'string' || typeofEasing === 'function') {
-              each(fromTweenParams, function (prop) {
-                composedEasing[prop] = easing;
-              });
-            } else {
-              each(fromTweenParams, function (prop) {
-                if (!composedEasing[prop]) {
-                  composedEasing[prop] = easing[prop] || DEFAULT_EASING;
-                }
-              });
-            }
-
-            return composedEasing;
-          }
-
-          /**
-           * Tweenable constructor.
-           * @class Tweenable
-           * @param {Object=} opt_initialState The values that the initial tween should
-           * start at if a `from` object is not provided to `{{#crossLink
-           * "Tweenable/tween:method"}}{{/crossLink}}` or `{{#crossLink
-           * "Tweenable/setConfig:method"}}{{/crossLink}}`.
-           * @param {Object=} opt_config Configuration object to be passed to
-           * `{{#crossLink "Tweenable/setConfig:method"}}{{/crossLink}}`.
-           * @module Tweenable
-           * @constructor
-           */
-          function Tweenable(opt_initialState, opt_config) {
-            this._currentState = opt_initialState || {};
-            this._configured = false;
-            this._scheduleFunction = DEFAULT_SCHEDULE_FUNCTION;
-
-            // To prevent unnecessary calls to setConfig do not set default
-            // configuration here.  Only set default configuration immediately before
-            // tweening if none has been set.
-            if (typeof opt_config !== 'undefined') {
-              this.setConfig(opt_config);
-            }
-          }
-
-          /**
-           * Configure and start a tween.
-           * @method tween
-           * @param {Object=} opt_config Configuration object to be passed to
-           * `{{#crossLink "Tweenable/setConfig:method"}}{{/crossLink}}`.
-           * @chainable
-           */
-          Tweenable.prototype.tween = function (opt_config) {
-            if (this._isTweening) {
-              return this;
-            }
-
-            // Only set default config if no configuration has been set previously and
-            // none is provided now.
-            if (opt_config !== undefined || !this._configured) {
-              this.setConfig(opt_config);
-            }
-
-            this._timestamp = now();
-            this._start(this.get(), this._attachment);
-            return this.resume();
-          };
-
-          /**
-           * Configure a tween that will start at some point in the future.
-           *
-           * @method setConfig
-           * @param {Object} config The following values are valid:
-           * - __from__ (_Object=_): Starting position.  If omitted, `{{#crossLink
-           *   "Tweenable/get:method"}}get(){{/crossLink}}` is used.
-           * - __to__ (_Object=_): Ending position.
-           * - __duration__ (_number=_): How many milliseconds to animate for.
-           * - __delay__ (_delay=_): How many milliseconds to wait before starting the
-           *   tween.
-           * - __start__ (_Function(Object, *)_): Function to execute when the tween
-           *   begins.  Receives the state of the tween as the first parameter and
-           *   `attachment` as the second parameter.
-           * - __step__ (_Function(Object, *, number)_): Function to execute on every
-           *   tick.  Receives `{{#crossLink
-           *   "Tweenable/get:method"}}get(){{/crossLink}}` as the first parameter,
-           *   `attachment` as the second parameter, and the time elapsed since the
-           *   start of the tween as the third. This function is not called on the
-           *   final step of the animation, but `finish` is.
-           * - __finish__ (_Function(Object, *)_): Function to execute upon tween
-           *   completion.  Receives the state of the tween as the first parameter and
-           *   `attachment` as the second parameter.
-           * - __easing__ (_Object.<string|Function>|string|Function=_): Easing curve
-           *   name(s) or function(s) to use for the tween.
-           * - __attachment__ (_*_): Cached value that is passed to the
-           *   `step`/`start`/`finish` methods.
-           * @chainable
-           */
-          Tweenable.prototype.setConfig = function (config) {
-            config = config || {};
-            this._configured = true;
-
-            // Attach something to this Tweenable instance (e.g.: a DOM element, an
-            // object, a string, etc.);
-            this._attachment = config.attachment;
-
-            // Init the internal state
-            this._pausedAtTime = null;
-            this._scheduleId = null;
-            this._delay = config.delay || 0;
-            this._start = config.start || noop;
-            this._step = config.step || noop;
-            this._finish = config.finish || noop;
-            this._duration = config.duration || DEFAULT_DURATION;
-            this._currentState = shallowCopy({}, config.from) || this.get();
-            this._originalState = this.get();
-            this._targetState = shallowCopy({}, config.to) || this.get();
-
-            var self = this;
-            this._timeoutHandler = function () {
-              timeoutHandler(self, self._timestamp, self._delay, self._duration, self._currentState, self._originalState, self._targetState, self._easing, self._step, self._scheduleFunction);
-            };
-
-            // Aliases used below
-            var currentState = this._currentState;
-            var targetState = this._targetState;
-
-            // Ensure that there is always something to tween to.
-            defaults(targetState, currentState);
-
-            this._easing = composeEasingObject(currentState, config.easing || DEFAULT_EASING);
-
-            this._filterArgs = [currentState, this._originalState, targetState, this._easing];
-
-            applyFilter(this, 'tweenCreated');
-            return this;
-          };
-
-          /**
-           * @method get
-           * @return {Object} The current state.
-           */
-          Tweenable.prototype.get = function () {
-            return shallowCopy({}, this._currentState);
-          };
-
-          /**
-           * @method set
-           * @param {Object} state The current state.
-           */
-          Tweenable.prototype.set = function (state) {
-            this._currentState = state;
-          };
-
-          /**
-           * Pause a tween.  Paused tweens can be resumed from the point at which they
-           * were paused.  This is different from `{{#crossLink
-           * "Tweenable/stop:method"}}{{/crossLink}}`, as that method
-           * causes a tween to start over when it is resumed.
-           * @method pause
-           * @chainable
-           */
-          Tweenable.prototype.pause = function () {
-            this._pausedAtTime = now();
-            this._isPaused = true;
-            return this;
-          };
-
-          /**
-           * Resume a paused tween.
-           * @method resume
-           * @chainable
-           */
-          Tweenable.prototype.resume = function () {
-            if (this._isPaused) {
-              this._timestamp += now() - this._pausedAtTime;
-            }
-
-            this._isPaused = false;
-            this._isTweening = true;
-
-            this._timeoutHandler();
-
-            return this;
-          };
-
-          /**
-           * Move the state of the animation to a specific point in the tween's
-           * timeline.  If the animation is not running, this will cause the `step`
-           * handlers to be called.
-           * @method seek
-           * @param {millisecond} millisecond The millisecond of the animation to seek
-           * to.  This must not be less than `0`.
-           * @chainable
-           */
-          Tweenable.prototype.seek = function (millisecond) {
-            millisecond = Math.max(millisecond, 0);
-            var currentTime = now();
-
-            if (this._timestamp + millisecond === 0) {
-              return this;
-            }
-
-            this._timestamp = currentTime - millisecond;
-
-            if (!this.isPlaying()) {
-              this._isTweening = true;
-              this._isPaused = false;
-
-              // If the animation is not running, call timeoutHandler to make sure that
-              // any step handlers are run.
-              timeoutHandler(this, this._timestamp, this._delay, this._duration, this._currentState, this._originalState, this._targetState, this._easing, this._step, this._scheduleFunction, currentTime);
-
-              this.pause();
-            }
-
-            return this;
-          };
-
-          /**
-           * Stops and cancels a tween.
-           * @param {boolean=} gotoEnd If `false` or omitted, the tween just stops at
-           * its current state, and the `finish` handler is not invoked.  If `true`,
-           * the tweened object's values are instantly set to the target values, and
-           * `finish` is invoked.
-           * @method stop
-           * @chainable
-           */
-          Tweenable.prototype.stop = function (gotoEnd) {
-            this._isTweening = false;
-            this._isPaused = false;
-            this._timeoutHandler = noop;
-
-            (root.cancelAnimationFrame || root.webkitCancelAnimationFrame || root.oCancelAnimationFrame || root.msCancelAnimationFrame || root.mozCancelRequestAnimationFrame || root.clearTimeout)(this._scheduleId);
-
-            if (gotoEnd) {
-              applyFilter(this, 'beforeTween');
-              tweenProps(1, this._currentState, this._originalState, this._targetState, 1, 0, this._easing);
-              applyFilter(this, 'afterTween');
-              applyFilter(this, 'afterTweenEnd');
-              this._finish.call(this, this._currentState, this._attachment);
-            }
-
-            return this;
-          };
-
-          /**
-           * @method isPlaying
-           * @return {boolean} Whether or not a tween is running.
-           */
-          Tweenable.prototype.isPlaying = function () {
-            return this._isTweening && !this._isPaused;
-          };
-
-          /**
-           * Set a custom schedule function.
-           *
-           * If a custom function is not set,
-           * [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window.requestAnimationFrame)
-           * is used if available, otherwise
-           * [`setTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/Window.setTimeout)
-           * is used.
-           * @method setScheduleFunction
-           * @param {Function(Function,number)} scheduleFunction The function to be
-           * used to schedule the next frame to be rendered.
-           */
-          Tweenable.prototype.setScheduleFunction = function (scheduleFunction) {
-            this._scheduleFunction = scheduleFunction;
-          };
-
-          /**
-           * `delete` all "own" properties.  Call this when the `Tweenable` instance
-           * is no longer needed to free memory.
-           * @method dispose
-           */
-          Tweenable.prototype.dispose = function () {
-            var prop;
-            for (prop in this) {
-              if (this.hasOwnProperty(prop)) {
-                delete this[prop];
-              }
-            }
-          };
-
-          /**
-           * Filters are used for transforming the properties of a tween at various
-           * points in a Tweenable's life cycle.  See the README for more info on this.
-           * @private
-           */
-          Tweenable.prototype.filter = {};
-
-          /**
-           * This object contains all of the tweens available to Shifty.  It is
-           * extensible - simply attach properties to the `Tweenable.prototype.formula`
-           * Object following the same format as `linear`.
-           *
-           * `pos` should be a normalized `number` (between 0 and 1).
-           * @property formula
-           * @type {Object(function)}
-           */
-          Tweenable.prototype.formula = {
-            linear: function linear(pos) {
-              return pos;
-            }
-          };
-
-          formula = Tweenable.prototype.formula;
-
-          shallowCopy(Tweenable, {
-            'now': now,
-            'each': each,
-            'tweenProps': tweenProps,
-            'tweenProp': tweenProp,
-            'applyFilter': applyFilter,
-            'shallowCopy': shallowCopy,
-            'defaults': defaults,
-            'composeEasingObject': composeEasingObject
-          });
-
-          // `root` is provided in the intro/outro files.
-
-          // A hook used for unit testing.
-          if (typeof SHIFTY_DEBUG_NOW === 'function') {
-            root.timeoutHandler = timeoutHandler;
-          }
-
-          // Bootstrap Tweenable appropriately for the environment.
-          if ((typeof exports === "undefined" ? "undefined" : _typeof(exports)) === 'object') {
-            // CommonJS
-            module.exports = Tweenable;
-          } else if (typeof define === 'function' && define.amd) {
-            // AMD
-            define(function () {
-              return Tweenable;
-            });
-          } else if (typeof root.Tweenable === 'undefined') {
-            // Browser: Make `Tweenable` globally accessible.
-            root.Tweenable = Tweenable;
-          }
-
-          return Tweenable;
-        }();
-
-        /*!
-         * All equations are adapted from Thomas Fuchs'
-         * [Scripty2](https://github.com/madrobby/scripty2/blob/master/src/effects/transitions/penner.js).
-         *
-         * Based on Easing Equations (c) 2003 [Robert
-         * Penner](http://www.robertpenner.com/), all rights reserved. This work is
-         * [subject to terms](http://www.robertpenner.com/easing_terms_of_use.html).
-         */
-
-        /*!
-         *  TERMS OF USE - EASING EQUATIONS
-         *  Open source under the BSD License.
-         *  Easing Equations (c) 2003 Robert Penner, all rights reserved.
-         */
-
-        ;(function () {
-
-          Tweenable.shallowCopy(Tweenable.prototype.formula, {
-            easeInQuad: function easeInQuad(pos) {
-              return Math.pow(pos, 2);
-            },
-
-            easeOutQuad: function easeOutQuad(pos) {
-              return -(Math.pow(pos - 1, 2) - 1);
-            },
-
-            easeInOutQuad: function easeInOutQuad(pos) {
-              if ((pos /= 0.5) < 1) {
-                return 0.5 * Math.pow(pos, 2);
-              }
-              return -0.5 * ((pos -= 2) * pos - 2);
-            },
-
-            easeInCubic: function easeInCubic(pos) {
-              return Math.pow(pos, 3);
-            },
-
-            easeOutCubic: function easeOutCubic(pos) {
-              return Math.pow(pos - 1, 3) + 1;
-            },
-
-            easeInOutCubic: function easeInOutCubic(pos) {
-              if ((pos /= 0.5) < 1) {
-                return 0.5 * Math.pow(pos, 3);
-              }
-              return 0.5 * (Math.pow(pos - 2, 3) + 2);
-            },
-
-            easeInQuart: function easeInQuart(pos) {
-              return Math.pow(pos, 4);
-            },
-
-            easeOutQuart: function easeOutQuart(pos) {
-              return -(Math.pow(pos - 1, 4) - 1);
-            },
-
-            easeInOutQuart: function easeInOutQuart(pos) {
-              if ((pos /= 0.5) < 1) {
-                return 0.5 * Math.pow(pos, 4);
-              }
-              return -0.5 * ((pos -= 2) * Math.pow(pos, 3) - 2);
-            },
-
-            easeInQuint: function easeInQuint(pos) {
-              return Math.pow(pos, 5);
-            },
-
-            easeOutQuint: function easeOutQuint(pos) {
-              return Math.pow(pos - 1, 5) + 1;
-            },
-
-            easeInOutQuint: function easeInOutQuint(pos) {
-              if ((pos /= 0.5) < 1) {
-                return 0.5 * Math.pow(pos, 5);
-              }
-              return 0.5 * (Math.pow(pos - 2, 5) + 2);
-            },
-
-            easeInSine: function easeInSine(pos) {
-              return -Math.cos(pos * (Math.PI / 2)) + 1;
-            },
-
-            easeOutSine: function easeOutSine(pos) {
-              return Math.sin(pos * (Math.PI / 2));
-            },
-
-            easeInOutSine: function easeInOutSine(pos) {
-              return -0.5 * (Math.cos(Math.PI * pos) - 1);
-            },
-
-            easeInExpo: function easeInExpo(pos) {
-              return pos === 0 ? 0 : Math.pow(2, 10 * (pos - 1));
-            },
-
-            easeOutExpo: function easeOutExpo(pos) {
-              return pos === 1 ? 1 : -Math.pow(2, -10 * pos) + 1;
-            },
-
-            easeInOutExpo: function easeInOutExpo(pos) {
-              if (pos === 0) {
-                return 0;
-              }
-              if (pos === 1) {
-                return 1;
-              }
-              if ((pos /= 0.5) < 1) {
-                return 0.5 * Math.pow(2, 10 * (pos - 1));
-              }
-              return 0.5 * (-Math.pow(2, -10 * --pos) + 2);
-            },
-
-            easeInCirc: function easeInCirc(pos) {
-              return -(Math.sqrt(1 - pos * pos) - 1);
-            },
-
-            easeOutCirc: function easeOutCirc(pos) {
-              return Math.sqrt(1 - Math.pow(pos - 1, 2));
-            },
-
-            easeInOutCirc: function easeInOutCirc(pos) {
-              if ((pos /= 0.5) < 1) {
-                return -0.5 * (Math.sqrt(1 - pos * pos) - 1);
-              }
-              return 0.5 * (Math.sqrt(1 - (pos -= 2) * pos) + 1);
-            },
-
-            easeOutBounce: function easeOutBounce(pos) {
-              if (pos < 1 / 2.75) {
-                return 7.5625 * pos * pos;
-              } else if (pos < 2 / 2.75) {
-                return 7.5625 * (pos -= 1.5 / 2.75) * pos + 0.75;
-              } else if (pos < 2.5 / 2.75) {
-                return 7.5625 * (pos -= 2.25 / 2.75) * pos + 0.9375;
-              } else {
-                return 7.5625 * (pos -= 2.625 / 2.75) * pos + 0.984375;
-              }
-            },
-
-            easeInBack: function easeInBack(pos) {
-              var s = 1.70158;
-              return pos * pos * ((s + 1) * pos - s);
-            },
-
-            easeOutBack: function easeOutBack(pos) {
-              var s = 1.70158;
-              return (pos = pos - 1) * pos * ((s + 1) * pos + s) + 1;
-            },
-
-            easeInOutBack: function easeInOutBack(pos) {
-              var s = 1.70158;
-              if ((pos /= 0.5) < 1) {
-                return 0.5 * (pos * pos * (((s *= 1.525) + 1) * pos - s));
-              }
-              return 0.5 * ((pos -= 2) * pos * (((s *= 1.525) + 1) * pos + s) + 2);
-            },
-
-            elastic: function elastic(pos) {
-              // jshint maxlen:90
-              return -1 * Math.pow(4, -8 * pos) * Math.sin((pos * 6 - 1) * (2 * Math.PI) / 2) + 1;
-            },
-
-            swingFromTo: function swingFromTo(pos) {
-              var s = 1.70158;
-              return (pos /= 0.5) < 1 ? 0.5 * (pos * pos * (((s *= 1.525) + 1) * pos - s)) : 0.5 * ((pos -= 2) * pos * (((s *= 1.525) + 1) * pos + s) + 2);
-            },
-
-            swingFrom: function swingFrom(pos) {
-              var s = 1.70158;
-              return pos * pos * ((s + 1) * pos - s);
-            },
-
-            swingTo: function swingTo(pos) {
-              var s = 1.70158;
-              return (pos -= 1) * pos * ((s + 1) * pos + s) + 1;
-            },
-
-            bounce: function bounce(pos) {
-              if (pos < 1 / 2.75) {
-                return 7.5625 * pos * pos;
-              } else if (pos < 2 / 2.75) {
-                return 7.5625 * (pos -= 1.5 / 2.75) * pos + 0.75;
-              } else if (pos < 2.5 / 2.75) {
-                return 7.5625 * (pos -= 2.25 / 2.75) * pos + 0.9375;
-              } else {
-                return 7.5625 * (pos -= 2.625 / 2.75) * pos + 0.984375;
-              }
-            },
-
-            bouncePast: function bouncePast(pos) {
-              if (pos < 1 / 2.75) {
-                return 7.5625 * pos * pos;
-              } else if (pos < 2 / 2.75) {
-                return 2 - (7.5625 * (pos -= 1.5 / 2.75) * pos + 0.75);
-              } else if (pos < 2.5 / 2.75) {
-                return 2 - (7.5625 * (pos -= 2.25 / 2.75) * pos + 0.9375);
-              } else {
-                return 2 - (7.5625 * (pos -= 2.625 / 2.75) * pos + 0.984375);
-              }
-            },
-
-            easeFromTo: function easeFromTo(pos) {
-              if ((pos /= 0.5) < 1) {
-                return 0.5 * Math.pow(pos, 4);
-              }
-              return -0.5 * ((pos -= 2) * Math.pow(pos, 3) - 2);
-            },
-
-            easeFrom: function easeFrom(pos) {
-              return Math.pow(pos, 4);
-            },
-
-            easeTo: function easeTo(pos) {
-              return Math.pow(pos, 0.25);
-            }
-          });
-        })();
-
-        // jshint maxlen:100
-        /**
-         * The Bezier magic in this file is adapted/copied almost wholesale from
-         * [Scripty2](https://github.com/madrobby/scripty2/blob/master/src/effects/transitions/cubic-bezier.js),
-         * which was adapted from Apple code (which probably came from
-         * [here](http://opensource.apple.com/source/WebCore/WebCore-955.66/platform/graphics/UnitBezier.h)).
-         * Special thanks to Apple and Thomas Fuchs for much of this code.
-         */
-
-        /**
-         *  Copyright (c) 2006 Apple Computer, Inc. All rights reserved.
-         *
-         *  Redistribution and use in source and binary forms, with or without
-         *  modification, are permitted provided that the following conditions are met:
-         *
-         *  1. Redistributions of source code must retain the above copyright notice,
-         *  this list of conditions and the following disclaimer.
-         *
-         *  2. Redistributions in binary form must reproduce the above copyright notice,
-         *  this list of conditions and the following disclaimer in the documentation
-         *  and/or other materials provided with the distribution.
-         *
-         *  3. Neither the name of the copyright holder(s) nor the names of any
-         *  contributors may be used to endorse or promote products derived from
-         *  this software without specific prior written permission.
-         *
-         *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-         *  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-         *  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-         *  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-         *  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-         *  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-         *  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-         *  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-         *  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-         *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-         *  POSSIBILITY OF SUCH DAMAGE.
-         */
-        ;(function () {
-          // port of webkit cubic bezier handling by http://www.netzgesta.de/dev/
-          function cubicBezierAtTime(t, p1x, p1y, p2x, p2y, duration) {
-            var ax = 0,
-                bx = 0,
-                cx = 0,
-                ay = 0,
-                by = 0,
-                cy = 0;
-            function sampleCurveX(t) {
-              return ((ax * t + bx) * t + cx) * t;
-            }
-            function sampleCurveY(t) {
-              return ((ay * t + by) * t + cy) * t;
-            }
-            function sampleCurveDerivativeX(t) {
-              return (3.0 * ax * t + 2.0 * bx) * t + cx;
-            }
-            function solveEpsilon(duration) {
-              return 1.0 / (200.0 * duration);
-            }
-            function solve(x, epsilon) {
-              return sampleCurveY(solveCurveX(x, epsilon));
-            }
-            function fabs(n) {
-              if (n >= 0) {
-                return n;
-              } else {
-                return 0 - n;
-              }
-            }
-            function solveCurveX(x, epsilon) {
-              var t0, t1, t2, x2, d2, i;
-              for (t2 = x, i = 0; i < 8; i++) {
-                x2 = sampleCurveX(t2) - x;
-                if (fabs(x2) < epsilon) {
-                  return t2;
-                }
-                d2 = sampleCurveDerivativeX(t2);
-                if (fabs(d2) < 1e-6) {
-                  break;
-                }
-                t2 = t2 - x2 / d2;
-              }
-              t0 = 0.0;
-              t1 = 1.0;
-              t2 = x;
-              if (t2 < t0) {
-                return t0;
-              }
-              if (t2 > t1) {
-                return t1;
-              }
-              while (t0 < t1) {
-                x2 = sampleCurveX(t2);
-                if (fabs(x2 - x) < epsilon) {
-                  return t2;
-                }
-                if (x > x2) {
-                  t0 = t2;
-                } else {
-                  t1 = t2;
-                }
-                t2 = (t1 - t0) * 0.5 + t0;
-              }
-              return t2; // Failure.
-            }
-            cx = 3.0 * p1x;
-            bx = 3.0 * (p2x - p1x) - cx;
-            ax = 1.0 - cx - bx;
-            cy = 3.0 * p1y;
-            by = 3.0 * (p2y - p1y) - cy;
-            ay = 1.0 - cy - by;
-            return solve(t, solveEpsilon(duration));
-          }
-          /**
-           *  getCubicBezierTransition(x1, y1, x2, y2) -> Function
-           *
-           *  Generates a transition easing function that is compatible
-           *  with WebKit's CSS transitions `-webkit-transition-timing-function`
-           *  CSS property.
-           *
-           *  The W3C has more information about CSS3 transition timing functions:
-           *  http://www.w3.org/TR/css3-transitions/#transition-timing-function_tag
-           *
-           *  @param {number} x1
-           *  @param {number} y1
-           *  @param {number} x2
-           *  @param {number} y2
-           *  @return {function}
-           *  @private
-           */
-          function getCubicBezierTransition(x1, y1, x2, y2) {
-            return function (pos) {
-              return cubicBezierAtTime(pos, x1, y1, x2, y2, 1);
-            };
-          }
-          // End ported code
-
-          /**
-           * Create a Bezier easing function and attach it to `{{#crossLink
-           * "Tweenable/formula:property"}}Tweenable#formula{{/crossLink}}`.  This
-           * function gives you total control over the easing curve.  Matthew Lein's
-           * [Ceaser](http://matthewlein.com/ceaser/) is a useful tool for visualizing
-           * the curves you can make with this function.
-           * @method setBezierFunction
-           * @param {string} name The name of the easing curve.  Overwrites the old
-           * easing function on `{{#crossLink
-           * "Tweenable/formula:property"}}Tweenable#formula{{/crossLink}}` if it
-           * exists.
-           * @param {number} x1
-           * @param {number} y1
-           * @param {number} x2
-           * @param {number} y2
-           * @return {function} The easing function that was attached to
-           * Tweenable.prototype.formula.
-           */
-          Tweenable.setBezierFunction = function (name, x1, y1, x2, y2) {
-            var cubicBezierTransition = getCubicBezierTransition(x1, y1, x2, y2);
-            cubicBezierTransition.displayName = name;
-            cubicBezierTransition.x1 = x1;
-            cubicBezierTransition.y1 = y1;
-            cubicBezierTransition.x2 = x2;
-            cubicBezierTransition.y2 = y2;
-
-            return Tweenable.prototype.formula[name] = cubicBezierTransition;
-          };
-
-          /**
-           * `delete` an easing function from `{{#crossLink
-           * "Tweenable/formula:property"}}Tweenable#formula{{/crossLink}}`.  Be
-           * careful with this method, as it `delete`s whatever easing formula matches
-           * `name` (which means you can delete standard Shifty easing functions).
-           * @method unsetBezierFunction
-           * @param {string} name The name of the easing function to delete.
-           * @return {function}
-           */
-          Tweenable.unsetBezierFunction = function (name) {
-            delete Tweenable.prototype.formula[name];
-          };
-        })();
-
-        ;(function () {
-
-          function getInterpolatedValues(from, current, targetState, position, easing, delay) {
-            return Tweenable.tweenProps(position, current, from, targetState, 1, delay, easing);
-          }
-
-          // Fake a Tweenable and patch some internals.  This approach allows us to
-          // skip uneccessary processing and object recreation, cutting down on garbage
-          // collection pauses.
-          var mockTweenable = new Tweenable();
-          mockTweenable._filterArgs = [];
-
-          /**
-           * Compute the midpoint of two Objects.  This method effectively calculates a
-           * specific frame of animation that `{{#crossLink
-           * "Tweenable/tween:method"}}{{/crossLink}}` does many times over the course
-           * of a full tween.
-           *
-           *     var interpolatedValues = Tweenable.interpolate({
-           *       width: '100px',
-           *       opacity: 0,
-           *       color: '#fff'
-           *     }, {
-           *       width: '200px',
-           *       opacity: 1,
-           *       color: '#000'
-           *     }, 0.5);
-           *
-           *     console.log(interpolatedValues);
-           *     // {opacity: 0.5, width: "150px", color: "rgb(127,127,127)"}
-           *
-           * @static
-           * @method interpolate
-           * @param {Object} from The starting values to tween from.
-           * @param {Object} targetState The ending values to tween to.
-           * @param {number} position The normalized position value (between `0.0` and
-           * `1.0`) to interpolate the values between `from` and `to` for.  `from`
-           * represents `0` and `to` represents `1`.
-           * @param {Object.<string|Function>|string|Function} easing The easing
-           * curve(s) to calculate the midpoint against.  You can reference any easing
-           * function attached to `Tweenable.prototype.formula`, or provide the easing
-           * function(s) directly.  If omitted, this defaults to "linear".
-           * @param {number=} opt_delay Optional delay to pad the beginning of the
-           * interpolated tween with.  This increases the range of `position` from (`0`
-           * through `1`) to (`0` through `1 + opt_delay`).  So, a delay of `0.5` would
-           * increase all valid values of `position` to numbers between `0` and `1.5`.
-           * @return {Object}
-           */
-          Tweenable.interpolate = function (from, targetState, position, easing, opt_delay) {
-
-            var current = Tweenable.shallowCopy({}, from);
-            var delay = opt_delay || 0;
-            var easingObject = Tweenable.composeEasingObject(from, easing || 'linear');
-
-            mockTweenable.set({});
-
-            // Alias and reuse the _filterArgs array instead of recreating it.
-            var filterArgs = mockTweenable._filterArgs;
-            filterArgs.length = 0;
-            filterArgs[0] = current;
-            filterArgs[1] = from;
-            filterArgs[2] = targetState;
-            filterArgs[3] = easingObject;
-
-            // Any defined value transformation must be applied
-            Tweenable.applyFilter(mockTweenable, 'tweenCreated');
-            Tweenable.applyFilter(mockTweenable, 'beforeTween');
-
-            var interpolatedValues = getInterpolatedValues(from, current, targetState, position, easingObject, delay);
-
-            // Transform values back into their original format
-            Tweenable.applyFilter(mockTweenable, 'afterTween');
-
-            return interpolatedValues;
-          };
-        })();
-
-        /**
-         * This module adds string interpolation support to Shifty.
-         *
-         * The Token extension allows Shifty to tween numbers inside of strings.  Among
-         * other things, this allows you to animate CSS properties.  For example, you
-         * can do this:
-         *
-         *     var tweenable = new Tweenable();
-         *     tweenable.tween({
-         *       from: { transform: 'translateX(45px)' },
-         *       to: { transform: 'translateX(90xp)' }
-         *     });
-         *
-         * `translateX(45)` will be tweened to `translateX(90)`.  To demonstrate:
-         *
-         *     var tweenable = new Tweenable();
-         *     tweenable.tween({
-         *       from: { transform: 'translateX(45px)' },
-         *       to: { transform: 'translateX(90px)' },
-         *       step: function (state) {
-         *         console.log(state.transform);
-         *       }
-         *     });
-         *
-         * The above snippet will log something like this in the console:
-         *
-         *     translateX(60.3px)
-         *     ...
-         *     translateX(76.05px)
-         *     ...
-         *     translateX(90px)
-         *
-         * Another use for this is animating colors:
-         *
-         *     var tweenable = new Tweenable();
-         *     tweenable.tween({
-         *       from: { color: 'rgb(0,255,0)' },
-         *       to: { color: 'rgb(255,0,255)' },
-         *       step: function (state) {
-         *         console.log(state.color);
-         *       }
-         *     });
-         *
-         * The above snippet will log something like this:
-         *
-         *     rgb(84,170,84)
-         *     ...
-         *     rgb(170,84,170)
-         *     ...
-         *     rgb(255,0,255)
-         *
-         * This extension also supports hexadecimal colors, in both long (`#ff00ff`)
-         * and short (`#f0f`) forms.  Be aware that hexadecimal input values will be
-         * converted into the equivalent RGB output values.  This is done to optimize
-         * for performance.
-         *
-         *     var tweenable = new Tweenable();
-         *     tweenable.tween({
-         *       from: { color: '#0f0' },
-         *       to: { color: '#f0f' },
-         *       step: function (state) {
-         *         console.log(state.color);
-         *       }
-         *     });
-         *
-         * This snippet will generate the same output as the one before it because
-         * equivalent values were supplied (just in hexadecimal form rather than RGB):
-         *
-         *     rgb(84,170,84)
-         *     ...
-         *     rgb(170,84,170)
-         *     ...
-         *     rgb(255,0,255)
-         *
-         * ## Easing support
-         *
-         * Easing works somewhat differently in the Token extension.  This is because
-         * some CSS properties have multiple values in them, and you might need to
-         * tween each value along its own easing curve.  A basic example:
-         *
-         *     var tweenable = new Tweenable();
-         *     tweenable.tween({
-         *       from: { transform: 'translateX(0px) translateY(0px)' },
-         *       to: { transform:   'translateX(100px) translateY(100px)' },
-         *       easing: { transform: 'easeInQuad' },
-         *       step: function (state) {
-         *         console.log(state.transform);
-         *       }
-         *     });
-         *
-         * The above snippet will create values like this:
-         *
-         *     translateX(11.56px) translateY(11.56px)
-         *     ...
-         *     translateX(46.24px) translateY(46.24px)
-         *     ...
-         *     translateX(100px) translateY(100px)
-         *
-         * In this case, the values for `translateX` and `translateY` are always the
-         * same for each step of the tween, because they have the same start and end
-         * points and both use the same easing curve.  We can also tween `translateX`
-         * and `translateY` along independent curves:
-         *
-         *     var tweenable = new Tweenable();
-         *     tweenable.tween({
-         *       from: { transform: 'translateX(0px) translateY(0px)' },
-         *       to: { transform:   'translateX(100px) translateY(100px)' },
-         *       easing: { transform: 'easeInQuad bounce' },
-         *       step: function (state) {
-         *         console.log(state.transform);
-         *       }
-         *     });
-         *
-         * The above snippet will create values like this:
-         *
-         *     translateX(10.89px) translateY(82.35px)
-         *     ...
-         *     translateX(44.89px) translateY(86.73px)
-         *     ...
-         *     translateX(100px) translateY(100px)
-         *
-         * `translateX` and `translateY` are not in sync anymore, because `easeInQuad`
-         * was specified for `translateX` and `bounce` for `translateY`.  Mixing and
-         * matching easing curves can make for some interesting motion in your
-         * animations.
-         *
-         * The order of the space-separated easing curves correspond the token values
-         * they apply to.  If there are more token values than easing curves listed,
-         * the last easing curve listed is used.
-         * @submodule Tweenable.token
-         */
-
-        // token function is defined above only so that dox-foundation sees it as
-        // documentation and renders it.  It is never used, and is optimized away at
-        // build time.
-
-        ;(function (Tweenable) {
-
-          /**
-           * @typedef {{
-           *   formatString: string
-           *   chunkNames: Array.<string>
-           * }}
-           * @private
-           */
-          var formatManifest;
-
-          // CONSTANTS
-
-          var R_NUMBER_COMPONENT = /(\d|\-|\.)/;
-          var R_FORMAT_CHUNKS = /([^\-0-9\.]+)/g;
-          var R_UNFORMATTED_VALUES = /[0-9.\-]+/g;
-          var R_RGB = new RegExp('rgb\\(' + R_UNFORMATTED_VALUES.source + /,\s*/.source + R_UNFORMATTED_VALUES.source + /,\s*/.source + R_UNFORMATTED_VALUES.source + '\\)', 'g');
-          var R_RGB_PREFIX = /^.*\(/;
-          var R_HEX = /#([0-9]|[a-f]){3,6}/gi;
-          var VALUE_PLACEHOLDER = 'VAL';
-
-          // HELPERS
-
-          /**
-           * @param {Array.number} rawValues
-           * @param {string} prefix
-           *
-           * @return {Array.<string>}
-           * @private
-           */
-          function getFormatChunksFrom(rawValues, prefix) {
-            var accumulator = [];
-
-            var rawValuesLength = rawValues.length;
-            var i;
-
-            for (i = 0; i < rawValuesLength; i++) {
-              accumulator.push('_' + prefix + '_' + i);
-            }
-
-            return accumulator;
-          }
-
-          /**
-           * @param {string} formattedString
-           *
-           * @return {string}
-           * @private
-           */
-          function getFormatStringFrom(formattedString) {
-            var chunks = formattedString.match(R_FORMAT_CHUNKS);
-
-            if (!chunks) {
-              // chunks will be null if there were no tokens to parse in
-              // formattedString (for example, if formattedString is '2').  Coerce
-              // chunks to be useful here.
-              chunks = ['', ''];
-
-              // If there is only one chunk, assume that the string is a number
-              // followed by a token...
-              // NOTE: This may be an unwise assumption.
-            } else if (chunks.length === 1 ||
-            // ...or if the string starts with a number component (".", "-", or a
-            // digit)...
-            formattedString[0].match(R_NUMBER_COMPONENT)) {
-              // ...prepend an empty string here to make sure that the formatted number
-              // is properly replaced by VALUE_PLACEHOLDER
-              chunks.unshift('');
-            }
-
-            return chunks.join(VALUE_PLACEHOLDER);
-          }
-
-          /**
-           * Convert all hex color values within a string to an rgb string.
-           *
-           * @param {Object} stateObject
-           *
-           * @return {Object} The modified obj
-           * @private
-           */
-          function sanitizeObjectForHexProps(stateObject) {
-            Tweenable.each(stateObject, function (prop) {
-              var currentProp = stateObject[prop];
-
-              if (typeof currentProp === 'string' && currentProp.match(R_HEX)) {
-                stateObject[prop] = sanitizeHexChunksToRGB(currentProp);
-              }
-            });
-          }
-
-          /**
-           * @param {string} str
-           *
-           * @return {string}
-           * @private
-           */
-          function sanitizeHexChunksToRGB(str) {
-            return filterStringChunks(R_HEX, str, convertHexToRGB);
-          }
-
-          /**
-           * @param {string} hexString
-           *
-           * @return {string}
-           * @private
-           */
-          function convertHexToRGB(hexString) {
-            var rgbArr = hexToRGBArray(hexString);
-            return 'rgb(' + rgbArr[0] + ',' + rgbArr[1] + ',' + rgbArr[2] + ')';
-          }
-
-          var hexToRGBArray_returnArray = [];
-          /**
-           * Convert a hexadecimal string to an array with three items, one each for
-           * the red, blue, and green decimal values.
-           *
-           * @param {string} hex A hexadecimal string.
-           *
-           * @returns {Array.<number>} The converted Array of RGB values if `hex` is a
-           * valid string, or an Array of three 0's.
-           * @private
-           */
-          function hexToRGBArray(hex) {
-
-            hex = hex.replace(/#/, '');
-
-            // If the string is a shorthand three digit hex notation, normalize it to
-            // the standard six digit notation
-            if (hex.length === 3) {
-              hex = hex.split('');
-              hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
-            }
-
-            hexToRGBArray_returnArray[0] = hexToDec(hex.substr(0, 2));
-            hexToRGBArray_returnArray[1] = hexToDec(hex.substr(2, 2));
-            hexToRGBArray_returnArray[2] = hexToDec(hex.substr(4, 2));
-
-            return hexToRGBArray_returnArray;
-          }
-
-          /**
-           * Convert a base-16 number to base-10.
-           *
-           * @param {Number|String} hex The value to convert
-           *
-           * @returns {Number} The base-10 equivalent of `hex`.
-           * @private
-           */
-          function hexToDec(hex) {
-            return parseInt(hex, 16);
-          }
-
-          /**
-           * Runs a filter operation on all chunks of a string that match a RegExp
-           *
-           * @param {RegExp} pattern
-           * @param {string} unfilteredString
-           * @param {function(string)} filter
-           *
-           * @return {string}
-           * @private
-           */
-          function filterStringChunks(pattern, unfilteredString, filter) {
-            var pattenMatches = unfilteredString.match(pattern);
-            var filteredString = unfilteredString.replace(pattern, VALUE_PLACEHOLDER);
-
-            if (pattenMatches) {
-              var pattenMatchesLength = pattenMatches.length;
-              var currentChunk;
-
-              for (var i = 0; i < pattenMatchesLength; i++) {
-                currentChunk = pattenMatches.shift();
-                filteredString = filteredString.replace(VALUE_PLACEHOLDER, filter(currentChunk));
-              }
-            }
-
-            return filteredString;
-          }
-
-          /**
-           * Check for floating point values within rgb strings and rounds them.
-           *
-           * @param {string} formattedString
-           *
-           * @return {string}
-           * @private
-           */
-          function sanitizeRGBChunks(formattedString) {
-            return filterStringChunks(R_RGB, formattedString, sanitizeRGBChunk);
-          }
-
-          /**
-           * @param {string} rgbChunk
-           *
-           * @return {string}
-           * @private
-           */
-          function sanitizeRGBChunk(rgbChunk) {
-            var numbers = rgbChunk.match(R_UNFORMATTED_VALUES);
-            var numbersLength = numbers.length;
-            var sanitizedString = rgbChunk.match(R_RGB_PREFIX)[0];
-
-            for (var i = 0; i < numbersLength; i++) {
-              sanitizedString += parseInt(numbers[i], 10) + ',';
-            }
-
-            sanitizedString = sanitizedString.slice(0, -1) + ')';
-
-            return sanitizedString;
-          }
-
-          /**
-           * @param {Object} stateObject
-           *
-           * @return {Object} An Object of formatManifests that correspond to
-           * the string properties of stateObject
-           * @private
-           */
-          function getFormatManifests(stateObject) {
-            var manifestAccumulator = {};
-
-            Tweenable.each(stateObject, function (prop) {
-              var currentProp = stateObject[prop];
-
-              if (typeof currentProp === 'string') {
-                var rawValues = getValuesFrom(currentProp);
-
-                manifestAccumulator[prop] = {
-                  'formatString': getFormatStringFrom(currentProp),
-                  'chunkNames': getFormatChunksFrom(rawValues, prop)
-                };
-              }
-            });
-
-            return manifestAccumulator;
-          }
-
-          /**
-           * @param {Object} stateObject
-           * @param {Object} formatManifests
-           * @private
-           */
-          function expandFormattedProperties(stateObject, formatManifests) {
-            Tweenable.each(formatManifests, function (prop) {
-              var currentProp = stateObject[prop];
-              var rawValues = getValuesFrom(currentProp);
-              var rawValuesLength = rawValues.length;
-
-              for (var i = 0; i < rawValuesLength; i++) {
-                stateObject[formatManifests[prop].chunkNames[i]] = +rawValues[i];
-              }
-
-              delete stateObject[prop];
-            });
-          }
-
-          /**
-           * @param {Object} stateObject
-           * @param {Object} formatManifests
-           * @private
-           */
-          function collapseFormattedProperties(stateObject, formatManifests) {
-            Tweenable.each(formatManifests, function (prop) {
-              var currentProp = stateObject[prop];
-              var formatChunks = extractPropertyChunks(stateObject, formatManifests[prop].chunkNames);
-              var valuesList = getValuesList(formatChunks, formatManifests[prop].chunkNames);
-              currentProp = getFormattedValues(formatManifests[prop].formatString, valuesList);
-              stateObject[prop] = sanitizeRGBChunks(currentProp);
-            });
-          }
-
-          /**
-           * @param {Object} stateObject
-           * @param {Array.<string>} chunkNames
-           *
-           * @return {Object} The extracted value chunks.
-           * @private
-           */
-          function extractPropertyChunks(stateObject, chunkNames) {
-            var extractedValues = {};
-            var currentChunkName,
-                chunkNamesLength = chunkNames.length;
-
-            for (var i = 0; i < chunkNamesLength; i++) {
-              currentChunkName = chunkNames[i];
-              extractedValues[currentChunkName] = stateObject[currentChunkName];
-              delete stateObject[currentChunkName];
-            }
-
-            return extractedValues;
-          }
-
-          var getValuesList_accumulator = [];
-          /**
-           * @param {Object} stateObject
-           * @param {Array.<string>} chunkNames
-           *
-           * @return {Array.<number>}
-           * @private
-           */
-          function getValuesList(stateObject, chunkNames) {
-            getValuesList_accumulator.length = 0;
-            var chunkNamesLength = chunkNames.length;
-
-            for (var i = 0; i < chunkNamesLength; i++) {
-              getValuesList_accumulator.push(stateObject[chunkNames[i]]);
-            }
-
-            return getValuesList_accumulator;
-          }
-
-          /**
-           * @param {string} formatString
-           * @param {Array.<number>} rawValues
-           *
-           * @return {string}
-           * @private
-           */
-          function getFormattedValues(formatString, rawValues) {
-            var formattedValueString = formatString;
-            var rawValuesLength = rawValues.length;
-
-            for (var i = 0; i < rawValuesLength; i++) {
-              formattedValueString = formattedValueString.replace(VALUE_PLACEHOLDER, +rawValues[i].toFixed(4));
-            }
-
-            return formattedValueString;
-          }
-
-          /**
-           * Note: It's the duty of the caller to convert the Array elements of the
-           * return value into numbers.  This is a performance optimization.
-           *
-           * @param {string} formattedString
-           *
-           * @return {Array.<string>|null}
-           * @private
-           */
-          function getValuesFrom(formattedString) {
-            return formattedString.match(R_UNFORMATTED_VALUES);
-          }
-
-          /**
-           * @param {Object} easingObject
-           * @param {Object} tokenData
-           * @private
-           */
-          function expandEasingObject(easingObject, tokenData) {
-            Tweenable.each(tokenData, function (prop) {
-              var currentProp = tokenData[prop];
-              var chunkNames = currentProp.chunkNames;
-              var chunkLength = chunkNames.length;
-
-              var easing = easingObject[prop];
-              var i;
-
-              if (typeof easing === 'string') {
-                var easingChunks = easing.split(' ');
-                var lastEasingChunk = easingChunks[easingChunks.length - 1];
-
-                for (i = 0; i < chunkLength; i++) {
-                  easingObject[chunkNames[i]] = easingChunks[i] || lastEasingChunk;
-                }
-              } else {
-                for (i = 0; i < chunkLength; i++) {
-                  easingObject[chunkNames[i]] = easing;
-                }
-              }
-
-              delete easingObject[prop];
-            });
-          }
-
-          /**
-           * @param {Object} easingObject
-           * @param {Object} tokenData
-           * @private
-           */
-          function collapseEasingObject(easingObject, tokenData) {
-            Tweenable.each(tokenData, function (prop) {
-              var currentProp = tokenData[prop];
-              var chunkNames = currentProp.chunkNames;
-              var chunkLength = chunkNames.length;
-
-              var firstEasing = easingObject[chunkNames[0]];
-              var typeofEasings = typeof firstEasing === "undefined" ? "undefined" : _typeof(firstEasing);
-
-              if (typeofEasings === 'string') {
-                var composedEasingString = '';
-
-                for (var i = 0; i < chunkLength; i++) {
-                  composedEasingString += ' ' + easingObject[chunkNames[i]];
-                  delete easingObject[chunkNames[i]];
-                }
-
-                easingObject[prop] = composedEasingString.substr(1);
-              } else {
-                easingObject[prop] = firstEasing;
-              }
-            });
-          }
-
-          Tweenable.prototype.filter.token = {
-            'tweenCreated': function tweenCreated(currentState, fromState, toState, easingObject) {
-              sanitizeObjectForHexProps(currentState);
-              sanitizeObjectForHexProps(fromState);
-              sanitizeObjectForHexProps(toState);
-              this._tokenData = getFormatManifests(currentState);
-            },
-
-            'beforeTween': function beforeTween(currentState, fromState, toState, easingObject) {
-              expandEasingObject(easingObject, this._tokenData);
-              expandFormattedProperties(currentState, this._tokenData);
-              expandFormattedProperties(fromState, this._tokenData);
-              expandFormattedProperties(toState, this._tokenData);
-            },
-
-            'afterTween': function afterTween(currentState, fromState, toState, easingObject) {
-              collapseFormattedProperties(currentState, this._tokenData);
-              collapseFormattedProperties(fromState, this._tokenData);
-              collapseFormattedProperties(toState, this._tokenData);
-              collapseEasingObject(easingObject, this._tokenData);
-            }
-          };
-        })(Tweenable);
-      }).call(null);
-    }, {}], 2: [function (require, module, exports) {
-      // Circle shaped progress bar
-
-      var Shape = require('./shape');
-      var utils = require('./utils');
-
-      var Circle = function Circle(container, options) {
-        // Use two arcs to form a circle
-        // See this answer http://stackoverflow.com/a/10477334/1446092
-        this._pathTemplate = 'M 50,50 m 0,-{radius}' + ' a {radius},{radius} 0 1 1 0,{2radius}' + ' a {radius},{radius} 0 1 1 0,-{2radius}';
-
-        this.containerAspectRatio = 1;
-
-        Shape.apply(this, arguments);
-      };
-
-      Circle.prototype = new Shape();
-      Circle.prototype.constructor = Circle;
-
-      Circle.prototype._pathString = function _pathString(opts) {
-        var widthOfWider = opts.strokeWidth;
-        if (opts.trailWidth && opts.trailWidth > opts.strokeWidth) {
-          widthOfWider = opts.trailWidth;
-        }
-
-        var r = 50 - widthOfWider / 2;
-
-        return utils.render(this._pathTemplate, {
-          radius: r,
-          '2radius': r * 2
-        });
-      };
-
-      Circle.prototype._trailString = function _trailString(opts) {
-        return this._pathString(opts);
-      };
-
-      module.exports = Circle;
-    }, { "./shape": 7, "./utils": 8 }], 3: [function (require, module, exports) {
-      // Line shaped progress bar
-
-      var Shape = require('./shape');
-      var utils = require('./utils');
-
-      var Line = function Line(container, options) {
-        this._pathTemplate = 'M 0,{center} L 100,{center}';
-        Shape.apply(this, arguments);
-      };
-
-      Line.prototype = new Shape();
-      Line.prototype.constructor = Line;
-
-      Line.prototype._initializeSvg = function _initializeSvg(svg, opts) {
-        svg.setAttribute('viewBox', '0 0 100 ' + opts.strokeWidth);
-        svg.setAttribute('preserveAspectRatio', 'none');
-      };
-
-      Line.prototype._pathString = function _pathString(opts) {
-        return utils.render(this._pathTemplate, {
-          center: opts.strokeWidth / 2
-        });
-      };
-
-      Line.prototype._trailString = function _trailString(opts) {
-        return this._pathString(opts);
-      };
-
-      module.exports = Line;
-    }, { "./shape": 7, "./utils": 8 }], 4: [function (require, module, exports) {
-      module.exports = {
-        // Higher level API, different shaped progress bars
-        Line: require('./line'),
-        Circle: require('./circle'),
-        SemiCircle: require('./semicircle'),
-
-        // Lower level API to use any SVG path
-        Path: require('./path'),
-
-        // Base-class for creating new custom shapes
-        // to be in line with the API of built-in shapes
-        // Undocumented.
-        Shape: require('./shape'),
-
-        // Internal utils, undocumented.
-        utils: require('./utils')
-      };
-    }, { "./circle": 2, "./line": 3, "./path": 5, "./semicircle": 6, "./shape": 7, "./utils": 8 }], 5: [function (require, module, exports) {
-      // Lower level API to animate any kind of svg path
-
-      var Tweenable = require('shifty');
-      var utils = require('./utils');
-
-      var EASING_ALIASES = {
-        easeIn: 'easeInCubic',
-        easeOut: 'easeOutCubic',
-        easeInOut: 'easeInOutCubic'
-      };
-
-      var Path = function Path(path, opts) {
-        // Throw a better error if not initialized with `new` keyword
-        if (!(this instanceof Path)) {
-          throw new Error('Constructor was called without new keyword');
-        }
-
-        // Default parameters for animation
-        opts = utils.extend({
-          duration: 800,
-          easing: 'linear',
-          from: {},
-          to: {},
-          step: function step() {}
-        }, opts);
-
-        var element;
-        if (utils.isString(path)) {
-          element = document.querySelector(path);
-        } else {
-          element = path;
-        }
-
-        // Reveal .path as public attribute
-        this.path = element;
-        this._opts = opts;
-        this._tweenable = null;
-
-        // Set up the starting positions
-        var length = this.path.getTotalLength();
-        this.path.style.strokeDasharray = length + ' ' + length;
-        this.set(0);
-      };
-
-      Path.prototype.value = function value() {
-        var offset = this._getComputedDashOffset();
-        var length = this.path.getTotalLength();
-
-        var progress = 1 - offset / length;
-        // Round number to prevent returning very small number like 1e-30, which
-        // is practically 0
-        return parseFloat(progress.toFixed(6), 10);
-      };
-
-      Path.prototype.set = function set(progress) {
-        this.stop();
-
-        this.path.style.strokeDashoffset = this._progressToOffset(progress);
-
-        var step = this._opts.step;
-        if (utils.isFunction(step)) {
-          var easing = this._easing(this._opts.easing);
-          var values = this._calculateTo(progress, easing);
-          var reference = this._opts.shape || this;
-          step(values, reference, this._opts.attachment);
-        }
-      };
-
-      Path.prototype.stop = function stop() {
-        this._stopTween();
-        this.path.style.strokeDashoffset = this._getComputedDashOffset();
-      };
-
-      // Method introduced here:
-      // http://jakearchibald.com/2013/animated-line-drawing-svg/
-      Path.prototype.animate = function animate(progress, opts, cb) {
-        opts = opts || {};
-
-        if (utils.isFunction(opts)) {
-          cb = opts;
-          opts = {};
-        }
-
-        var passedOpts = utils.extend({}, opts);
-
-        // Copy default opts to new object so defaults are not modified
-        var defaultOpts = utils.extend({}, this._opts);
-        opts = utils.extend(defaultOpts, opts);
-
-        var shiftyEasing = this._easing(opts.easing);
-        var values = this._resolveFromAndTo(progress, shiftyEasing, passedOpts);
-
-        this.stop();
-
-        // Trigger a layout so styles are calculated & the browser
-        // picks up the starting position before animating
-        this.path.getBoundingClientRect();
-
-        var offset = this._getComputedDashOffset();
-        var newOffset = this._progressToOffset(progress);
-
-        var self = this;
-        this._tweenable = new Tweenable();
-        this._tweenable.tween({
-          from: utils.extend({ offset: offset }, values.from),
-          to: utils.extend({ offset: newOffset }, values.to),
-          duration: opts.duration,
-          easing: shiftyEasing,
-          step: function step(state) {
-            self.path.style.strokeDashoffset = state.offset;
-            var reference = opts.shape || self;
-            opts.step(state, reference, opts.attachment);
-          },
-          finish: function finish(state) {
-            if (utils.isFunction(cb)) {
-              cb();
-            }
-          }
-        });
-      };
-
-      Path.prototype._getComputedDashOffset = function _getComputedDashOffset() {
-        var computedStyle = window.getComputedStyle(this.path, null);
-        return parseFloat(computedStyle.getPropertyValue('stroke-dashoffset'), 10);
-      };
-
-      Path.prototype._progressToOffset = function _progressToOffset(progress) {
-        var length = this.path.getTotalLength();
-        return length - progress * length;
-      };
-
-      // Resolves from and to values for animation.
-      Path.prototype._resolveFromAndTo = function _resolveFromAndTo(progress, easing, opts) {
-        if (opts.from && opts.to) {
-          return {
-            from: opts.from,
-            to: opts.to
-          };
-        }
-
-        return {
-          from: this._calculateFrom(easing),
-          to: this._calculateTo(progress, easing)
-        };
-      };
-
-      // Calculate `from` values from options passed at initialization
-      Path.prototype._calculateFrom = function _calculateFrom(easing) {
-        return Tweenable.interpolate(this._opts.from, this._opts.to, this.value(), easing);
-      };
-
-      // Calculate `to` values from options passed at initialization
-      Path.prototype._calculateTo = function _calculateTo(progress, easing) {
-        return Tweenable.interpolate(this._opts.from, this._opts.to, progress, easing);
-      };
-
-      Path.prototype._stopTween = function _stopTween() {
-        if (this._tweenable !== null) {
-          this._tweenable.stop();
-          this._tweenable = null;
-        }
-      };
-
-      Path.prototype._easing = function _easing(easing) {
-        if (EASING_ALIASES.hasOwnProperty(easing)) {
-          return EASING_ALIASES[easing];
-        }
-
-        return easing;
-      };
-
-      module.exports = Path;
-    }, { "./utils": 8, "shifty": 1 }], 6: [function (require, module, exports) {
-      // Semi-SemiCircle shaped progress bar
-
-      var Shape = require('./shape');
-      var Circle = require('./circle');
-      var utils = require('./utils');
-
-      var SemiCircle = function SemiCircle(container, options) {
-        // Use one arc to form a SemiCircle
-        // See this answer http://stackoverflow.com/a/10477334/1446092
-        this._pathTemplate = 'M 50,50 m -{radius},0' + ' a {radius},{radius} 0 1 1 {2radius},0';
-
-        this.containerAspectRatio = 2;
-
-        Shape.apply(this, arguments);
-      };
-
-      SemiCircle.prototype = new Shape();
-      SemiCircle.prototype.constructor = SemiCircle;
-
-      SemiCircle.prototype._initializeSvg = function _initializeSvg(svg, opts) {
-        svg.setAttribute('viewBox', '0 0 100 50');
-      };
-
-      SemiCircle.prototype._initializeTextContainer = function _initializeTextContainer(opts, container, textContainer) {
-        if (opts.text.style) {
-          // Reset top style
-          textContainer.style.top = 'auto';
-          textContainer.style.bottom = '0';
-
-          if (opts.text.alignToBottom) {
-            utils.setStyle(textContainer, 'transform', 'translate(-50%, 0)');
-          } else {
-            utils.setStyle(textContainer, 'transform', 'translate(-50%, 50%)');
-          }
-        }
-      };
-
-      // Share functionality with Circle, just have different path
-      SemiCircle.prototype._pathString = Circle.prototype._pathString;
-      SemiCircle.prototype._trailString = Circle.prototype._trailString;
-
-      module.exports = SemiCircle;
-    }, { "./circle": 2, "./shape": 7, "./utils": 8 }], 7: [function (require, module, exports) {
-      // Base object for different progress bar shapes
-
-      var Path = require('./path');
-      var utils = require('./utils');
-
-      var DESTROYED_ERROR = 'Object is destroyed';
-
-      var Shape = function Shape(container, opts) {
-        // Throw a better error if progress bars are not initialized with `new`
-        // keyword
-        if (!(this instanceof Shape)) {
-          throw new Error('Constructor was called without new keyword');
-        }
-
-        // Prevent calling constructor without parameters so inheritance
-        // works correctly. To understand, this is how Shape is inherited:
-        //
-        //   Line.prototype = new Shape();
-        //
-        // We just want to set the prototype for Line.
-        if (arguments.length === 0) {
-          return;
-        }
-
-        // Default parameters for progress bar creation
-        this._opts = utils.extend({
-          color: '#555',
-          strokeWidth: 1.0,
-          trailColor: null,
-          trailWidth: null,
-          fill: null,
-          text: {
-            style: {
-              color: null,
-              position: 'absolute',
-              left: '50%',
-              top: '50%',
-              padding: 0,
-              margin: 0,
-              transform: {
-                prefix: true,
-                value: 'translate(-50%, -50%)'
-              }
-            },
-            autoStyleContainer: true,
-            alignToBottom: true,
-            value: null,
-            className: 'progressbar-text'
-          },
-          svgStyle: {
-            display: 'block',
-            width: '100%'
-          },
-          warnings: false
-        }, opts, true); // Use recursive extend
-
-        // If user specifies e.g. svgStyle or text style, the whole object
-        // should replace the defaults to make working with styles easier
-        if (utils.isObject(opts) && opts.svgStyle !== undefined) {
-          this._opts.svgStyle = opts.svgStyle;
-        }
-        if (utils.isObject(opts) && utils.isObject(opts.text) && opts.text.style !== undefined) {
-          this._opts.text.style = opts.text.style;
-        }
-
-        var svgView = this._createSvgView(this._opts);
-
-        var element;
-        if (utils.isString(container)) {
-          element = document.querySelector(container);
-        } else {
-          element = container;
-        }
-
-        if (!element) {
-          throw new Error('Container does not exist: ' + container);
-        }
-
-        this._container = element;
-        this._container.appendChild(svgView.svg);
-        if (this._opts.warnings) {
-          this._warnContainerAspectRatio(this._container);
-        }
-
-        if (this._opts.svgStyle) {
-          utils.setStyles(svgView.svg, this._opts.svgStyle);
-        }
-
-        // Expose public attributes before Path initialization
-        this.svg = svgView.svg;
-        this.path = svgView.path;
-        this.trail = svgView.trail;
-        this.text = null;
-
-        var newOpts = utils.extend({
-          attachment: undefined,
-          shape: this
-        }, this._opts);
-        this._progressPath = new Path(svgView.path, newOpts);
-
-        if (utils.isObject(this._opts.text) && this._opts.text.value !== null) {
-          this.setText(this._opts.text.value);
-        }
-      };
-
-      Shape.prototype.animate = function animate(progress, opts, cb) {
-        if (this._progressPath === null) {
-          throw new Error(DESTROYED_ERROR);
-        }
-
-        this._progressPath.animate(progress, opts, cb);
-      };
-
-      Shape.prototype.stop = function stop() {
-        if (this._progressPath === null) {
-          throw new Error(DESTROYED_ERROR);
-        }
-
-        // Don't crash if stop is called inside step function
-        if (this._progressPath === undefined) {
-          return;
-        }
-
-        this._progressPath.stop();
-      };
-
-      Shape.prototype.destroy = function destroy() {
-        if (this._progressPath === null) {
-          throw new Error(DESTROYED_ERROR);
-        }
-
-        this.stop();
-        this.svg.parentNode.removeChild(this.svg);
-        this.svg = null;
-        this.path = null;
-        this.trail = null;
-        this._progressPath = null;
-
-        if (this.text !== null) {
-          this.text.parentNode.removeChild(this.text);
-          this.text = null;
-        }
-      };
-
-      Shape.prototype.set = function set(progress) {
-        if (this._progressPath === null) {
-          throw new Error(DESTROYED_ERROR);
-        }
-
-        this._progressPath.set(progress);
-      };
-
-      Shape.prototype.value = function value() {
-        if (this._progressPath === null) {
-          throw new Error(DESTROYED_ERROR);
-        }
-
-        if (this._progressPath === undefined) {
-          return 0;
-        }
-
-        return this._progressPath.value();
-      };
-
-      Shape.prototype.setText = function setText(newText) {
-        if (this._progressPath === null) {
-          throw new Error(DESTROYED_ERROR);
-        }
-
-        if (this.text === null) {
-          // Create new text node
-          this.text = this._createTextContainer(this._opts, this._container);
-          this._container.appendChild(this.text);
-        }
-
-        // Remove previous text and add new
-        if (utils.isObject(newText)) {
-          utils.removeChildren(this.text);
-          this.text.appendChild(newText);
-        } else {
-          this.text.innerHTML = newText;
-        }
-      };
-
-      Shape.prototype._createSvgView = function _createSvgView(opts) {
-        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        this._initializeSvg(svg, opts);
-
-        var trailPath = null;
-        // Each option listed in the if condition are 'triggers' for creating
-        // the trail path
-        if (opts.trailColor || opts.trailWidth) {
-          trailPath = this._createTrail(opts);
-          svg.appendChild(trailPath);
-        }
-
-        var path = this._createPath(opts);
-        svg.appendChild(path);
-
-        return {
-          svg: svg,
-          path: path,
-          trail: trailPath
-        };
-      };
-
-      Shape.prototype._initializeSvg = function _initializeSvg(svg, opts) {
-        svg.setAttribute('viewBox', '0 0 100 100');
-      };
-
-      Shape.prototype._createPath = function _createPath(opts) {
-        var pathString = this._pathString(opts);
-        return this._createPathElement(pathString, opts);
-      };
-
-      Shape.prototype._createTrail = function _createTrail(opts) {
-        // Create path string with original passed options
-        var pathString = this._trailString(opts);
-
-        // Prevent modifying original
-        var newOpts = utils.extend({}, opts);
-
-        // Defaults for parameters which modify trail path
-        if (!newOpts.trailColor) {
-          newOpts.trailColor = '#eee';
-        }
-        if (!newOpts.trailWidth) {
-          newOpts.trailWidth = newOpts.strokeWidth;
-        }
-
-        newOpts.color = newOpts.trailColor;
-        newOpts.strokeWidth = newOpts.trailWidth;
-
-        // When trail path is set, fill must be set for it instead of the
-        // actual path to prevent trail stroke from clipping
-        newOpts.fill = null;
-
-        return this._createPathElement(pathString, newOpts);
-      };
-
-      Shape.prototype._createPathElement = function _createPathElement(pathString, opts) {
-        var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', pathString);
-        path.setAttribute('stroke', opts.color);
-        path.setAttribute('stroke-width', opts.strokeWidth);
-
-        if (opts.fill) {
-          path.setAttribute('fill', opts.fill);
-        } else {
-          path.setAttribute('fill-opacity', '0');
-        }
-
-        return path;
-      };
-
-      Shape.prototype._createTextContainer = function _createTextContainer(opts, container) {
-        var textContainer = document.createElement('div');
-        textContainer.className = opts.text.className;
-
-        var textStyle = opts.text.style;
-        if (textStyle) {
-          if (opts.text.autoStyleContainer) {
-            container.style.position = 'relative';
-          }
-
-          utils.setStyles(textContainer, textStyle);
-          // Default text color to progress bar's color
-          if (!textStyle.color) {
-            textContainer.style.color = opts.color;
-          }
-        }
-
-        this._initializeTextContainer(opts, container, textContainer);
-        return textContainer;
-      };
-
-      // Give custom shapes possibility to modify text element
-      Shape.prototype._initializeTextContainer = function (opts, container, element) {
-        // By default, no-op
-        // Custom shapes should respect API options, such as text.style
-      };
-
-      Shape.prototype._pathString = function _pathString(opts) {
-        throw new Error('Override this function for each progress bar');
-      };
-
-      Shape.prototype._trailString = function _trailString(opts) {
-        throw new Error('Override this function for each progress bar');
-      };
-
-      Shape.prototype._warnContainerAspectRatio = function _warnContainerAspectRatio(container) {
-        if (!this.containerAspectRatio) {
-          return;
-        }
-
-        var computedStyle = window.getComputedStyle(container, null);
-        var width = parseFloat(computedStyle.getPropertyValue('width'), 10);
-        var height = parseFloat(computedStyle.getPropertyValue('height'), 10);
-        if (!utils.floatEquals(this.containerAspectRatio, width / height)) {
-          console.warn('Incorrect aspect ratio of container', '#' + container.id, 'detected:', computedStyle.getPropertyValue('width') + '(width)', '/', computedStyle.getPropertyValue('height') + '(height)', '=', width / height);
-
-          console.warn('Aspect ratio of should be', this.containerAspectRatio);
-        }
-      };
-
-      module.exports = Shape;
-    }, { "./path": 5, "./utils": 8 }], 8: [function (require, module, exports) {
-      // Utility functions
-
-      var PREFIXES = 'Webkit Moz O ms'.split(' ');
-      var FLOAT_COMPARISON_EPSILON = 0.001;
-
-      // Copy all attributes from source object to destination object.
-      // destination object is mutated.
-      function extend(destination, source, recursive) {
-        destination = destination || {};
-        source = source || {};
-        recursive = recursive || false;
-
-        for (var attrName in source) {
-          if (source.hasOwnProperty(attrName)) {
-            var destVal = destination[attrName];
-            var sourceVal = source[attrName];
-            if (recursive && isObject(destVal) && isObject(sourceVal)) {
-              destination[attrName] = extend(destVal, sourceVal, recursive);
-            } else {
-              destination[attrName] = sourceVal;
-            }
-          }
-        }
-
-        return destination;
-      }
-
-      // Renders templates with given variables. Variables must be surrounded with
-      // braces without any spaces, e.g. {variable}
-      // All instances of variable placeholders will be replaced with given content
-      // Example:
-      // render('Hello, {message}!', {message: 'world'})
-      function render(template, vars) {
-        var rendered = template;
-
-        for (var key in vars) {
-          if (vars.hasOwnProperty(key)) {
-            var val = vars[key];
-            var regExpString = '\\{' + key + '\\}';
-            var regExp = new RegExp(regExpString, 'g');
-
-            rendered = rendered.replace(regExp, val);
-          }
-        }
-
-        return rendered;
-      }
-
-      function setStyle(element, style, value) {
-        var elStyle = element.style; // cache for performance
-
-        for (var i = 0; i < PREFIXES.length; ++i) {
-          var prefix = PREFIXES[i];
-          elStyle[prefix + capitalize(style)] = value;
-        }
-
-        elStyle[style] = value;
-      }
-
-      function setStyles(element, styles) {
-        forEachObject(styles, function (styleValue, styleName) {
-          // Allow disabling some individual styles by setting them
-          // to null or undefined
-          if (styleValue === null || styleValue === undefined) {
-            return;
-          }
-
-          // If style's value is {prefix: true, value: '50%'},
-          // Set also browser prefixed styles
-          if (isObject(styleValue) && styleValue.prefix === true) {
-            setStyle(element, styleName, styleValue.value);
-          } else {
-            element.style[styleName] = styleValue;
-          }
-        });
-      }
-
-      function capitalize(text) {
-        return text.charAt(0).toUpperCase() + text.slice(1);
-      }
-
-      function isString(obj) {
-        return typeof obj === 'string' || obj instanceof String;
-      }
-
-      function isFunction(obj) {
-        return typeof obj === 'function';
-      }
-
-      function isArray(obj) {
-        return Object.prototype.toString.call(obj) === '[object Array]';
-      }
-
-      // Returns true if `obj` is object as in {a: 1, b: 2}, not if it's function or
-      // array
-      function isObject(obj) {
-        if (isArray(obj)) {
-          return false;
-        }
-
-        var type = typeof obj === "undefined" ? "undefined" : _typeof(obj);
-        return type === 'object' && !!obj;
-      }
-
-      function forEachObject(object, callback) {
-        for (var key in object) {
-          if (object.hasOwnProperty(key)) {
-            var val = object[key];
-            callback(val, key);
-          }
-        }
-      }
-
-      function floatEquals(a, b) {
-        return Math.abs(a - b) < FLOAT_COMPARISON_EPSILON;
-      }
-
-      // https://coderwall.com/p/nygghw/don-t-use-innerhtml-to-empty-dom-elements
-      function removeChildren(el) {
-        while (el.firstChild) {
-          el.removeChild(el.firstChild);
-        }
-      }
-
-      module.exports = {
-        extend: extend,
-        render: render,
-        setStyle: setStyle,
-        setStyles: setStyles,
-        capitalize: capitalize,
-        isString: isString,
-        isFunction: isFunction,
-        isObject: isObject,
-        forEachObject: forEachObject,
-        floatEquals: floatEquals,
-        removeChildren: removeChildren
-      };
-    }, {}] }, {}, [4])(4);
-});
-
-/***/ }),
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_three_js__ = __webpack_require__(71);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_three_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_three_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__third_party_Tween__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__third_party_Tween___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__third_party_Tween__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__third_party_progressbar__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__third_party_progressbar___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__third_party_progressbar__);
-// import * as THREE from './third-party/threejs/three';
-
-
-
-
-var THREE = __WEBPACK_IMPORTED_MODULE_0_three_js___default()(["OBJLoader", "OrbitControls"]);
-var StereoEffect = __webpack_require__(73)(THREE);
-
-// var OrbitControls = require('three-orbit-controls')(THREE);
-// var OBJLoader = require('three-obj-loader');
-// OBJLoader(THREE);
-
-var camera, scene, renderer, sphere, cube, left_bar, right_bar, effect, controls, element, container, scCube, mesh, x, intersects, animScale, msg;
-var buttonState;
-var selectableObjs = [];
-var width = window.innerWidth,
-    height = window.innerHeight;
-var clock = new THREE.Clock();
-
-var min = { x: 100, y: 100, z: 100 };
-var touchTweenTo = new __WEBPACK_IMPORTED_MODULE_1__third_party_Tween__["Tween"](min);
-var max = { x: 120, y: 120, z: 120 };
-
-//Set up animation cycle used on touched objects
-touchTweenTo.to(max, 200);
-touchTweenTo.easing(__WEBPACK_IMPORTED_MODULE_1__third_party_Tween__["Easing"].Bounce.InOut);
-touchTweenTo.repeat(Infinity); // repeats forever
-touchTweenTo.start();
-
-var SELECTION_TIME = 2000;
-
-//Allow for fullscreen and detect return from
-var goFS = document.getElementById("goFS");
-document.getElementById("goFS").style.display = 'block';
-var doc = window.document;
-var docEl = doc.documentElement;
-
-goFS.addEventListener("click", function () {
-    document.body.requestFullscreen();
-    // fullscreen(docEl);
-}, false);
-
-document.addEventListener('webkitfullscreenchange', function (e) {
-    buttonState = document.getElementById("goFS").style.display;
-    if (buttonState == 'block' || buttonState == 'undefined') {
-        document.getElementById("goFS").style.display = 'none';
-    }
-    if (buttonState == 'none') {
-        document.getElementById("goFS").style.display = 'block';
-    }
-});
-
-document.getElementById("selection_confirmation_overlay").style.display = 'none';
-
-//Build Three.js scene
-
-init();
-animate();
-
-function init() {
-
-    left_bar = new __WEBPACK_IMPORTED_MODULE_2__third_party_progressbar__["Circle"]('#guide_circle_left', {
-        strokeWidth: 10,
-        easing: 'easeInOut',
-        duration: SELECTION_TIME,
-        color: 'lime',
-        trailWidth: 2,
-        svgStyle: null
-    });
-
-    right_bar = new __WEBPACK_IMPORTED_MODULE_2__third_party_progressbar__["Circle"]('#guide_circle_right', {
-        strokeWidth: 10,
-        easing: 'easeInOut',
-        duration: SELECTION_TIME,
-        color: 'lime',
-        trailWidth: 2,
-        svgStyle: null });
-    //right_bar.animate(1);
-
-    //Stereo scene
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    element = renderer.domElement;
-    container = document.getElementById('scene');
-    container.appendChild(element);
-
-    effect = new StereoEffect(renderer);
-
-    scene = new THREE.Scene();
-
-    camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
-    camera.position.set(0, -5, 0);
-    scene.add(camera);
-
-    controls = new THREE.OrbitControls(camera, element);
-    //controls.rotateUp(Math.PI / 4);
-    controls.target.set(camera.position.x + 0.1, camera.position.y, camera.position.z);
-    //controls.noZoom = true;
-    //controls.noPan = true;
-
-    function setOrientationControls(e) {
-        if (!e.alpha) {
-            return;
-        }
-
-        controls = __webpack_require__(87)(THREE, camera);
-        // controls = new THREE.DeviceOrientationControls(camera, true);
-        controls.connect();
-        controls.update();
-
-        element.addEventListener('click', fullscreen, false);
-
-        window.removeEventListener('deviceorientation', setOrientationControls, true);
-    }
-    window.addEventListener('deviceorientation', setOrientationControls, true);
-
-    // Add lights
-    var ambLight = new THREE.AmbientLight(0x808080); // soft white light
-    scene.add(ambLight);
-
-    var ptLight = new THREE.PointLight(0xffffff, 1.75, 1000);
-    ptLight.position.set(-100, 100, 100);
-    scene.add(ptLight);
-
-    //Add other scene elements
-    // drawSimpleSkybox();
-
-    drawShapes();
-    drawScene('./images/room_1.jpg');
-
-    window.addEventListener('resize', resize, false);
-    setTimeout(resize, 1);
-}
-
-function drawScene(load_image) {
-    var geometry = new THREE.SphereGeometry(500, 60, 40);
-    geometry.scale(-1, 1, 1);
-
-    var material = new THREE.MeshBasicMaterial({
-        map: new THREE.TextureLoader().load(load_image)
-    });
-
-    mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
-}
-
-function resetCamera() {
-    controls.target.set(camera.position.x + 0.1, camera.position.y, camera.position.z);
-}
-
-function drawShapes() {
-    var manager = new THREE.LoadingManager();
-    manager.onProgress = function (item, loaded, total) {
-        console.log(item, loaded, total);
-    };
-
-    var objLoader = new THREE.OBJLoader(manager);
-    objLoader.load("models/star_charm.obj", meshloader("models/star_charm.obj", -35, 5, -15, 0.5, "objStar"));
-
-    function meshloader(fileName, position_z, position_y, position_x, rotation, title) {
-        return function (geometry) {
-            //Place in scene
-            var color;
-            if (fileName.indexOf("star") !== -1) {
-                color = 0xFF6500;
-                geometry.scale.set(50, 50, 50);
-                geometry.position.z = position_z;
-                geometry.position.y = position_y;
-                geometry.position.x = position_x;
-                geometry.rotation.y = rotation;
-                selectableObjs.push(geometry);
-                geometry.userData = { name: title, touched: false };
-                scene.add(geometry);
-            }
-
-            //Apply material
-            geometry.traverse(function (child) {
-                if (child instanceof THREE.Mesh) {
-                    var material = new THREE.MeshPhongMaterial({ color: color,
-                        side: THREE.DoubleSide,
-                        emissive: 0x000000,
-                        envMap: scCube
-                    });
-                    child.material = material;
-                }
-            });
-        };
-    }
-}
-
-//What happens after an object is selected
-function postSelectAction(selectedObjectName) {
-    console.log("The " + selectedObjectName + " was selected by user. Use this function to create appropriate scene transition.");
-
-    document.getElementById("selection_confirmation_overlay").style.display = 'block';
-
-    setTimeout(function () {
-        document.getElementById("selection_confirmation_overlay").style.display = 'none';
-        if (selectedObjectName == 'objStar') {
-            drawScene('./images/room_2.jpg');
-            resetCamera();
-        }
-    }, 250);
-}
-
-function getIntersections(objects) {
-    var raycaster = new THREE.Raycaster();
-
-    var vector = new THREE.Vector3(0, 0, -1);
-    vector.applyQuaternion(camera.quaternion);
-
-    raycaster.set(camera.position, vector);
-
-    return raycaster.intersectObjects(objects, true);
-}
-
-function updateHUDTxt(msg) {
-    x = document.getElementsByClassName("info_text"); // Find the elements
-    for (var i = 0; i < x.length; i++) {
-        x[i].innerText = msg; // Change the content
-    }
-}
-
-function getTouchMsg(charm) {
-    msg = "That's a " + charm + ", which has the power to ";
-
-    switch (charm) {
-        case "heart":
-            msg = msg + "bring things to life.";
-            msg = msg.replace(charm, "pink " + charm);
-            break;
-        case "moon":
-            msg = msg + "make things invisible.";
-            msg = msg.replace(charm, "blue " + charm);
-            break;
-        case "clover":
-            msg = msg + "bring luck (but you never know which kind).";
-            msg = msg.replace(charm, "green " + charm);
-            break;
-        case "star":
-            msg = msg + "make things fly (but you already have that).";
-            msg = msg.replace(charm, "orange " + charm);
-            break;
-
-    }
-
-    return msg + " Keep looking at it to select it.";
-}
-
-function resize() {
-    var width = container.offsetWidth;
-    var height = container.offsetHeight;
-
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-
-    renderer.setSize(width, height);
-    effect.setSize(width, height);
-}
-
-function update(dt) {
-    resize();
-
-    camera.updateProjectionMatrix();
-
-    // check camera positioning
-    // console.log(camera.position);
-    controls.update(dt);
-}
-
-function render(dt) {
-
-    updateHUDTxt(""); //Set HUD txt to blank to start render loop.
-
-    intersects = getIntersections(selectableObjs);
-
-    if (intersects.length == 0) {
-        //nothing being "touched"
-        left_bar.set(0.0); //reset any active progress bars to 0
-        right_bar.set(0.0);
-
-        //Loop over all OBJ objects (the charms)
-        scene.traverse(function (object) {
-            //Set all charms touch flag to false as nothing is selected.
-            if (object instanceof THREE.Group) {
-                if (intersects.length == 0) {
-                    object.userData.touched = false;
-                }
-            }
-        });
-    } else {
-        //something being touched
-        //Set the touched charm's touch flag to true, so we can give it special treatment in the animation function
-        intersects[0].object.parent.userData.touched = true;
-        msg = getTouchMsg(intersects[0].object.parent.userData.name); //update HUD text to register the touch
-        updateHUDTxt(msg);
-    }
-
-    effect.render(scene, camera);
-}
-
-function animate(t) {
-
-    __WEBPACK_IMPORTED_MODULE_1__third_party_Tween__["update"]();
-
-    touchTweenTo.onUpdate(function () {
-        animScale = this;
-    });
-
-    scene.traverse(function (object) {
-        if (object instanceof THREE.Group) {
-            // object.rotation.y = object.rotation.y + 0.01;
-
-            if (object.userData.touched) {
-                object.scale.x = animScale.x / 1.5;
-                object.scale.y = animScale.y / 1.5;
-                object.scale.z = animScale.z / 1.5;
-
-                if (left_bar.value() == 0) {
-                    //don't restart progress bar if already progress
-                    left_bar.animate(1.0, {}, function () {
-                        postSelectAction(object.userData.name); //add callback to left side progress bar to register completed selection
-                    });
-                }
-                if (right_bar.value() == 0) {
-                    //don't restart if in progress
-                    right_bar.animate(1.0);
-                }
-            }
-        }
-    });
-
-    requestAnimationFrame(animate);
-
-    update(clock.getDelta());
-    render(clock.getDelta());
-}
-
-function fullscreen(container) {
-    if (container.requestFullscreen) {
-        container.requestFullscreen();
-    } else if (container.msRequestFullscreen) {
-        container.msRequestFullscreen();
-    } else if (container.mozRequestFullScreen) {
-        container.mozRequestFullScreen();
-    } else if (container.webkitRequestFullscreen) {
-        container.webkitRequestFullscreen();
-    }
-}
-
-/***/ }),
 /* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(jQuery) {/*!
- * Bootstrap v3.3.7 (http://getbootstrap.com)
- * Copyright 2011-2016 Twitter, Inc.
- * Licensed under the MIT license
- */
-
-if (typeof jQuery === 'undefined') {
-  throw new Error('Bootstrap\'s JavaScript requires jQuery')
-}
-
-+function ($) {
-  'use strict';
-  var version = $.fn.jquery.split(' ')[0].split('.')
-  if ((version[0] < 2 && version[1] < 9) || (version[0] == 1 && version[1] == 9 && version[2] < 1) || (version[0] > 3)) {
-    throw new Error('Bootstrap\'s JavaScript requires jQuery version 1.9.1 or higher, but lower than version 4')
-  }
-}(jQuery);
-
-/* ========================================================================
- * Bootstrap: transition.js v3.3.7
- * http://getbootstrap.com/javascript/#transitions
- * ========================================================================
- * Copyright 2011-2016 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
- * ======================================================================== */
-
-
-+function ($) {
-  'use strict';
-
-  // CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
-  // ============================================================
-
-  function transitionEnd() {
-    var el = document.createElement('bootstrap')
-
-    var transEndEventNames = {
-      WebkitTransition : 'webkitTransitionEnd',
-      MozTransition    : 'transitionend',
-      OTransition      : 'oTransitionEnd otransitionend',
-      transition       : 'transitionend'
-    }
-
-    for (var name in transEndEventNames) {
-      if (el.style[name] !== undefined) {
-        return { end: transEndEventNames[name] }
-      }
-    }
-
-    return false // explicit for ie8 (  ._.)
-  }
-
-  // http://blog.alexmaccaw.com/css-transitions
-  $.fn.emulateTransitionEnd = function (duration) {
-    var called = false
-    var $el = this
-    $(this).one('bsTransitionEnd', function () { called = true })
-    var callback = function () { if (!called) $($el).trigger($.support.transition.end) }
-    setTimeout(callback, duration)
-    return this
-  }
-
-  $(function () {
-    $.support.transition = transitionEnd()
-
-    if (!$.support.transition) return
-
-    $.event.special.bsTransitionEnd = {
-      bindType: $.support.transition.end,
-      delegateType: $.support.transition.end,
-      handle: function (e) {
-        if ($(e.target).is(this)) return e.handleObj.handler.apply(this, arguments)
-      }
-    }
-  })
-
-}(jQuery);
-
-/* ========================================================================
- * Bootstrap: alert.js v3.3.7
- * http://getbootstrap.com/javascript/#alerts
- * ========================================================================
- * Copyright 2011-2016 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
- * ======================================================================== */
-
-
-+function ($) {
-  'use strict';
-
-  // ALERT CLASS DEFINITION
-  // ======================
-
-  var dismiss = '[data-dismiss="alert"]'
-  var Alert   = function (el) {
-    $(el).on('click', dismiss, this.close)
-  }
-
-  Alert.VERSION = '3.3.7'
-
-  Alert.TRANSITION_DURATION = 150
-
-  Alert.prototype.close = function (e) {
-    var $this    = $(this)
-    var selector = $this.attr('data-target')
-
-    if (!selector) {
-      selector = $this.attr('href')
-      selector = selector && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
-    }
-
-    var $parent = $(selector === '#' ? [] : selector)
-
-    if (e) e.preventDefault()
-
-    if (!$parent.length) {
-      $parent = $this.closest('.alert')
-    }
-
-    $parent.trigger(e = $.Event('close.bs.alert'))
-
-    if (e.isDefaultPrevented()) return
-
-    $parent.removeClass('in')
-
-    function removeElement() {
-      // detach from parent, fire event then clean up data
-      $parent.detach().trigger('closed.bs.alert').remove()
-    }
-
-    $.support.transition && $parent.hasClass('fade') ?
-      $parent
-        .one('bsTransitionEnd', removeElement)
-        .emulateTransitionEnd(Alert.TRANSITION_DURATION) :
-      removeElement()
-  }
-
-
-  // ALERT PLUGIN DEFINITION
-  // =======================
-
-  function Plugin(option) {
-    return this.each(function () {
-      var $this = $(this)
-      var data  = $this.data('bs.alert')
-
-      if (!data) $this.data('bs.alert', (data = new Alert(this)))
-      if (typeof option == 'string') data[option].call($this)
-    })
-  }
-
-  var old = $.fn.alert
-
-  $.fn.alert             = Plugin
-  $.fn.alert.Constructor = Alert
-
-
-  // ALERT NO CONFLICT
-  // =================
-
-  $.fn.alert.noConflict = function () {
-    $.fn.alert = old
-    return this
-  }
-
-
-  // ALERT DATA-API
-  // ==============
-
-  $(document).on('click.bs.alert.data-api', dismiss, Alert.prototype.close)
-
-}(jQuery);
-
-/* ========================================================================
- * Bootstrap: button.js v3.3.7
- * http://getbootstrap.com/javascript/#buttons
- * ========================================================================
- * Copyright 2011-2016 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
- * ======================================================================== */
-
-
-+function ($) {
-  'use strict';
-
-  // BUTTON PUBLIC CLASS DEFINITION
-  // ==============================
-
-  var Button = function (element, options) {
-    this.$element  = $(element)
-    this.options   = $.extend({}, Button.DEFAULTS, options)
-    this.isLoading = false
-  }
-
-  Button.VERSION  = '3.3.7'
-
-  Button.DEFAULTS = {
-    loadingText: 'loading...'
-  }
-
-  Button.prototype.setState = function (state) {
-    var d    = 'disabled'
-    var $el  = this.$element
-    var val  = $el.is('input') ? 'val' : 'html'
-    var data = $el.data()
-
-    state += 'Text'
-
-    if (data.resetText == null) $el.data('resetText', $el[val]())
-
-    // push to event loop to allow forms to submit
-    setTimeout($.proxy(function () {
-      $el[val](data[state] == null ? this.options[state] : data[state])
-
-      if (state == 'loadingText') {
-        this.isLoading = true
-        $el.addClass(d).attr(d, d).prop(d, true)
-      } else if (this.isLoading) {
-        this.isLoading = false
-        $el.removeClass(d).removeAttr(d).prop(d, false)
-      }
-    }, this), 0)
-  }
-
-  Button.prototype.toggle = function () {
-    var changed = true
-    var $parent = this.$element.closest('[data-toggle="buttons"]')
-
-    if ($parent.length) {
-      var $input = this.$element.find('input')
-      if ($input.prop('type') == 'radio') {
-        if ($input.prop('checked')) changed = false
-        $parent.find('.active').removeClass('active')
-        this.$element.addClass('active')
-      } else if ($input.prop('type') == 'checkbox') {
-        if (($input.prop('checked')) !== this.$element.hasClass('active')) changed = false
-        this.$element.toggleClass('active')
-      }
-      $input.prop('checked', this.$element.hasClass('active'))
-      if (changed) $input.trigger('change')
-    } else {
-      this.$element.attr('aria-pressed', !this.$element.hasClass('active'))
-      this.$element.toggleClass('active')
-    }
-  }
-
-
-  // BUTTON PLUGIN DEFINITION
-  // ========================
-
-  function Plugin(option) {
-    return this.each(function () {
-      var $this   = $(this)
-      var data    = $this.data('bs.button')
-      var options = typeof option == 'object' && option
-
-      if (!data) $this.data('bs.button', (data = new Button(this, options)))
-
-      if (option == 'toggle') data.toggle()
-      else if (option) data.setState(option)
-    })
-  }
-
-  var old = $.fn.button
-
-  $.fn.button             = Plugin
-  $.fn.button.Constructor = Button
-
-
-  // BUTTON NO CONFLICT
-  // ==================
-
-  $.fn.button.noConflict = function () {
-    $.fn.button = old
-    return this
-  }
-
-
-  // BUTTON DATA-API
-  // ===============
-
-  $(document)
-    .on('click.bs.button.data-api', '[data-toggle^="button"]', function (e) {
-      var $btn = $(e.target).closest('.btn')
-      Plugin.call($btn, 'toggle')
-      if (!($(e.target).is('input[type="radio"], input[type="checkbox"]'))) {
-        // Prevent double click on radios, and the double selections (so cancellation) on checkboxes
-        e.preventDefault()
-        // The target component still receive the focus
-        if ($btn.is('input,button')) $btn.trigger('focus')
-        else $btn.find('input:visible,button:visible').first().trigger('focus')
-      }
-    })
-    .on('focus.bs.button.data-api blur.bs.button.data-api', '[data-toggle^="button"]', function (e) {
-      $(e.target).closest('.btn').toggleClass('focus', /^focus(in)?$/.test(e.type))
-    })
-
-}(jQuery);
-
-/* ========================================================================
- * Bootstrap: carousel.js v3.3.7
- * http://getbootstrap.com/javascript/#carousel
- * ========================================================================
- * Copyright 2011-2016 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
- * ======================================================================== */
-
-
-+function ($) {
-  'use strict';
-
-  // CAROUSEL CLASS DEFINITION
-  // =========================
-
-  var Carousel = function (element, options) {
-    this.$element    = $(element)
-    this.$indicators = this.$element.find('.carousel-indicators')
-    this.options     = options
-    this.paused      = null
-    this.sliding     = null
-    this.interval    = null
-    this.$active     = null
-    this.$items      = null
-
-    this.options.keyboard && this.$element.on('keydown.bs.carousel', $.proxy(this.keydown, this))
-
-    this.options.pause == 'hover' && !('ontouchstart' in document.documentElement) && this.$element
-      .on('mouseenter.bs.carousel', $.proxy(this.pause, this))
-      .on('mouseleave.bs.carousel', $.proxy(this.cycle, this))
-  }
-
-  Carousel.VERSION  = '3.3.7'
-
-  Carousel.TRANSITION_DURATION = 600
-
-  Carousel.DEFAULTS = {
-    interval: 5000,
-    pause: 'hover',
-    wrap: true,
-    keyboard: true
-  }
-
-  Carousel.prototype.keydown = function (e) {
-    if (/input|textarea/i.test(e.target.tagName)) return
-    switch (e.which) {
-      case 37: this.prev(); break
-      case 39: this.next(); break
-      default: return
-    }
-
-    e.preventDefault()
-  }
-
-  Carousel.prototype.cycle = function (e) {
-    e || (this.paused = false)
-
-    this.interval && clearInterval(this.interval)
-
-    this.options.interval
-      && !this.paused
-      && (this.interval = setInterval($.proxy(this.next, this), this.options.interval))
-
-    return this
-  }
-
-  Carousel.prototype.getItemIndex = function (item) {
-    this.$items = item.parent().children('.item')
-    return this.$items.index(item || this.$active)
-  }
-
-  Carousel.prototype.getItemForDirection = function (direction, active) {
-    var activeIndex = this.getItemIndex(active)
-    var willWrap = (direction == 'prev' && activeIndex === 0)
-                || (direction == 'next' && activeIndex == (this.$items.length - 1))
-    if (willWrap && !this.options.wrap) return active
-    var delta = direction == 'prev' ? -1 : 1
-    var itemIndex = (activeIndex + delta) % this.$items.length
-    return this.$items.eq(itemIndex)
-  }
-
-  Carousel.prototype.to = function (pos) {
-    var that        = this
-    var activeIndex = this.getItemIndex(this.$active = this.$element.find('.item.active'))
-
-    if (pos > (this.$items.length - 1) || pos < 0) return
-
-    if (this.sliding)       return this.$element.one('slid.bs.carousel', function () { that.to(pos) }) // yes, "slid"
-    if (activeIndex == pos) return this.pause().cycle()
-
-    return this.slide(pos > activeIndex ? 'next' : 'prev', this.$items.eq(pos))
-  }
-
-  Carousel.prototype.pause = function (e) {
-    e || (this.paused = true)
-
-    if (this.$element.find('.next, .prev').length && $.support.transition) {
-      this.$element.trigger($.support.transition.end)
-      this.cycle(true)
-    }
-
-    this.interval = clearInterval(this.interval)
-
-    return this
-  }
-
-  Carousel.prototype.next = function () {
-    if (this.sliding) return
-    return this.slide('next')
-  }
-
-  Carousel.prototype.prev = function () {
-    if (this.sliding) return
-    return this.slide('prev')
-  }
-
-  Carousel.prototype.slide = function (type, next) {
-    var $active   = this.$element.find('.item.active')
-    var $next     = next || this.getItemForDirection(type, $active)
-    var isCycling = this.interval
-    var direction = type == 'next' ? 'left' : 'right'
-    var that      = this
-
-    if ($next.hasClass('active')) return (this.sliding = false)
-
-    var relatedTarget = $next[0]
-    var slideEvent = $.Event('slide.bs.carousel', {
-      relatedTarget: relatedTarget,
-      direction: direction
-    })
-    this.$element.trigger(slideEvent)
-    if (slideEvent.isDefaultPrevented()) return
-
-    this.sliding = true
-
-    isCycling && this.pause()
-
-    if (this.$indicators.length) {
-      this.$indicators.find('.active').removeClass('active')
-      var $nextIndicator = $(this.$indicators.children()[this.getItemIndex($next)])
-      $nextIndicator && $nextIndicator.addClass('active')
-    }
-
-    var slidEvent = $.Event('slid.bs.carousel', { relatedTarget: relatedTarget, direction: direction }) // yes, "slid"
-    if ($.support.transition && this.$element.hasClass('slide')) {
-      $next.addClass(type)
-      $next[0].offsetWidth // force reflow
-      $active.addClass(direction)
-      $next.addClass(direction)
-      $active
-        .one('bsTransitionEnd', function () {
-          $next.removeClass([type, direction].join(' ')).addClass('active')
-          $active.removeClass(['active', direction].join(' '))
-          that.sliding = false
-          setTimeout(function () {
-            that.$element.trigger(slidEvent)
-          }, 0)
-        })
-        .emulateTransitionEnd(Carousel.TRANSITION_DURATION)
-    } else {
-      $active.removeClass('active')
-      $next.addClass('active')
-      this.sliding = false
-      this.$element.trigger(slidEvent)
-    }
-
-    isCycling && this.cycle()
-
-    return this
-  }
-
-
-  // CAROUSEL PLUGIN DEFINITION
-  // ==========================
-
-  function Plugin(option) {
-    return this.each(function () {
-      var $this   = $(this)
-      var data    = $this.data('bs.carousel')
-      var options = $.extend({}, Carousel.DEFAULTS, $this.data(), typeof option == 'object' && option)
-      var action  = typeof option == 'string' ? option : options.slide
-
-      if (!data) $this.data('bs.carousel', (data = new Carousel(this, options)))
-      if (typeof option == 'number') data.to(option)
-      else if (action) data[action]()
-      else if (options.interval) data.pause().cycle()
-    })
-  }
-
-  var old = $.fn.carousel
-
-  $.fn.carousel             = Plugin
-  $.fn.carousel.Constructor = Carousel
-
-
-  // CAROUSEL NO CONFLICT
-  // ====================
-
-  $.fn.carousel.noConflict = function () {
-    $.fn.carousel = old
-    return this
-  }
-
-
-  // CAROUSEL DATA-API
-  // =================
-
-  var clickHandler = function (e) {
-    var href
-    var $this   = $(this)
-    var $target = $($this.attr('data-target') || (href = $this.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '')) // strip for ie7
-    if (!$target.hasClass('carousel')) return
-    var options = $.extend({}, $target.data(), $this.data())
-    var slideIndex = $this.attr('data-slide-to')
-    if (slideIndex) options.interval = false
-
-    Plugin.call($target, options)
-
-    if (slideIndex) {
-      $target.data('bs.carousel').to(slideIndex)
-    }
-
-    e.preventDefault()
-  }
-
-  $(document)
-    .on('click.bs.carousel.data-api', '[data-slide]', clickHandler)
-    .on('click.bs.carousel.data-api', '[data-slide-to]', clickHandler)
-
-  $(window).on('load', function () {
-    $('[data-ride="carousel"]').each(function () {
-      var $carousel = $(this)
-      Plugin.call($carousel, $carousel.data())
-    })
-  })
-
-}(jQuery);
-
-/* ========================================================================
- * Bootstrap: collapse.js v3.3.7
- * http://getbootstrap.com/javascript/#collapse
- * ========================================================================
- * Copyright 2011-2016 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
- * ======================================================================== */
-
-/* jshint latedef: false */
-
-+function ($) {
-  'use strict';
-
-  // COLLAPSE PUBLIC CLASS DEFINITION
-  // ================================
-
-  var Collapse = function (element, options) {
-    this.$element      = $(element)
-    this.options       = $.extend({}, Collapse.DEFAULTS, options)
-    this.$trigger      = $('[data-toggle="collapse"][href="#' + element.id + '"],' +
-                           '[data-toggle="collapse"][data-target="#' + element.id + '"]')
-    this.transitioning = null
-
-    if (this.options.parent) {
-      this.$parent = this.getParent()
-    } else {
-      this.addAriaAndCollapsedClass(this.$element, this.$trigger)
-    }
-
-    if (this.options.toggle) this.toggle()
-  }
-
-  Collapse.VERSION  = '3.3.7'
-
-  Collapse.TRANSITION_DURATION = 350
-
-  Collapse.DEFAULTS = {
-    toggle: true
-  }
-
-  Collapse.prototype.dimension = function () {
-    var hasWidth = this.$element.hasClass('width')
-    return hasWidth ? 'width' : 'height'
-  }
-
-  Collapse.prototype.show = function () {
-    if (this.transitioning || this.$element.hasClass('in')) return
-
-    var activesData
-    var actives = this.$parent && this.$parent.children('.panel').children('.in, .collapsing')
-
-    if (actives && actives.length) {
-      activesData = actives.data('bs.collapse')
-      if (activesData && activesData.transitioning) return
-    }
-
-    var startEvent = $.Event('show.bs.collapse')
-    this.$element.trigger(startEvent)
-    if (startEvent.isDefaultPrevented()) return
-
-    if (actives && actives.length) {
-      Plugin.call(actives, 'hide')
-      activesData || actives.data('bs.collapse', null)
-    }
-
-    var dimension = this.dimension()
-
-    this.$element
-      .removeClass('collapse')
-      .addClass('collapsing')[dimension](0)
-      .attr('aria-expanded', true)
-
-    this.$trigger
-      .removeClass('collapsed')
-      .attr('aria-expanded', true)
-
-    this.transitioning = 1
-
-    var complete = function () {
-      this.$element
-        .removeClass('collapsing')
-        .addClass('collapse in')[dimension]('')
-      this.transitioning = 0
-      this.$element
-        .trigger('shown.bs.collapse')
-    }
-
-    if (!$.support.transition) return complete.call(this)
-
-    var scrollSize = $.camelCase(['scroll', dimension].join('-'))
-
-    this.$element
-      .one('bsTransitionEnd', $.proxy(complete, this))
-      .emulateTransitionEnd(Collapse.TRANSITION_DURATION)[dimension](this.$element[0][scrollSize])
-  }
-
-  Collapse.prototype.hide = function () {
-    if (this.transitioning || !this.$element.hasClass('in')) return
-
-    var startEvent = $.Event('hide.bs.collapse')
-    this.$element.trigger(startEvent)
-    if (startEvent.isDefaultPrevented()) return
-
-    var dimension = this.dimension()
-
-    this.$element[dimension](this.$element[dimension]())[0].offsetHeight
-
-    this.$element
-      .addClass('collapsing')
-      .removeClass('collapse in')
-      .attr('aria-expanded', false)
-
-    this.$trigger
-      .addClass('collapsed')
-      .attr('aria-expanded', false)
-
-    this.transitioning = 1
-
-    var complete = function () {
-      this.transitioning = 0
-      this.$element
-        .removeClass('collapsing')
-        .addClass('collapse')
-        .trigger('hidden.bs.collapse')
-    }
-
-    if (!$.support.transition) return complete.call(this)
-
-    this.$element
-      [dimension](0)
-      .one('bsTransitionEnd', $.proxy(complete, this))
-      .emulateTransitionEnd(Collapse.TRANSITION_DURATION)
-  }
-
-  Collapse.prototype.toggle = function () {
-    this[this.$element.hasClass('in') ? 'hide' : 'show']()
-  }
-
-  Collapse.prototype.getParent = function () {
-    return $(this.options.parent)
-      .find('[data-toggle="collapse"][data-parent="' + this.options.parent + '"]')
-      .each($.proxy(function (i, element) {
-        var $element = $(element)
-        this.addAriaAndCollapsedClass(getTargetFromTrigger($element), $element)
-      }, this))
-      .end()
-  }
-
-  Collapse.prototype.addAriaAndCollapsedClass = function ($element, $trigger) {
-    var isOpen = $element.hasClass('in')
-
-    $element.attr('aria-expanded', isOpen)
-    $trigger
-      .toggleClass('collapsed', !isOpen)
-      .attr('aria-expanded', isOpen)
-  }
-
-  function getTargetFromTrigger($trigger) {
-    var href
-    var target = $trigger.attr('data-target')
-      || (href = $trigger.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '') // strip for ie7
-
-    return $(target)
-  }
-
-
-  // COLLAPSE PLUGIN DEFINITION
-  // ==========================
-
-  function Plugin(option) {
-    return this.each(function () {
-      var $this   = $(this)
-      var data    = $this.data('bs.collapse')
-      var options = $.extend({}, Collapse.DEFAULTS, $this.data(), typeof option == 'object' && option)
-
-      if (!data && options.toggle && /show|hide/.test(option)) options.toggle = false
-      if (!data) $this.data('bs.collapse', (data = new Collapse(this, options)))
-      if (typeof option == 'string') data[option]()
-    })
-  }
-
-  var old = $.fn.collapse
-
-  $.fn.collapse             = Plugin
-  $.fn.collapse.Constructor = Collapse
-
-
-  // COLLAPSE NO CONFLICT
-  // ====================
-
-  $.fn.collapse.noConflict = function () {
-    $.fn.collapse = old
-    return this
-  }
-
-
-  // COLLAPSE DATA-API
-  // =================
-
-  $(document).on('click.bs.collapse.data-api', '[data-toggle="collapse"]', function (e) {
-    var $this   = $(this)
-
-    if (!$this.attr('data-target')) e.preventDefault()
-
-    var $target = getTargetFromTrigger($this)
-    var data    = $target.data('bs.collapse')
-    var option  = data ? 'toggle' : $this.data()
-
-    Plugin.call($target, option)
-  })
-
-}(jQuery);
-
-/* ========================================================================
- * Bootstrap: dropdown.js v3.3.7
- * http://getbootstrap.com/javascript/#dropdowns
- * ========================================================================
- * Copyright 2011-2016 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
- * ======================================================================== */
-
-
-+function ($) {
-  'use strict';
-
-  // DROPDOWN CLASS DEFINITION
-  // =========================
-
-  var backdrop = '.dropdown-backdrop'
-  var toggle   = '[data-toggle="dropdown"]'
-  var Dropdown = function (element) {
-    $(element).on('click.bs.dropdown', this.toggle)
-  }
-
-  Dropdown.VERSION = '3.3.7'
-
-  function getParent($this) {
-    var selector = $this.attr('data-target')
-
-    if (!selector) {
-      selector = $this.attr('href')
-      selector = selector && /#[A-Za-z]/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
-    }
-
-    var $parent = selector && $(selector)
-
-    return $parent && $parent.length ? $parent : $this.parent()
-  }
-
-  function clearMenus(e) {
-    if (e && e.which === 3) return
-    $(backdrop).remove()
-    $(toggle).each(function () {
-      var $this         = $(this)
-      var $parent       = getParent($this)
-      var relatedTarget = { relatedTarget: this }
-
-      if (!$parent.hasClass('open')) return
-
-      if (e && e.type == 'click' && /input|textarea/i.test(e.target.tagName) && $.contains($parent[0], e.target)) return
-
-      $parent.trigger(e = $.Event('hide.bs.dropdown', relatedTarget))
-
-      if (e.isDefaultPrevented()) return
-
-      $this.attr('aria-expanded', 'false')
-      $parent.removeClass('open').trigger($.Event('hidden.bs.dropdown', relatedTarget))
-    })
-  }
-
-  Dropdown.prototype.toggle = function (e) {
-    var $this = $(this)
-
-    if ($this.is('.disabled, :disabled')) return
-
-    var $parent  = getParent($this)
-    var isActive = $parent.hasClass('open')
-
-    clearMenus()
-
-    if (!isActive) {
-      if ('ontouchstart' in document.documentElement && !$parent.closest('.navbar-nav').length) {
-        // if mobile we use a backdrop because click events don't delegate
-        $(document.createElement('div'))
-          .addClass('dropdown-backdrop')
-          .insertAfter($(this))
-          .on('click', clearMenus)
-      }
-
-      var relatedTarget = { relatedTarget: this }
-      $parent.trigger(e = $.Event('show.bs.dropdown', relatedTarget))
-
-      if (e.isDefaultPrevented()) return
-
-      $this
-        .trigger('focus')
-        .attr('aria-expanded', 'true')
-
-      $parent
-        .toggleClass('open')
-        .trigger($.Event('shown.bs.dropdown', relatedTarget))
-    }
-
-    return false
-  }
-
-  Dropdown.prototype.keydown = function (e) {
-    if (!/(38|40|27|32)/.test(e.which) || /input|textarea/i.test(e.target.tagName)) return
-
-    var $this = $(this)
-
-    e.preventDefault()
-    e.stopPropagation()
-
-    if ($this.is('.disabled, :disabled')) return
-
-    var $parent  = getParent($this)
-    var isActive = $parent.hasClass('open')
-
-    if (!isActive && e.which != 27 || isActive && e.which == 27) {
-      if (e.which == 27) $parent.find(toggle).trigger('focus')
-      return $this.trigger('click')
-    }
-
-    var desc = ' li:not(.disabled):visible a'
-    var $items = $parent.find('.dropdown-menu' + desc)
-
-    if (!$items.length) return
-
-    var index = $items.index(e.target)
-
-    if (e.which == 38 && index > 0)                 index--         // up
-    if (e.which == 40 && index < $items.length - 1) index++         // down
-    if (!~index)                                    index = 0
-
-    $items.eq(index).trigger('focus')
-  }
-
-
-  // DROPDOWN PLUGIN DEFINITION
-  // ==========================
-
-  function Plugin(option) {
-    return this.each(function () {
-      var $this = $(this)
-      var data  = $this.data('bs.dropdown')
-
-      if (!data) $this.data('bs.dropdown', (data = new Dropdown(this)))
-      if (typeof option == 'string') data[option].call($this)
-    })
-  }
-
-  var old = $.fn.dropdown
-
-  $.fn.dropdown             = Plugin
-  $.fn.dropdown.Constructor = Dropdown
-
-
-  // DROPDOWN NO CONFLICT
-  // ====================
-
-  $.fn.dropdown.noConflict = function () {
-    $.fn.dropdown = old
-    return this
-  }
-
-
-  // APPLY TO STANDARD DROPDOWN ELEMENTS
-  // ===================================
-
-  $(document)
-    .on('click.bs.dropdown.data-api', clearMenus)
-    .on('click.bs.dropdown.data-api', '.dropdown form', function (e) { e.stopPropagation() })
-    .on('click.bs.dropdown.data-api', toggle, Dropdown.prototype.toggle)
-    .on('keydown.bs.dropdown.data-api', toggle, Dropdown.prototype.keydown)
-    .on('keydown.bs.dropdown.data-api', '.dropdown-menu', Dropdown.prototype.keydown)
-
-}(jQuery);
-
-/* ========================================================================
- * Bootstrap: modal.js v3.3.7
- * http://getbootstrap.com/javascript/#modals
- * ========================================================================
- * Copyright 2011-2016 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
- * ======================================================================== */
-
-
-+function ($) {
-  'use strict';
-
-  // MODAL CLASS DEFINITION
-  // ======================
-
-  var Modal = function (element, options) {
-    this.options             = options
-    this.$body               = $(document.body)
-    this.$element            = $(element)
-    this.$dialog             = this.$element.find('.modal-dialog')
-    this.$backdrop           = null
-    this.isShown             = null
-    this.originalBodyPad     = null
-    this.scrollbarWidth      = 0
-    this.ignoreBackdropClick = false
-
-    if (this.options.remote) {
-      this.$element
-        .find('.modal-content')
-        .load(this.options.remote, $.proxy(function () {
-          this.$element.trigger('loaded.bs.modal')
-        }, this))
-    }
-  }
-
-  Modal.VERSION  = '3.3.7'
-
-  Modal.TRANSITION_DURATION = 300
-  Modal.BACKDROP_TRANSITION_DURATION = 150
-
-  Modal.DEFAULTS = {
-    backdrop: true,
-    keyboard: true,
-    show: true
-  }
-
-  Modal.prototype.toggle = function (_relatedTarget) {
-    return this.isShown ? this.hide() : this.show(_relatedTarget)
-  }
-
-  Modal.prototype.show = function (_relatedTarget) {
-    var that = this
-    var e    = $.Event('show.bs.modal', { relatedTarget: _relatedTarget })
-
-    this.$element.trigger(e)
-
-    if (this.isShown || e.isDefaultPrevented()) return
-
-    this.isShown = true
-
-    this.checkScrollbar()
-    this.setScrollbar()
-    this.$body.addClass('modal-open')
-
-    this.escape()
-    this.resize()
-
-    this.$element.on('click.dismiss.bs.modal', '[data-dismiss="modal"]', $.proxy(this.hide, this))
-
-    this.$dialog.on('mousedown.dismiss.bs.modal', function () {
-      that.$element.one('mouseup.dismiss.bs.modal', function (e) {
-        if ($(e.target).is(that.$element)) that.ignoreBackdropClick = true
-      })
-    })
-
-    this.backdrop(function () {
-      var transition = $.support.transition && that.$element.hasClass('fade')
-
-      if (!that.$element.parent().length) {
-        that.$element.appendTo(that.$body) // don't move modals dom position
-      }
-
-      that.$element
-        .show()
-        .scrollTop(0)
-
-      that.adjustDialog()
-
-      if (transition) {
-        that.$element[0].offsetWidth // force reflow
-      }
-
-      that.$element.addClass('in')
-
-      that.enforceFocus()
-
-      var e = $.Event('shown.bs.modal', { relatedTarget: _relatedTarget })
-
-      transition ?
-        that.$dialog // wait for modal to slide in
-          .one('bsTransitionEnd', function () {
-            that.$element.trigger('focus').trigger(e)
-          })
-          .emulateTransitionEnd(Modal.TRANSITION_DURATION) :
-        that.$element.trigger('focus').trigger(e)
-    })
-  }
-
-  Modal.prototype.hide = function (e) {
-    if (e) e.preventDefault()
-
-    e = $.Event('hide.bs.modal')
-
-    this.$element.trigger(e)
-
-    if (!this.isShown || e.isDefaultPrevented()) return
-
-    this.isShown = false
-
-    this.escape()
-    this.resize()
-
-    $(document).off('focusin.bs.modal')
-
-    this.$element
-      .removeClass('in')
-      .off('click.dismiss.bs.modal')
-      .off('mouseup.dismiss.bs.modal')
-
-    this.$dialog.off('mousedown.dismiss.bs.modal')
-
-    $.support.transition && this.$element.hasClass('fade') ?
-      this.$element
-        .one('bsTransitionEnd', $.proxy(this.hideModal, this))
-        .emulateTransitionEnd(Modal.TRANSITION_DURATION) :
-      this.hideModal()
-  }
-
-  Modal.prototype.enforceFocus = function () {
-    $(document)
-      .off('focusin.bs.modal') // guard against infinite focus loop
-      .on('focusin.bs.modal', $.proxy(function (e) {
-        if (document !== e.target &&
-            this.$element[0] !== e.target &&
-            !this.$element.has(e.target).length) {
-          this.$element.trigger('focus')
-        }
-      }, this))
-  }
-
-  Modal.prototype.escape = function () {
-    if (this.isShown && this.options.keyboard) {
-      this.$element.on('keydown.dismiss.bs.modal', $.proxy(function (e) {
-        e.which == 27 && this.hide()
-      }, this))
-    } else if (!this.isShown) {
-      this.$element.off('keydown.dismiss.bs.modal')
-    }
-  }
-
-  Modal.prototype.resize = function () {
-    if (this.isShown) {
-      $(window).on('resize.bs.modal', $.proxy(this.handleUpdate, this))
-    } else {
-      $(window).off('resize.bs.modal')
-    }
-  }
-
-  Modal.prototype.hideModal = function () {
-    var that = this
-    this.$element.hide()
-    this.backdrop(function () {
-      that.$body.removeClass('modal-open')
-      that.resetAdjustments()
-      that.resetScrollbar()
-      that.$element.trigger('hidden.bs.modal')
-    })
-  }
-
-  Modal.prototype.removeBackdrop = function () {
-    this.$backdrop && this.$backdrop.remove()
-    this.$backdrop = null
-  }
-
-  Modal.prototype.backdrop = function (callback) {
-    var that = this
-    var animate = this.$element.hasClass('fade') ? 'fade' : ''
-
-    if (this.isShown && this.options.backdrop) {
-      var doAnimate = $.support.transition && animate
-
-      this.$backdrop = $(document.createElement('div'))
-        .addClass('modal-backdrop ' + animate)
-        .appendTo(this.$body)
-
-      this.$element.on('click.dismiss.bs.modal', $.proxy(function (e) {
-        if (this.ignoreBackdropClick) {
-          this.ignoreBackdropClick = false
-          return
-        }
-        if (e.target !== e.currentTarget) return
-        this.options.backdrop == 'static'
-          ? this.$element[0].focus()
-          : this.hide()
-      }, this))
-
-      if (doAnimate) this.$backdrop[0].offsetWidth // force reflow
-
-      this.$backdrop.addClass('in')
-
-      if (!callback) return
-
-      doAnimate ?
-        this.$backdrop
-          .one('bsTransitionEnd', callback)
-          .emulateTransitionEnd(Modal.BACKDROP_TRANSITION_DURATION) :
-        callback()
-
-    } else if (!this.isShown && this.$backdrop) {
-      this.$backdrop.removeClass('in')
-
-      var callbackRemove = function () {
-        that.removeBackdrop()
-        callback && callback()
-      }
-      $.support.transition && this.$element.hasClass('fade') ?
-        this.$backdrop
-          .one('bsTransitionEnd', callbackRemove)
-          .emulateTransitionEnd(Modal.BACKDROP_TRANSITION_DURATION) :
-        callbackRemove()
-
-    } else if (callback) {
-      callback()
-    }
-  }
-
-  // these following methods are used to handle overflowing modals
-
-  Modal.prototype.handleUpdate = function () {
-    this.adjustDialog()
-  }
-
-  Modal.prototype.adjustDialog = function () {
-    var modalIsOverflowing = this.$element[0].scrollHeight > document.documentElement.clientHeight
-
-    this.$element.css({
-      paddingLeft:  !this.bodyIsOverflowing && modalIsOverflowing ? this.scrollbarWidth : '',
-      paddingRight: this.bodyIsOverflowing && !modalIsOverflowing ? this.scrollbarWidth : ''
-    })
-  }
-
-  Modal.prototype.resetAdjustments = function () {
-    this.$element.css({
-      paddingLeft: '',
-      paddingRight: ''
-    })
-  }
-
-  Modal.prototype.checkScrollbar = function () {
-    var fullWindowWidth = window.innerWidth
-    if (!fullWindowWidth) { // workaround for missing window.innerWidth in IE8
-      var documentElementRect = document.documentElement.getBoundingClientRect()
-      fullWindowWidth = documentElementRect.right - Math.abs(documentElementRect.left)
-    }
-    this.bodyIsOverflowing = document.body.clientWidth < fullWindowWidth
-    this.scrollbarWidth = this.measureScrollbar()
-  }
-
-  Modal.prototype.setScrollbar = function () {
-    var bodyPad = parseInt((this.$body.css('padding-right') || 0), 10)
-    this.originalBodyPad = document.body.style.paddingRight || ''
-    if (this.bodyIsOverflowing) this.$body.css('padding-right', bodyPad + this.scrollbarWidth)
-  }
-
-  Modal.prototype.resetScrollbar = function () {
-    this.$body.css('padding-right', this.originalBodyPad)
-  }
-
-  Modal.prototype.measureScrollbar = function () { // thx walsh
-    var scrollDiv = document.createElement('div')
-    scrollDiv.className = 'modal-scrollbar-measure'
-    this.$body.append(scrollDiv)
-    var scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth
-    this.$body[0].removeChild(scrollDiv)
-    return scrollbarWidth
-  }
-
-
-  // MODAL PLUGIN DEFINITION
-  // =======================
-
-  function Plugin(option, _relatedTarget) {
-    return this.each(function () {
-      var $this   = $(this)
-      var data    = $this.data('bs.modal')
-      var options = $.extend({}, Modal.DEFAULTS, $this.data(), typeof option == 'object' && option)
-
-      if (!data) $this.data('bs.modal', (data = new Modal(this, options)))
-      if (typeof option == 'string') data[option](_relatedTarget)
-      else if (options.show) data.show(_relatedTarget)
-    })
-  }
-
-  var old = $.fn.modal
-
-  $.fn.modal             = Plugin
-  $.fn.modal.Constructor = Modal
-
-
-  // MODAL NO CONFLICT
-  // =================
-
-  $.fn.modal.noConflict = function () {
-    $.fn.modal = old
-    return this
-  }
-
-
-  // MODAL DATA-API
-  // ==============
-
-  $(document).on('click.bs.modal.data-api', '[data-toggle="modal"]', function (e) {
-    var $this   = $(this)
-    var href    = $this.attr('href')
-    var $target = $($this.attr('data-target') || (href && href.replace(/.*(?=#[^\s]+$)/, ''))) // strip for ie7
-    var option  = $target.data('bs.modal') ? 'toggle' : $.extend({ remote: !/#/.test(href) && href }, $target.data(), $this.data())
-
-    if ($this.is('a')) e.preventDefault()
-
-    $target.one('show.bs.modal', function (showEvent) {
-      if (showEvent.isDefaultPrevented()) return // only register focus restorer if modal will actually get shown
-      $target.one('hidden.bs.modal', function () {
-        $this.is(':visible') && $this.trigger('focus')
-      })
-    })
-    Plugin.call($target, option, this)
-  })
-
-}(jQuery);
-
-/* ========================================================================
- * Bootstrap: tooltip.js v3.3.7
- * http://getbootstrap.com/javascript/#tooltip
- * Inspired by the original jQuery.tipsy by Jason Frame
- * ========================================================================
- * Copyright 2011-2016 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
- * ======================================================================== */
-
-
-+function ($) {
-  'use strict';
-
-  // TOOLTIP PUBLIC CLASS DEFINITION
-  // ===============================
-
-  var Tooltip = function (element, options) {
-    this.type       = null
-    this.options    = null
-    this.enabled    = null
-    this.timeout    = null
-    this.hoverState = null
-    this.$element   = null
-    this.inState    = null
-
-    this.init('tooltip', element, options)
-  }
-
-  Tooltip.VERSION  = '3.3.7'
-
-  Tooltip.TRANSITION_DURATION = 150
-
-  Tooltip.DEFAULTS = {
-    animation: true,
-    placement: 'top',
-    selector: false,
-    template: '<div class="tooltip" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>',
-    trigger: 'hover focus',
-    title: '',
-    delay: 0,
-    html: false,
-    container: false,
-    viewport: {
-      selector: 'body',
-      padding: 0
-    }
-  }
-
-  Tooltip.prototype.init = function (type, element, options) {
-    this.enabled   = true
-    this.type      = type
-    this.$element  = $(element)
-    this.options   = this.getOptions(options)
-    this.$viewport = this.options.viewport && $($.isFunction(this.options.viewport) ? this.options.viewport.call(this, this.$element) : (this.options.viewport.selector || this.options.viewport))
-    this.inState   = { click: false, hover: false, focus: false }
-
-    if (this.$element[0] instanceof document.constructor && !this.options.selector) {
-      throw new Error('`selector` option must be specified when initializing ' + this.type + ' on the window.document object!')
-    }
-
-    var triggers = this.options.trigger.split(' ')
-
-    for (var i = triggers.length; i--;) {
-      var trigger = triggers[i]
-
-      if (trigger == 'click') {
-        this.$element.on('click.' + this.type, this.options.selector, $.proxy(this.toggle, this))
-      } else if (trigger != 'manual') {
-        var eventIn  = trigger == 'hover' ? 'mouseenter' : 'focusin'
-        var eventOut = trigger == 'hover' ? 'mouseleave' : 'focusout'
-
-        this.$element.on(eventIn  + '.' + this.type, this.options.selector, $.proxy(this.enter, this))
-        this.$element.on(eventOut + '.' + this.type, this.options.selector, $.proxy(this.leave, this))
-      }
-    }
-
-    this.options.selector ?
-      (this._options = $.extend({}, this.options, { trigger: 'manual', selector: '' })) :
-      this.fixTitle()
-  }
-
-  Tooltip.prototype.getDefaults = function () {
-    return Tooltip.DEFAULTS
-  }
-
-  Tooltip.prototype.getOptions = function (options) {
-    options = $.extend({}, this.getDefaults(), this.$element.data(), options)
-
-    if (options.delay && typeof options.delay == 'number') {
-      options.delay = {
-        show: options.delay,
-        hide: options.delay
-      }
-    }
-
-    return options
-  }
-
-  Tooltip.prototype.getDelegateOptions = function () {
-    var options  = {}
-    var defaults = this.getDefaults()
-
-    this._options && $.each(this._options, function (key, value) {
-      if (defaults[key] != value) options[key] = value
-    })
-
-    return options
-  }
-
-  Tooltip.prototype.enter = function (obj) {
-    var self = obj instanceof this.constructor ?
-      obj : $(obj.currentTarget).data('bs.' + this.type)
-
-    if (!self) {
-      self = new this.constructor(obj.currentTarget, this.getDelegateOptions())
-      $(obj.currentTarget).data('bs.' + this.type, self)
-    }
-
-    if (obj instanceof $.Event) {
-      self.inState[obj.type == 'focusin' ? 'focus' : 'hover'] = true
-    }
-
-    if (self.tip().hasClass('in') || self.hoverState == 'in') {
-      self.hoverState = 'in'
-      return
-    }
-
-    clearTimeout(self.timeout)
-
-    self.hoverState = 'in'
-
-    if (!self.options.delay || !self.options.delay.show) return self.show()
-
-    self.timeout = setTimeout(function () {
-      if (self.hoverState == 'in') self.show()
-    }, self.options.delay.show)
-  }
-
-  Tooltip.prototype.isInStateTrue = function () {
-    for (var key in this.inState) {
-      if (this.inState[key]) return true
-    }
-
-    return false
-  }
-
-  Tooltip.prototype.leave = function (obj) {
-    var self = obj instanceof this.constructor ?
-      obj : $(obj.currentTarget).data('bs.' + this.type)
-
-    if (!self) {
-      self = new this.constructor(obj.currentTarget, this.getDelegateOptions())
-      $(obj.currentTarget).data('bs.' + this.type, self)
-    }
-
-    if (obj instanceof $.Event) {
-      self.inState[obj.type == 'focusout' ? 'focus' : 'hover'] = false
-    }
-
-    if (self.isInStateTrue()) return
-
-    clearTimeout(self.timeout)
-
-    self.hoverState = 'out'
-
-    if (!self.options.delay || !self.options.delay.hide) return self.hide()
-
-    self.timeout = setTimeout(function () {
-      if (self.hoverState == 'out') self.hide()
-    }, self.options.delay.hide)
-  }
-
-  Tooltip.prototype.show = function () {
-    var e = $.Event('show.bs.' + this.type)
-
-    if (this.hasContent() && this.enabled) {
-      this.$element.trigger(e)
-
-      var inDom = $.contains(this.$element[0].ownerDocument.documentElement, this.$element[0])
-      if (e.isDefaultPrevented() || !inDom) return
-      var that = this
-
-      var $tip = this.tip()
-
-      var tipId = this.getUID(this.type)
-
-      this.setContent()
-      $tip.attr('id', tipId)
-      this.$element.attr('aria-describedby', tipId)
-
-      if (this.options.animation) $tip.addClass('fade')
-
-      var placement = typeof this.options.placement == 'function' ?
-        this.options.placement.call(this, $tip[0], this.$element[0]) :
-        this.options.placement
-
-      var autoToken = /\s?auto?\s?/i
-      var autoPlace = autoToken.test(placement)
-      if (autoPlace) placement = placement.replace(autoToken, '') || 'top'
-
-      $tip
-        .detach()
-        .css({ top: 0, left: 0, display: 'block' })
-        .addClass(placement)
-        .data('bs.' + this.type, this)
-
-      this.options.container ? $tip.appendTo(this.options.container) : $tip.insertAfter(this.$element)
-      this.$element.trigger('inserted.bs.' + this.type)
-
-      var pos          = this.getPosition()
-      var actualWidth  = $tip[0].offsetWidth
-      var actualHeight = $tip[0].offsetHeight
-
-      if (autoPlace) {
-        var orgPlacement = placement
-        var viewportDim = this.getPosition(this.$viewport)
-
-        placement = placement == 'bottom' && pos.bottom + actualHeight > viewportDim.bottom ? 'top'    :
-                    placement == 'top'    && pos.top    - actualHeight < viewportDim.top    ? 'bottom' :
-                    placement == 'right'  && pos.right  + actualWidth  > viewportDim.width  ? 'left'   :
-                    placement == 'left'   && pos.left   - actualWidth  < viewportDim.left   ? 'right'  :
-                    placement
-
-        $tip
-          .removeClass(orgPlacement)
-          .addClass(placement)
-      }
-
-      var calculatedOffset = this.getCalculatedOffset(placement, pos, actualWidth, actualHeight)
-
-      this.applyPlacement(calculatedOffset, placement)
-
-      var complete = function () {
-        var prevHoverState = that.hoverState
-        that.$element.trigger('shown.bs.' + that.type)
-        that.hoverState = null
-
-        if (prevHoverState == 'out') that.leave(that)
-      }
-
-      $.support.transition && this.$tip.hasClass('fade') ?
-        $tip
-          .one('bsTransitionEnd', complete)
-          .emulateTransitionEnd(Tooltip.TRANSITION_DURATION) :
-        complete()
-    }
-  }
-
-  Tooltip.prototype.applyPlacement = function (offset, placement) {
-    var $tip   = this.tip()
-    var width  = $tip[0].offsetWidth
-    var height = $tip[0].offsetHeight
-
-    // manually read margins because getBoundingClientRect includes difference
-    var marginTop = parseInt($tip.css('margin-top'), 10)
-    var marginLeft = parseInt($tip.css('margin-left'), 10)
-
-    // we must check for NaN for ie 8/9
-    if (isNaN(marginTop))  marginTop  = 0
-    if (isNaN(marginLeft)) marginLeft = 0
-
-    offset.top  += marginTop
-    offset.left += marginLeft
-
-    // $.fn.offset doesn't round pixel values
-    // so we use setOffset directly with our own function B-0
-    $.offset.setOffset($tip[0], $.extend({
-      using: function (props) {
-        $tip.css({
-          top: Math.round(props.top),
-          left: Math.round(props.left)
-        })
-      }
-    }, offset), 0)
-
-    $tip.addClass('in')
-
-    // check to see if placing tip in new offset caused the tip to resize itself
-    var actualWidth  = $tip[0].offsetWidth
-    var actualHeight = $tip[0].offsetHeight
-
-    if (placement == 'top' && actualHeight != height) {
-      offset.top = offset.top + height - actualHeight
-    }
-
-    var delta = this.getViewportAdjustedDelta(placement, offset, actualWidth, actualHeight)
-
-    if (delta.left) offset.left += delta.left
-    else offset.top += delta.top
-
-    var isVertical          = /top|bottom/.test(placement)
-    var arrowDelta          = isVertical ? delta.left * 2 - width + actualWidth : delta.top * 2 - height + actualHeight
-    var arrowOffsetPosition = isVertical ? 'offsetWidth' : 'offsetHeight'
-
-    $tip.offset(offset)
-    this.replaceArrow(arrowDelta, $tip[0][arrowOffsetPosition], isVertical)
-  }
-
-  Tooltip.prototype.replaceArrow = function (delta, dimension, isVertical) {
-    this.arrow()
-      .css(isVertical ? 'left' : 'top', 50 * (1 - delta / dimension) + '%')
-      .css(isVertical ? 'top' : 'left', '')
-  }
-
-  Tooltip.prototype.setContent = function () {
-    var $tip  = this.tip()
-    var title = this.getTitle()
-
-    $tip.find('.tooltip-inner')[this.options.html ? 'html' : 'text'](title)
-    $tip.removeClass('fade in top bottom left right')
-  }
-
-  Tooltip.prototype.hide = function (callback) {
-    var that = this
-    var $tip = $(this.$tip)
-    var e    = $.Event('hide.bs.' + this.type)
-
-    function complete() {
-      if (that.hoverState != 'in') $tip.detach()
-      if (that.$element) { // TODO: Check whether guarding this code with this `if` is really necessary.
-        that.$element
-          .removeAttr('aria-describedby')
-          .trigger('hidden.bs.' + that.type)
-      }
-      callback && callback()
-    }
-
-    this.$element.trigger(e)
-
-    if (e.isDefaultPrevented()) return
-
-    $tip.removeClass('in')
-
-    $.support.transition && $tip.hasClass('fade') ?
-      $tip
-        .one('bsTransitionEnd', complete)
-        .emulateTransitionEnd(Tooltip.TRANSITION_DURATION) :
-      complete()
-
-    this.hoverState = null
-
-    return this
-  }
-
-  Tooltip.prototype.fixTitle = function () {
-    var $e = this.$element
-    if ($e.attr('title') || typeof $e.attr('data-original-title') != 'string') {
-      $e.attr('data-original-title', $e.attr('title') || '').attr('title', '')
-    }
-  }
-
-  Tooltip.prototype.hasContent = function () {
-    return this.getTitle()
-  }
-
-  Tooltip.prototype.getPosition = function ($element) {
-    $element   = $element || this.$element
-
-    var el     = $element[0]
-    var isBody = el.tagName == 'BODY'
-
-    var elRect    = el.getBoundingClientRect()
-    if (elRect.width == null) {
-      // width and height are missing in IE8, so compute them manually; see https://github.com/twbs/bootstrap/issues/14093
-      elRect = $.extend({}, elRect, { width: elRect.right - elRect.left, height: elRect.bottom - elRect.top })
-    }
-    var isSvg = window.SVGElement && el instanceof window.SVGElement
-    // Avoid using $.offset() on SVGs since it gives incorrect results in jQuery 3.
-    // See https://github.com/twbs/bootstrap/issues/20280
-    var elOffset  = isBody ? { top: 0, left: 0 } : (isSvg ? null : $element.offset())
-    var scroll    = { scroll: isBody ? document.documentElement.scrollTop || document.body.scrollTop : $element.scrollTop() }
-    var outerDims = isBody ? { width: $(window).width(), height: $(window).height() } : null
-
-    return $.extend({}, elRect, scroll, outerDims, elOffset)
-  }
-
-  Tooltip.prototype.getCalculatedOffset = function (placement, pos, actualWidth, actualHeight) {
-    return placement == 'bottom' ? { top: pos.top + pos.height,   left: pos.left + pos.width / 2 - actualWidth / 2 } :
-           placement == 'top'    ? { top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2 } :
-           placement == 'left'   ? { top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth } :
-        /* placement == 'right' */ { top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width }
-
-  }
-
-  Tooltip.prototype.getViewportAdjustedDelta = function (placement, pos, actualWidth, actualHeight) {
-    var delta = { top: 0, left: 0 }
-    if (!this.$viewport) return delta
-
-    var viewportPadding = this.options.viewport && this.options.viewport.padding || 0
-    var viewportDimensions = this.getPosition(this.$viewport)
-
-    if (/right|left/.test(placement)) {
-      var topEdgeOffset    = pos.top - viewportPadding - viewportDimensions.scroll
-      var bottomEdgeOffset = pos.top + viewportPadding - viewportDimensions.scroll + actualHeight
-      if (topEdgeOffset < viewportDimensions.top) { // top overflow
-        delta.top = viewportDimensions.top - topEdgeOffset
-      } else if (bottomEdgeOffset > viewportDimensions.top + viewportDimensions.height) { // bottom overflow
-        delta.top = viewportDimensions.top + viewportDimensions.height - bottomEdgeOffset
-      }
-    } else {
-      var leftEdgeOffset  = pos.left - viewportPadding
-      var rightEdgeOffset = pos.left + viewportPadding + actualWidth
-      if (leftEdgeOffset < viewportDimensions.left) { // left overflow
-        delta.left = viewportDimensions.left - leftEdgeOffset
-      } else if (rightEdgeOffset > viewportDimensions.right) { // right overflow
-        delta.left = viewportDimensions.left + viewportDimensions.width - rightEdgeOffset
-      }
-    }
-
-    return delta
-  }
-
-  Tooltip.prototype.getTitle = function () {
-    var title
-    var $e = this.$element
-    var o  = this.options
-
-    title = $e.attr('data-original-title')
-      || (typeof o.title == 'function' ? o.title.call($e[0]) :  o.title)
-
-    return title
-  }
-
-  Tooltip.prototype.getUID = function (prefix) {
-    do prefix += ~~(Math.random() * 1000000)
-    while (document.getElementById(prefix))
-    return prefix
-  }
-
-  Tooltip.prototype.tip = function () {
-    if (!this.$tip) {
-      this.$tip = $(this.options.template)
-      if (this.$tip.length != 1) {
-        throw new Error(this.type + ' `template` option must consist of exactly 1 top-level element!')
-      }
-    }
-    return this.$tip
-  }
-
-  Tooltip.prototype.arrow = function () {
-    return (this.$arrow = this.$arrow || this.tip().find('.tooltip-arrow'))
-  }
-
-  Tooltip.prototype.enable = function () {
-    this.enabled = true
-  }
-
-  Tooltip.prototype.disable = function () {
-    this.enabled = false
-  }
-
-  Tooltip.prototype.toggleEnabled = function () {
-    this.enabled = !this.enabled
-  }
-
-  Tooltip.prototype.toggle = function (e) {
-    var self = this
-    if (e) {
-      self = $(e.currentTarget).data('bs.' + this.type)
-      if (!self) {
-        self = new this.constructor(e.currentTarget, this.getDelegateOptions())
-        $(e.currentTarget).data('bs.' + this.type, self)
-      }
-    }
-
-    if (e) {
-      self.inState.click = !self.inState.click
-      if (self.isInStateTrue()) self.enter(self)
-      else self.leave(self)
-    } else {
-      self.tip().hasClass('in') ? self.leave(self) : self.enter(self)
-    }
-  }
-
-  Tooltip.prototype.destroy = function () {
-    var that = this
-    clearTimeout(this.timeout)
-    this.hide(function () {
-      that.$element.off('.' + that.type).removeData('bs.' + that.type)
-      if (that.$tip) {
-        that.$tip.detach()
-      }
-      that.$tip = null
-      that.$arrow = null
-      that.$viewport = null
-      that.$element = null
-    })
-  }
-
-
-  // TOOLTIP PLUGIN DEFINITION
-  // =========================
-
-  function Plugin(option) {
-    return this.each(function () {
-      var $this   = $(this)
-      var data    = $this.data('bs.tooltip')
-      var options = typeof option == 'object' && option
-
-      if (!data && /destroy|hide/.test(option)) return
-      if (!data) $this.data('bs.tooltip', (data = new Tooltip(this, options)))
-      if (typeof option == 'string') data[option]()
-    })
-  }
-
-  var old = $.fn.tooltip
-
-  $.fn.tooltip             = Plugin
-  $.fn.tooltip.Constructor = Tooltip
-
-
-  // TOOLTIP NO CONFLICT
-  // ===================
-
-  $.fn.tooltip.noConflict = function () {
-    $.fn.tooltip = old
-    return this
-  }
-
-}(jQuery);
-
-/* ========================================================================
- * Bootstrap: popover.js v3.3.7
- * http://getbootstrap.com/javascript/#popovers
- * ========================================================================
- * Copyright 2011-2016 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
- * ======================================================================== */
-
-
-+function ($) {
-  'use strict';
-
-  // POPOVER PUBLIC CLASS DEFINITION
-  // ===============================
-
-  var Popover = function (element, options) {
-    this.init('popover', element, options)
-  }
-
-  if (!$.fn.tooltip) throw new Error('Popover requires tooltip.js')
-
-  Popover.VERSION  = '3.3.7'
-
-  Popover.DEFAULTS = $.extend({}, $.fn.tooltip.Constructor.DEFAULTS, {
-    placement: 'right',
-    trigger: 'click',
-    content: '',
-    template: '<div class="popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
-  })
-
-
-  // NOTE: POPOVER EXTENDS tooltip.js
-  // ================================
-
-  Popover.prototype = $.extend({}, $.fn.tooltip.Constructor.prototype)
-
-  Popover.prototype.constructor = Popover
-
-  Popover.prototype.getDefaults = function () {
-    return Popover.DEFAULTS
-  }
-
-  Popover.prototype.setContent = function () {
-    var $tip    = this.tip()
-    var title   = this.getTitle()
-    var content = this.getContent()
-
-    $tip.find('.popover-title')[this.options.html ? 'html' : 'text'](title)
-    $tip.find('.popover-content').children().detach().end()[ // we use append for html objects to maintain js events
-      this.options.html ? (typeof content == 'string' ? 'html' : 'append') : 'text'
-    ](content)
-
-    $tip.removeClass('fade top bottom left right in')
-
-    // IE8 doesn't accept hiding via the `:empty` pseudo selector, we have to do
-    // this manually by checking the contents.
-    if (!$tip.find('.popover-title').html()) $tip.find('.popover-title').hide()
-  }
-
-  Popover.prototype.hasContent = function () {
-    return this.getTitle() || this.getContent()
-  }
-
-  Popover.prototype.getContent = function () {
-    var $e = this.$element
-    var o  = this.options
-
-    return $e.attr('data-content')
-      || (typeof o.content == 'function' ?
-            o.content.call($e[0]) :
-            o.content)
-  }
-
-  Popover.prototype.arrow = function () {
-    return (this.$arrow = this.$arrow || this.tip().find('.arrow'))
-  }
-
-
-  // POPOVER PLUGIN DEFINITION
-  // =========================
-
-  function Plugin(option) {
-    return this.each(function () {
-      var $this   = $(this)
-      var data    = $this.data('bs.popover')
-      var options = typeof option == 'object' && option
-
-      if (!data && /destroy|hide/.test(option)) return
-      if (!data) $this.data('bs.popover', (data = new Popover(this, options)))
-      if (typeof option == 'string') data[option]()
-    })
-  }
-
-  var old = $.fn.popover
-
-  $.fn.popover             = Plugin
-  $.fn.popover.Constructor = Popover
-
-
-  // POPOVER NO CONFLICT
-  // ===================
-
-  $.fn.popover.noConflict = function () {
-    $.fn.popover = old
-    return this
-  }
-
-}(jQuery);
-
-/* ========================================================================
- * Bootstrap: scrollspy.js v3.3.7
- * http://getbootstrap.com/javascript/#scrollspy
- * ========================================================================
- * Copyright 2011-2016 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
- * ======================================================================== */
-
-
-+function ($) {
-  'use strict';
-
-  // SCROLLSPY CLASS DEFINITION
-  // ==========================
-
-  function ScrollSpy(element, options) {
-    this.$body          = $(document.body)
-    this.$scrollElement = $(element).is(document.body) ? $(window) : $(element)
-    this.options        = $.extend({}, ScrollSpy.DEFAULTS, options)
-    this.selector       = (this.options.target || '') + ' .nav li > a'
-    this.offsets        = []
-    this.targets        = []
-    this.activeTarget   = null
-    this.scrollHeight   = 0
-
-    this.$scrollElement.on('scroll.bs.scrollspy', $.proxy(this.process, this))
-    this.refresh()
-    this.process()
-  }
-
-  ScrollSpy.VERSION  = '3.3.7'
-
-  ScrollSpy.DEFAULTS = {
-    offset: 10
-  }
-
-  ScrollSpy.prototype.getScrollHeight = function () {
-    return this.$scrollElement[0].scrollHeight || Math.max(this.$body[0].scrollHeight, document.documentElement.scrollHeight)
-  }
-
-  ScrollSpy.prototype.refresh = function () {
-    var that          = this
-    var offsetMethod  = 'offset'
-    var offsetBase    = 0
-
-    this.offsets      = []
-    this.targets      = []
-    this.scrollHeight = this.getScrollHeight()
-
-    if (!$.isWindow(this.$scrollElement[0])) {
-      offsetMethod = 'position'
-      offsetBase   = this.$scrollElement.scrollTop()
-    }
-
-    this.$body
-      .find(this.selector)
-      .map(function () {
-        var $el   = $(this)
-        var href  = $el.data('target') || $el.attr('href')
-        var $href = /^#./.test(href) && $(href)
-
-        return ($href
-          && $href.length
-          && $href.is(':visible')
-          && [[$href[offsetMethod]().top + offsetBase, href]]) || null
-      })
-      .sort(function (a, b) { return a[0] - b[0] })
-      .each(function () {
-        that.offsets.push(this[0])
-        that.targets.push(this[1])
-      })
-  }
-
-  ScrollSpy.prototype.process = function () {
-    var scrollTop    = this.$scrollElement.scrollTop() + this.options.offset
-    var scrollHeight = this.getScrollHeight()
-    var maxScroll    = this.options.offset + scrollHeight - this.$scrollElement.height()
-    var offsets      = this.offsets
-    var targets      = this.targets
-    var activeTarget = this.activeTarget
-    var i
-
-    if (this.scrollHeight != scrollHeight) {
-      this.refresh()
-    }
-
-    if (scrollTop >= maxScroll) {
-      return activeTarget != (i = targets[targets.length - 1]) && this.activate(i)
-    }
-
-    if (activeTarget && scrollTop < offsets[0]) {
-      this.activeTarget = null
-      return this.clear()
-    }
-
-    for (i = offsets.length; i--;) {
-      activeTarget != targets[i]
-        && scrollTop >= offsets[i]
-        && (offsets[i + 1] === undefined || scrollTop < offsets[i + 1])
-        && this.activate(targets[i])
-    }
-  }
-
-  ScrollSpy.prototype.activate = function (target) {
-    this.activeTarget = target
-
-    this.clear()
-
-    var selector = this.selector +
-      '[data-target="' + target + '"],' +
-      this.selector + '[href="' + target + '"]'
-
-    var active = $(selector)
-      .parents('li')
-      .addClass('active')
-
-    if (active.parent('.dropdown-menu').length) {
-      active = active
-        .closest('li.dropdown')
-        .addClass('active')
-    }
-
-    active.trigger('activate.bs.scrollspy')
-  }
-
-  ScrollSpy.prototype.clear = function () {
-    $(this.selector)
-      .parentsUntil(this.options.target, '.active')
-      .removeClass('active')
-  }
-
-
-  // SCROLLSPY PLUGIN DEFINITION
-  // ===========================
-
-  function Plugin(option) {
-    return this.each(function () {
-      var $this   = $(this)
-      var data    = $this.data('bs.scrollspy')
-      var options = typeof option == 'object' && option
-
-      if (!data) $this.data('bs.scrollspy', (data = new ScrollSpy(this, options)))
-      if (typeof option == 'string') data[option]()
-    })
-  }
-
-  var old = $.fn.scrollspy
-
-  $.fn.scrollspy             = Plugin
-  $.fn.scrollspy.Constructor = ScrollSpy
-
-
-  // SCROLLSPY NO CONFLICT
-  // =====================
-
-  $.fn.scrollspy.noConflict = function () {
-    $.fn.scrollspy = old
-    return this
-  }
-
-
-  // SCROLLSPY DATA-API
-  // ==================
-
-  $(window).on('load.bs.scrollspy.data-api', function () {
-    $('[data-spy="scroll"]').each(function () {
-      var $spy = $(this)
-      Plugin.call($spy, $spy.data())
-    })
-  })
-
-}(jQuery);
-
-/* ========================================================================
- * Bootstrap: tab.js v3.3.7
- * http://getbootstrap.com/javascript/#tabs
- * ========================================================================
- * Copyright 2011-2016 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
- * ======================================================================== */
-
-
-+function ($) {
-  'use strict';
-
-  // TAB CLASS DEFINITION
-  // ====================
-
-  var Tab = function (element) {
-    // jscs:disable requireDollarBeforejQueryAssignment
-    this.element = $(element)
-    // jscs:enable requireDollarBeforejQueryAssignment
-  }
-
-  Tab.VERSION = '3.3.7'
-
-  Tab.TRANSITION_DURATION = 150
-
-  Tab.prototype.show = function () {
-    var $this    = this.element
-    var $ul      = $this.closest('ul:not(.dropdown-menu)')
-    var selector = $this.data('target')
-
-    if (!selector) {
-      selector = $this.attr('href')
-      selector = selector && selector.replace(/.*(?=#[^\s]*$)/, '') // strip for ie7
-    }
-
-    if ($this.parent('li').hasClass('active')) return
-
-    var $previous = $ul.find('.active:last a')
-    var hideEvent = $.Event('hide.bs.tab', {
-      relatedTarget: $this[0]
-    })
-    var showEvent = $.Event('show.bs.tab', {
-      relatedTarget: $previous[0]
-    })
-
-    $previous.trigger(hideEvent)
-    $this.trigger(showEvent)
-
-    if (showEvent.isDefaultPrevented() || hideEvent.isDefaultPrevented()) return
-
-    var $target = $(selector)
-
-    this.activate($this.closest('li'), $ul)
-    this.activate($target, $target.parent(), function () {
-      $previous.trigger({
-        type: 'hidden.bs.tab',
-        relatedTarget: $this[0]
-      })
-      $this.trigger({
-        type: 'shown.bs.tab',
-        relatedTarget: $previous[0]
-      })
-    })
-  }
-
-  Tab.prototype.activate = function (element, container, callback) {
-    var $active    = container.find('> .active')
-    var transition = callback
-      && $.support.transition
-      && ($active.length && $active.hasClass('fade') || !!container.find('> .fade').length)
-
-    function next() {
-      $active
-        .removeClass('active')
-        .find('> .dropdown-menu > .active')
-          .removeClass('active')
-        .end()
-        .find('[data-toggle="tab"]')
-          .attr('aria-expanded', false)
-
-      element
-        .addClass('active')
-        .find('[data-toggle="tab"]')
-          .attr('aria-expanded', true)
-
-      if (transition) {
-        element[0].offsetWidth // reflow for transition
-        element.addClass('in')
-      } else {
-        element.removeClass('fade')
-      }
-
-      if (element.parent('.dropdown-menu').length) {
-        element
-          .closest('li.dropdown')
-            .addClass('active')
-          .end()
-          .find('[data-toggle="tab"]')
-            .attr('aria-expanded', true)
-      }
-
-      callback && callback()
-    }
-
-    $active.length && transition ?
-      $active
-        .one('bsTransitionEnd', next)
-        .emulateTransitionEnd(Tab.TRANSITION_DURATION) :
-      next()
-
-    $active.removeClass('in')
-  }
-
-
-  // TAB PLUGIN DEFINITION
-  // =====================
-
-  function Plugin(option) {
-    return this.each(function () {
-      var $this = $(this)
-      var data  = $this.data('bs.tab')
-
-      if (!data) $this.data('bs.tab', (data = new Tab(this)))
-      if (typeof option == 'string') data[option]()
-    })
-  }
-
-  var old = $.fn.tab
-
-  $.fn.tab             = Plugin
-  $.fn.tab.Constructor = Tab
-
-
-  // TAB NO CONFLICT
-  // ===============
-
-  $.fn.tab.noConflict = function () {
-    $.fn.tab = old
-    return this
-  }
-
-
-  // TAB DATA-API
-  // ============
-
-  var clickHandler = function (e) {
-    e.preventDefault()
-    Plugin.call($(this), 'show')
-  }
-
-  $(document)
-    .on('click.bs.tab.data-api', '[data-toggle="tab"]', clickHandler)
-    .on('click.bs.tab.data-api', '[data-toggle="pill"]', clickHandler)
-
-}(jQuery);
-
-/* ========================================================================
- * Bootstrap: affix.js v3.3.7
- * http://getbootstrap.com/javascript/#affix
- * ========================================================================
- * Copyright 2011-2016 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
- * ======================================================================== */
-
-
-+function ($) {
-  'use strict';
-
-  // AFFIX CLASS DEFINITION
-  // ======================
-
-  var Affix = function (element, options) {
-    this.options = $.extend({}, Affix.DEFAULTS, options)
-
-    this.$target = $(this.options.target)
-      .on('scroll.bs.affix.data-api', $.proxy(this.checkPosition, this))
-      .on('click.bs.affix.data-api',  $.proxy(this.checkPositionWithEventLoop, this))
-
-    this.$element     = $(element)
-    this.affixed      = null
-    this.unpin        = null
-    this.pinnedOffset = null
-
-    this.checkPosition()
-  }
-
-  Affix.VERSION  = '3.3.7'
-
-  Affix.RESET    = 'affix affix-top affix-bottom'
-
-  Affix.DEFAULTS = {
-    offset: 0,
-    target: window
-  }
-
-  Affix.prototype.getState = function (scrollHeight, height, offsetTop, offsetBottom) {
-    var scrollTop    = this.$target.scrollTop()
-    var position     = this.$element.offset()
-    var targetHeight = this.$target.height()
-
-    if (offsetTop != null && this.affixed == 'top') return scrollTop < offsetTop ? 'top' : false
-
-    if (this.affixed == 'bottom') {
-      if (offsetTop != null) return (scrollTop + this.unpin <= position.top) ? false : 'bottom'
-      return (scrollTop + targetHeight <= scrollHeight - offsetBottom) ? false : 'bottom'
-    }
-
-    var initializing   = this.affixed == null
-    var colliderTop    = initializing ? scrollTop : position.top
-    var colliderHeight = initializing ? targetHeight : height
-
-    if (offsetTop != null && scrollTop <= offsetTop) return 'top'
-    if (offsetBottom != null && (colliderTop + colliderHeight >= scrollHeight - offsetBottom)) return 'bottom'
-
-    return false
-  }
-
-  Affix.prototype.getPinnedOffset = function () {
-    if (this.pinnedOffset) return this.pinnedOffset
-    this.$element.removeClass(Affix.RESET).addClass('affix')
-    var scrollTop = this.$target.scrollTop()
-    var position  = this.$element.offset()
-    return (this.pinnedOffset = position.top - scrollTop)
-  }
-
-  Affix.prototype.checkPositionWithEventLoop = function () {
-    setTimeout($.proxy(this.checkPosition, this), 1)
-  }
-
-  Affix.prototype.checkPosition = function () {
-    if (!this.$element.is(':visible')) return
-
-    var height       = this.$element.height()
-    var offset       = this.options.offset
-    var offsetTop    = offset.top
-    var offsetBottom = offset.bottom
-    var scrollHeight = Math.max($(document).height(), $(document.body).height())
-
-    if (typeof offset != 'object')         offsetBottom = offsetTop = offset
-    if (typeof offsetTop == 'function')    offsetTop    = offset.top(this.$element)
-    if (typeof offsetBottom == 'function') offsetBottom = offset.bottom(this.$element)
-
-    var affix = this.getState(scrollHeight, height, offsetTop, offsetBottom)
-
-    if (this.affixed != affix) {
-      if (this.unpin != null) this.$element.css('top', '')
-
-      var affixType = 'affix' + (affix ? '-' + affix : '')
-      var e         = $.Event(affixType + '.bs.affix')
-
-      this.$element.trigger(e)
-
-      if (e.isDefaultPrevented()) return
-
-      this.affixed = affix
-      this.unpin = affix == 'bottom' ? this.getPinnedOffset() : null
-
-      this.$element
-        .removeClass(Affix.RESET)
-        .addClass(affixType)
-        .trigger(affixType.replace('affix', 'affixed') + '.bs.affix')
-    }
-
-    if (affix == 'bottom') {
-      this.$element.offset({
-        top: scrollHeight - height - offsetBottom
-      })
-    }
-  }
-
-
-  // AFFIX PLUGIN DEFINITION
-  // =======================
-
-  function Plugin(option) {
-    return this.each(function () {
-      var $this   = $(this)
-      var data    = $this.data('bs.affix')
-      var options = typeof option == 'object' && option
-
-      if (!data) $this.data('bs.affix', (data = new Affix(this, options)))
-      if (typeof option == 'string') data[option]()
-    })
-  }
-
-  var old = $.fn.affix
-
-  $.fn.affix             = Plugin
-  $.fn.affix.Constructor = Affix
-
-
-  // AFFIX NO CONFLICT
-  // =================
-
-  $.fn.affix.noConflict = function () {
-    $.fn.affix = old
-    return this
-  }
-
-
-  // AFFIX DATA-API
-  // ==============
-
-  $(window).on('load', function () {
-    $('[data-spy="affix"]').each(function () {
-      var $spy = $(this)
-      var data = $spy.data()
-
-      data.offset = data.offset || {}
-
-      if (data.offsetBottom != null) data.offset.bottom = data.offsetBottom
-      if (data.offsetTop    != null) data.offset.top    = data.offsetTop
-
-      Plugin.call($spy, data)
-    })
-  })
-
-}(jQuery);
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
-
-/***/ }),
-/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -33449,7 +31127,7 @@ if (typeof jQuery === 'undefined') {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(76), __webpack_require__(77)(module)))
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -33635,70 +31313,70 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./AdaptiveToneMappingPass.js": 11,
-	"./BasicShader.js": 12,
-	"./BleachBypassShader.js": 13,
-	"./BlendShader.js": 14,
-	"./BloomPass.js": 15,
-	"./BokehPass.js": 16,
-	"./BokehShader.js": 17,
-	"./BokehShader2.js": 18,
-	"./BrightnessContrastShader.js": 19,
-	"./CanvasRenderer.js": 20,
-	"./ColorCorrectionShader.js": 21,
-	"./ColorifyShader.js": 22,
-	"./ConvolutionShader.js": 23,
-	"./CopyShader.js": 24,
-	"./DDSLoader.js": 25,
-	"./DOFMipMapShader.js": 26,
-	"./DigitalGlitch.js": 27,
-	"./DotScreenPass.js": 28,
-	"./DotScreenShader.js": 29,
-	"./EdgeShader.js": 30,
-	"./EdgeShader2.js": 31,
-	"./EffectComposer.js": 32,
-	"./FXAAShader.js": 33,
-	"./FilmPass.js": 34,
-	"./FilmShader.js": 35,
-	"./FocusShader.js": 36,
-	"./FresnelShader.js": 37,
-	"./GammaCorrectionShader.js": 38,
-	"./GlitchPass.js": 39,
-	"./HorizontalBlurShader.js": 40,
-	"./HorizontalTiltShiftShader.js": 41,
-	"./HueSaturationShader.js": 42,
-	"./JSONLoader.js": 43,
-	"./KaleidoShader.js": 44,
-	"./LuminosityShader.js": 45,
-	"./MTLLoader.js": 46,
-	"./MarchingCubes.js": 47,
-	"./MaskPass.js": 48,
-	"./MirrorShader.js": 49,
-	"./NormalMapShader.js": 50,
-	"./OBJLoader.js": 51,
-	"./OceanShaders.js": 52,
-	"./OrbitControls.js": 53,
-	"./ParallaxShader.js": 54,
-	"./Projector.js": 55,
-	"./RGBShiftShader.js": 56,
-	"./RenderPass.js": 57,
-	"./SSAOShader.js": 58,
-	"./SVGLoader.js": 59,
-	"./SavePass.js": 60,
-	"./SepiaShader.js": 61,
-	"./ShaderPass.js": 62,
-	"./TechnicolorShader.js": 63,
-	"./TexturePass.js": 64,
-	"./ToneMapShader.js": 65,
-	"./TriangleBlurShader.js": 66,
-	"./UnpackDepthRGBAShader.js": 67,
-	"./VerticalBlurShader.js": 68,
-	"./VerticalTiltShiftShader.js": 69,
-	"./VignetteShader.js": 70
+	"./AdaptiveToneMappingPass.js": 10,
+	"./BasicShader.js": 11,
+	"./BleachBypassShader.js": 12,
+	"./BlendShader.js": 13,
+	"./BloomPass.js": 14,
+	"./BokehPass.js": 15,
+	"./BokehShader.js": 16,
+	"./BokehShader2.js": 17,
+	"./BrightnessContrastShader.js": 18,
+	"./CanvasRenderer.js": 19,
+	"./ColorCorrectionShader.js": 20,
+	"./ColorifyShader.js": 21,
+	"./ConvolutionShader.js": 22,
+	"./CopyShader.js": 23,
+	"./DDSLoader.js": 24,
+	"./DOFMipMapShader.js": 25,
+	"./DigitalGlitch.js": 26,
+	"./DotScreenPass.js": 27,
+	"./DotScreenShader.js": 28,
+	"./EdgeShader.js": 29,
+	"./EdgeShader2.js": 30,
+	"./EffectComposer.js": 31,
+	"./FXAAShader.js": 32,
+	"./FilmPass.js": 33,
+	"./FilmShader.js": 34,
+	"./FocusShader.js": 35,
+	"./FresnelShader.js": 36,
+	"./GammaCorrectionShader.js": 37,
+	"./GlitchPass.js": 38,
+	"./HorizontalBlurShader.js": 39,
+	"./HorizontalTiltShiftShader.js": 40,
+	"./HueSaturationShader.js": 41,
+	"./JSONLoader.js": 42,
+	"./KaleidoShader.js": 43,
+	"./LuminosityShader.js": 44,
+	"./MTLLoader.js": 45,
+	"./MarchingCubes.js": 46,
+	"./MaskPass.js": 47,
+	"./MirrorShader.js": 48,
+	"./NormalMapShader.js": 49,
+	"./OBJLoader.js": 50,
+	"./OceanShaders.js": 51,
+	"./OrbitControls.js": 52,
+	"./ParallaxShader.js": 53,
+	"./Projector.js": 54,
+	"./RGBShiftShader.js": 55,
+	"./RenderPass.js": 56,
+	"./SSAOShader.js": 57,
+	"./SVGLoader.js": 58,
+	"./SavePass.js": 59,
+	"./SepiaShader.js": 60,
+	"./ShaderPass.js": 61,
+	"./TechnicolorShader.js": 62,
+	"./TexturePass.js": 63,
+	"./ToneMapShader.js": 64,
+	"./TriangleBlurShader.js": 65,
+	"./UnpackDepthRGBAShader.js": 66,
+	"./VerticalBlurShader.js": 67,
+	"./VerticalTiltShiftShader.js": 68,
+	"./VignetteShader.js": 69
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -33714,10 +31392,10 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 10;
+webpackContext.id = 9;
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -34042,7 +31720,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -34082,7 +31760,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -34155,7 +31833,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -34214,7 +31892,7 @@ module.exports = function( THREE ){
 }
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -34339,7 +32017,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -34451,7 +32129,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -34576,7 +32254,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -34955,7 +32633,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -35022,7 +32700,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -36145,7 +33823,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -36204,7 +33882,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -36262,7 +33940,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -36372,7 +34050,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -36427,7 +34105,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -36705,7 +34383,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -36772,7 +34450,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -36884,7 +34562,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -36954,7 +34632,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -37031,7 +34709,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -37133,7 +34811,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -37215,7 +34893,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -37362,7 +35040,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -37390,7 +35068,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -37461,7 +35139,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -37574,7 +35252,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -37674,7 +35352,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 37 */
+/* 36 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -37757,7 +35435,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 38 */
+/* 37 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -37816,7 +35494,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 39 */
+/* 38 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -37938,7 +35616,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 40 */
+/* 39 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -38009,7 +35687,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 41 */
+/* 40 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -38083,7 +35761,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 42 */
+/* 41 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -38161,7 +35839,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 43 */
+/* 42 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -38725,7 +36403,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 44 */
+/* 43 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -38794,7 +36472,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 45 */
+/* 44 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -38853,7 +36531,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 46 */
+/* 45 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -39279,7 +36957,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 47 */
+/* 46 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -40345,7 +38023,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 48 */
+/* 47 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -40441,7 +38119,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 49 */
+/* 48 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -40508,7 +38186,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 50 */
+/* 49 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -40570,7 +38248,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 51 */
+/* 50 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -40982,7 +38660,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 52 */
+/* 51 */
 /***/ (function(module, exports) {
 
 ﻿module.exports = function( THREE ){
@@ -41379,7 +39057,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 53 */
+/* 52 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -42425,7 +40103,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 54 */
+/* 53 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -42618,7 +40296,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 55 */
+/* 54 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -43548,7 +41226,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 56 */
+/* 55 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -43613,7 +41291,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 57 */
+/* 56 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -43673,7 +41351,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 58 */
+/* 57 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -43907,7 +41585,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 59 */
+/* 58 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -43949,7 +41627,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 60 */
+/* 59 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -44021,7 +41699,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 61 */
+/* 60 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -44084,7 +41762,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 62 */
+/* 61 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -44153,7 +41831,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 63 */
+/* 62 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -44209,7 +41887,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 64 */
+/* 63 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -44265,7 +41943,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 65 */
+/* 64 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -44349,7 +42027,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 66 */
+/* 65 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -44436,7 +42114,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 67 */
+/* 66 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -44502,7 +42180,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 68 */
+/* 67 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -44573,7 +42251,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 69 */
+/* 68 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -44647,7 +42325,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 70 */
+/* 69 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -44719,12 +42397,12 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 71 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function( self ){
 
-	var THREE = __webpack_require__(72);
+	var THREE = __webpack_require__(71);
 
 	module.exports = function( addons ){
 
@@ -44741,7 +42419,7 @@ module.exports = function( THREE ){
 				}
 				else if( typeof addon === "string" ){
 
-					__webpack_require__(10)("./" + addon + ".js")(THREE);
+					__webpack_require__(9)("./" + addon + ".js")(THREE);
 
 				}
 				else {
@@ -44762,7 +42440,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 72 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;(function( self ){
@@ -86538,7 +84216,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;(function( self ){
 })(this || {});
 
 /***/ }),
-/* 73 */
+/* 72 */
 /***/ (function(module, exports) {
 
 /**
@@ -86702,96 +84380,7 @@ module.exports = function(THREE, renderer) {
 
 
 /***/ }),
-/* 74 */
-/***/ (function(module, exports) {
-
-module.exports = function() {
-	throw new Error("define cannot be used indirect");
-};
-
-
-/***/ }),
-/* 75 */
-/***/ (function(module, exports) {
-
-/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
-module.exports = __webpack_amd_options__;
-
-/* WEBPACK VAR INJECTION */}.call(exports, {}))
-
-/***/ }),
-/* 76 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 77 */
-/***/ (function(module, exports) {
-
-module.exports = function(module) {
-	if(!module.webpackPolyfill) {
-		module.deprecate = function() {};
-		module.paths = [];
-		// module.parent = undefined by default
-		if(!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function() {
-				return module.i;
-			}
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
-
-
-/***/ }),
-/* 78 */
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__(1);
-module.exports = __webpack_require__(2);
-
-
-/***/ }),
-/* 79 */,
-/* 80 */,
-/* 81 */,
-/* 82 */,
-/* 83 */,
-/* 84 */,
-/* 85 */,
-/* 86 */,
-/* 87 */
+/* 73 */
 /***/ (function(module, exports) {
 
 /* globals THREE, window */
@@ -86890,6 +84479,87 @@ function orientationControl(THREE, object) {
     };
   }
 }
+
+
+/***/ }),
+/* 74 */
+/***/ (function(module, exports) {
+
+module.exports = function() {
+	throw new Error("define cannot be used indirect");
+};
+
+
+/***/ }),
+/* 75 */
+/***/ (function(module, exports) {
+
+/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
+module.exports = __webpack_amd_options__;
+
+/* WEBPACK VAR INJECTION */}.call(exports, {}))
+
+/***/ }),
+/* 76 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 77 */
+/***/ (function(module, exports) {
+
+module.exports = function(module) {
+	if(!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if(!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+/* 78 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(0);
+module.exports = __webpack_require__(1);
 
 
 /***/ })
