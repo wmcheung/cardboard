@@ -3693,6 +3693,13 @@ function render(dt) {
         var point_y = intersects[0].point.y;
         var point_z = intersects[0].point.z;
 
+        // translucent blue sphere with additive blending for "glow" effect
+        var sphereGeom = new THREE.SphereGeometry(2, 10, 10);
+        var darkMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending });
+        var sphere = new THREE.Mesh(sphereGeom.clone(), darkMaterial);
+        sphere.position.set(point_x, point_y, point_z);
+        scene.add(sphere);
+
         // var material = new THREE.LineBasicMaterial({
         //     color: 0x0000ff
         // });
