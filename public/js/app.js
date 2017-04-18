@@ -3404,6 +3404,9 @@ var camera = void 0,
     buttonState = void 0;
 
 var selectableObjs = [];
+var current_scene = 1;
+var scene_objects = [];
+// let previousRaycastCoords;
 
 var width = window.innerWidth,
     height = window.innerHeight;
@@ -3528,6 +3531,14 @@ function create_stereo_scene() {
     scene.add(ptLight);
 }
 
+function generateWarpObjects() {
+    scene_objects[1] = new Array({ x: -28, y: -2.7, z: -40, name: 'warp', scene: '2' }, { x: -40, y: -8, z: -11, name: 'warp', scene: '3' });
+
+    scene_objects[2] = new Array({ x: -1, y: -2.7, z: -2, name: 'warp', scene: '2' });
+
+    scene_objects[3] = new Array({ x: -1, y: -2.7, z: -4, name: 'warp', scene: '2' });
+}
+
 function drawScene(load_image) {
     var geometry = new THREE.SphereGeometry(50, 30, 15);
     geometry.scale(-1, 1, 1);
@@ -3544,21 +3555,26 @@ function drawScene(load_image) {
     scene.add(mesh);
 }
 
-function meshloader(fileName, position_x, position_y, position_z, rotation, title) {
+function meshloader(fileName, position_x, position_y, position_z, rotation, title, warpTo) {
     return function (geometry) {
         //Place in scene
         var color = void 0;
-        if (fileName.indexOf("star") !== -1) {
-            color = 0xFF6500;
-            geometry.scale.set(50, 50, 50);
-            geometry.position.z = position_z;
-            geometry.position.y = position_y;
-            geometry.position.x = position_x;
-            geometry.rotation.y = rotation;
-            selectableObjs.push(geometry);
-            geometry.userData = { name: title, touched: false };
-            scene.add(geometry);
-        }
+
+        color = 0xFF6500;
+        geometry.scale.set(50, 50, 50);
+        geometry.position.z = position_z;
+        geometry.position.y = position_y;
+        geometry.position.x = position_x;
+        geometry.rotation.y = rotation;
+        selectableObjs.push(geometry);
+
+        geometry.userData = {
+            name: title,
+            touched: false,
+            scene: warpTo
+        };
+
+        scene.add(geometry);
 
         //Apply material
         geometry.traverse(function (child) {
@@ -3581,20 +3597,37 @@ function drawShapes() {
     };
 
     var objLoader = new THREE.OBJLoader(manager);
-    objLoader.load("models/star_charm.obj", meshloader("models/star_charm.obj", -28, -2.7, -40, 0.5, "objStar"));
+
+    scene_objects[current_scene].forEach(function (obj) {
+        objLoader.load("models/star_charm.obj", meshloader("models/star_charm.obj", obj.x, obj.y, obj.z, 0.5, obj.name, obj.scene));
+    });
+    // objLoader.load( "models/star_charm.obj", meshloader("models/star_charm.obj", -28, -2.7, -40, 0.5, "warp_1"));
+    // objLoader.load( "models/star_charm.obj", meshloader("models/star_charm.obj", -40, -8, -11, 0.5, "warp_2"));
+
     // objLoader.load( "models/star_charm.obj", meshloader("models/star_charm.obj", -35, 5, -15, 0.5, "objStar"));
 }
 
-//What happens after an object is selected
-function postSelectAction(selectedObjectName) {
-    console.log("The " + selectedObjectName + " was selected by user. Use this function to create appropriate scene transition.");
+// Clean up the objects with the name 'warp'
+function cleanWarpObjects() {
+    scene.children.forEach(function (object) {
+        if (object.userData.name == 'warp') {
+            scene.remove(object);
+        }
+    });
+}
 
+//What happens after an object is selected
+function postSelectAction(selectedObjectName, selectedObjectWarpNumber) {
     document.getElementById("selection_confirmation_overlay").style.display = 'block';
 
     setTimeout(function () {
         document.getElementById("selection_confirmation_overlay").style.display = 'none';
-        if (selectedObjectName == 'objStar') {
-            drawScene('./images/room_2.jpg');
+        if (selectedObjectName == 'warp') {
+            cleanWarpObjects();
+
+            current_scene = selectedObjectWarpNumber;
+            drawShapes();
+            drawScene('./images/room_' + selectedObjectWarpNumber + '.jpg');
             resetCamera();
         }
     }, 250);
@@ -3619,29 +3652,7 @@ function updateHUDTxt(msg) {
 }
 
 function getTouchMsg(charm) {
-    msg = "That's a " + charm + ", which has the power to ";
-
-    switch (charm) {
-        case "heart":
-            msg = msg + "bring things to life.";
-            msg = msg.replace(charm, "pink " + charm);
-            break;
-        case "moon":
-            msg = msg + "make things invisible.";
-            msg = msg.replace(charm, "blue " + charm);
-            break;
-        case "clover":
-            msg = msg + "bring luck (but you never know which kind).";
-            msg = msg.replace(charm, "green " + charm);
-            break;
-        case "star":
-            msg = msg + "make things fly (but you already have that).";
-            msg = msg.replace(charm, "orange " + charm);
-            break;
-
-    }
-
-    return msg + " Keep looking at it to select it.";
+    return "Blijf naar het object kijken om naar de volgende scene te gaan.";
 }
 
 function resize() {
@@ -3666,7 +3677,6 @@ function update(dt) {
 }
 
 function render(dt) {
-
     updateHUDTxt(""); //Set HUD txt to blank to start render loop.
 
     intersects = getIntersections(selectableObjs);
@@ -3688,7 +3698,7 @@ function render(dt) {
         });
     } else {
         //something being touched
-        console.log(intersects[0].point);
+        // console.log(intersects[0].point);
         var point_x = intersects[0].point.x;
         var point_y = intersects[0].point.y;
         var point_z = intersects[0].point.z;
@@ -3700,24 +3710,6 @@ function render(dt) {
         sphere.position.set(point_x, point_y, point_z);
         scene.add(sphere);
 
-        // var material = new THREE.LineBasicMaterial({
-        //     color: 0x0000ff
-        // });
-        //
-        // var geometry = new THREE.Geometry();
-        // geometry.vertices.push(
-        //     new THREE.Vector3( -10, 0, 0 ),
-        //     new THREE.Vector3( -35, 5, -15 ),
-        //     new THREE.Vector3( 10, 0, 0 )
-        // );
-        //
-        // geometry.vertices.push(
-        //     new THREE.Vector3( intersects[0].point.x, intersects[0].point.y, intersects[0].point.z ),
-        // );
-        //
-        // var line = new THREE.Line( geometry, material );
-        // scene.add( line );
-
         //Set the touched touch flag to true, so we can give it special treatment in the animation function
         intersects[0].object.parent.userData.touched = true;
         msg = getTouchMsg(intersects[0].object.parent.userData.name); //update HUD text to register the touch
@@ -3728,7 +3720,6 @@ function render(dt) {
 }
 
 function animate(t) {
-
     __WEBPACK_IMPORTED_MODULE_1__third_party_Tween__["update"]();
 
     touchTweenTo.onUpdate(function () {
@@ -3747,7 +3738,7 @@ function animate(t) {
                 if (left_bar.value() == 0) {
                     //don't restart progress bar if already progress
                     left_bar.animate(1.0, {}, function () {
-                        postSelectAction(object.userData.name); //add callback to left side progress bar to register completed selection
+                        postSelectAction(object.userData.name, object.userData.scene); //add callback to left side progress bar to register completed selection
                     });
                 }
                 if (right_bar.value() == 0) {
@@ -3768,6 +3759,7 @@ function initialize_vr() {
     create_guide_circles();
     create_stereo_scene();
 
+    generateWarpObjects();
     drawShapes();
     drawScene('./images/room_1.jpg');
 
