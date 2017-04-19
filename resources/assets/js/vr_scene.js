@@ -47,7 +47,11 @@ let min = { x: 100, y: 100, z: 100 }
 let touchTweenTo = new TWEEN.Tween(min);
 let max = { x: 120, y: 120, z: 120 };
 
+let color_red = 0xCB5F5F;
+let color_white = 0xEDE7B4;
+
 let reset_able_time = 0;
+let database_send_time = 0;
 let current_time = 0;
 
 // Set up animation cycle used on touched objects
@@ -321,6 +325,10 @@ function postSelectAction(selectedObjectName, selectedObjectWarpNumber) {
 
             current_scene = selectedObjectWarpNumber;
             showWarpObjects();
+
+            // When changing to another scene. Create a heatmap.
+            send_heatmap_to_database();
+
             // drawShapes();
             drawScene('./images/room_'+ selectedObjectWarpNumber +'.jpg');
             resetCamera();
@@ -362,13 +370,30 @@ function resize() {
 function create_heatmap_sphere(point_x, point_y, point_z) {
     // SphereGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
     let sphereGeom =  new THREE.SphereGeometry( 2, 10, 10 );
-    let darkMaterial = new THREE.MeshBasicMaterial( { color: 0xEDE7B4,  transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending } );
+    let darkMaterial = new THREE.MeshBasicMaterial( { color: color_white,  transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending } );
     let sphere = new THREE.Mesh( sphereGeom.clone(), darkMaterial );
     sphere.name = 'heatmap_trail';
 
     sphere.position.set(point_x, point_y, point_z);
     heatmap_trail.push(sphere);
     scene.add(sphere);
+}
+
+function send_heatmap_to_database() {
+    if(heatmap_trail.length > 0) {
+        heatmap_trail.forEach( (object) => {
+            let radius          = object.geometry.boundingSphere.radius;
+            let opacity         = object.material.opacity;
+            let transparent     = object.material.transparent;
+
+            // radius is bigger then 2. So colour was changed to red
+            if(radius >= 2) {
+
+            }else{
+
+            }
+        });
+    }
 }
 
 function update(dt) {
@@ -379,6 +404,13 @@ function update(dt) {
     // check camera positioning
     // console.log(camera.position);
     controls.update(dt);
+
+    // if(database_send_time >= 100) {
+    //     send_heatmap_to_database();
+    // }else{
+    //     database_send_time++;
+    // }
+
     reset_able_time++;
     current_time = clock.getElapsedTime();
 }
@@ -418,18 +450,20 @@ function render(dt) {
         let point_z = intersects[0].point.z;
 
         // translucent blue sphere with additive blending for "glow" effect
-        console.log(heatmap_trail.length);
-
         if(reset_able_time >= 10) {
             // console.log(heatmap_trail_radius_max);
             if(heatmap_trail.length > 0) {
                 heatmap_trail.forEach( (object) => {
-                    console.log('OBJECT: ' + object.position);
-                    console.log('INTERSECT: ' + intersects[0].point);
                     if(intersects[0].point.x == object.position.x && intersects[0].point.y == object.position.y && intersects[0].point.z == object.position.z) {
                         prev_point_x = point_x;
                         prev_point_y = point_y;
                         prev_point_z = point_z;
+
+                        // object.geometry.boundingSphere.radius
+                        // object.material.color
+                        // object.material.transparent
+                        // object.material.opacity
+
                         // console.log('found trail');
                         // console.log(heatmap_sphere_created);
                         if(!heatmap_trail_radius_max) {
@@ -441,7 +475,7 @@ function render(dt) {
                                 // console.log('radius not maxed');
                                 radius++;
                                 object.geometry = new THREE.SphereGeometry( radius, 10, 10 );
-                                object.material = new THREE.MeshBasicMaterial( { color: 0xCB5F5F,  transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending } );
+                                object.material = new THREE.MeshBasicMaterial( { color: color_red,  transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending } );
                             }
                         }
                     }
