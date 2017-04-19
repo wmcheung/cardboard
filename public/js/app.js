@@ -3408,7 +3408,14 @@ var selectableObjs = [];
 var current_scene = 1;
 var scene_objects = [];
 var heatmap_trail = [];
+var heatmap_trail_radius_max = false;
+var heatmap_sphere_created = false;
+var radius = 2;
 // let previousRaycastCoords;
+
+var prev_point_x = null;
+var prev_point_y = null;
+var prev_point_z = null;
 
 var width = window.innerWidth,
     height = window.innerHeight;
@@ -3431,7 +3438,7 @@ touchTweenTo.start();
 // Selection time for the guiding circles
 var SELECTION_TIME = 2000;
 
-var DEBUG = true;
+var DEBUG = false;
 
 // Full screen
 var goFS = document.getElementById("goFS");
@@ -3708,6 +3715,18 @@ function resize() {
     effect.setSize(width, height);
 }
 
+function create_heatmap_sphere(point_x, point_y, point_z) {
+    // SphereGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
+    var sphereGeom = new THREE.SphereGeometry(2, 10, 10);
+    var darkMaterial = new THREE.MeshBasicMaterial({ color: 0xEDE7B4, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending });
+    var sphere = new THREE.Mesh(sphereGeom.clone(), darkMaterial);
+    sphere.name = 'heatmap_trail';
+
+    sphere.position.set(point_x, point_y, point_z);
+    heatmap_trail.push(sphere);
+    scene.add(sphere);
+}
+
 function update(dt) {
     resize();
 
@@ -3746,7 +3765,7 @@ function render(dt) {
         });
 
         if (DEBUG) {
-            // console.log(intersects[0].point);
+            console.log(intersects[0].point);
         }
 
         var point_x = intersects[0].point.x;
@@ -3755,21 +3774,47 @@ function render(dt) {
 
         // translucent blue sphere with additive blending for "glow" effect
 
-        if (reset_able_time > 10) {
-            heatmap_trail.forEach(function (object) {
-                if (intersects[0].point.x == object.position.x && intersects[0].point.y == object.position.y && intersects[0].point.z == object.position.z) {
-                    console.log('found in the trail');
-                    console.log(object);
-                }
-            });
-            var sphereGeom = new THREE.SphereGeometry(2, 10, 10);
-            var darkMaterial = new THREE.MeshBasicMaterial({ color: 0xEDE7B4, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending });
-            var sphere = new THREE.Mesh(sphereGeom.clone(), darkMaterial);
-            sphere.name = 'heatmap_trail';
+        if (reset_able_time >= 10) {
+            // console.log(heatmap_trail_radius_max);
+            if (heatmap_trail.length > 0) {
+                heatmap_trail.forEach(function (object) {
+                    if (intersects[0].point.x == object.position.x && intersects[0].point.y == object.position.y && intersects[0].point.z == object.position.z) {
+                        prev_point_x = point_x;
+                        prev_point_y = point_y;
+                        prev_point_z = point_z;
+                        // console.log('found trail');
+                        // console.log(heatmap_sphere_created);
+                        if (!heatmap_trail_radius_max) {
+                            if (radius >= 10) {
+                                // console.log('radius maxed');
+                                radius = 2;
+                                heatmap_trail_radius_max = true;
+                            } else {
+                                // console.log('radius not maxed');
+                                radius++;
+                                object.geometry = new THREE.SphereGeometry(radius, 10, 10);
+                                object.material = new THREE.MeshBasicMaterial({ color: 0xCB5F5F, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending });
+                            }
+                        }
+                    }
 
-            sphere.position.set(point_x, point_y, point_z);
-            heatmap_trail.push(sphere);
-            scene.add(sphere);
+                    // console.log( 'PREV: '+ prev_point_x, prev_point_y, prev_point_z);
+                    // console.log( 'NEW: '+ point_x, point_y, point_z);
+                    if (prev_point_x != point_x && prev_point_y != point_y && prev_point_z != point_z) {
+                        if (reset_able_time >= 3) {
+                            // heatmap_sphere_created = true;
+                            heatmap_trail_radius_max = false;
+                            create_heatmap_sphere(point_x, point_y, point_z);
+                        }
+                    }
+
+                    reset_able_time = 0;
+                });
+            } else {
+                // console.log('empty trail');
+                create_heatmap_sphere(point_x, point_y, point_z);
+            }
+
             reset_able_time = 0;
         }
     }
