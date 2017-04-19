@@ -21,7 +21,7 @@ import * as ProgressBar from './third-party/progressbar';
 let THREE = THREELib(["OBJLoader", "OrbitControls"]);
 let StereoEffect = require('three-stereo-effect')(THREE);
 
-let camera, scene, renderer,
+let camera, scene, renderer, manager,
     left_bar, right_bar, effect, controls,
     element, container, scCube, mesh, x, intersects,
     animScale, msg, buttonState;
@@ -29,14 +29,19 @@ let camera, scene, renderer,
 let selectableObjs = [];
 let current_scene = 1;
 let scene_objects = [];
+let heatmap_trail = [];
 // let previousRaycastCoords;
 
 let width = window.innerWidth, height = window.innerHeight;
+let textureLoader = new THREE.TextureLoader();
 let clock = new THREE.Clock();
 
 let min = { x: 100, y: 100, z: 100 }
 let touchTweenTo = new TWEEN.Tween(min);
 let max = { x: 120, y: 120, z: 120 };
+
+let reset_able_time = 0;
+let current_time = 0;
 
 // Set up animation cycle used on touched objects
 touchTweenTo.to(max, 200);
@@ -46,6 +51,8 @@ touchTweenTo.start();
 
 // Selection time for the guiding circles
 let SELECTION_TIME = 2000;
+
+const DEBUG = true;
 
 // Full screen
 let goFS    =   document.getElementById("goFS");
@@ -161,35 +168,42 @@ function create_stereo_scene() {
     scene.add(ptLight);
 }
 
-function generateWarpObjects() {
+function generateWarpObjectsCoords() {
     scene_objects[1] = new Array(
-        { x: -28, y: -2.7, z: -40, name: 'warp', scene: '2' },
-        { x: -40, y: -8, z: -11, name: 'warp', scene: '3' }
+        { x: -28, y: -2.7, z: -40, rotate: 0.5, name: 'warp', scene: '2' },
+        { x: -40, y: -8, z: -11, rotate: 0.5, name: 'warp', scene: '3' }
     );
 
     scene_objects[2] = new Array(
-        { x: -1, y: -2.7, z: -2, name: 'warp', scene: '2' },
+        { x: 36, y: -0.6, z: -12, rotate: 1.3, name: 'warp', scene: '1' },
+        { x: 37, y: -1.9, z: 32, rotate: 1, name: 'warp', scene: '3' }
     );
 
     scene_objects[3] = new Array(
-        { x: -1, y: -2.7, z: -4, name: 'warp', scene: '2' },
+        { x: 43, y: -2.5, z: -20, rotate: 1.4,  name: 'warp', scene: '1' },
+        { x: -26, y: -9, z: 38, rotate: 0.2, name: 'warp', scene: '4' }
+    );
+
+    scene_objects[4] = new Array(
+        { x: 37, y: -7, z: 29, rotate: 1.4,  name: 'warp', scene: '3' },
     );
 }
 
 function drawScene(load_image) {
-    let geometry = new THREE.SphereGeometry( 50, 30, 15 );
-    geometry.scale( - 1, 1, 1 );
-    // geometry.userData = {name: 'sphere_scene', touched: false };
+    // Create the sphere
+    let scene_geometry = new THREE.SphereGeometry( 50, 30, 15 );
+    scene_geometry.scale( - 1, 1, 1 );
 
-    let material = new THREE.MeshBasicMaterial( {
-        map: new THREE.TextureLoader().load(load_image)
+    let scene_material = new THREE.MeshBasicMaterial( {
+        map: textureLoader.load('./images/room_' + current_scene + '.jpg')
     });
 
-    mesh = new THREE.Mesh( geometry, material );
-    mesh.material.side = THREE.DoubleSide;
+    let scene_mesh = new THREE.Mesh( scene_geometry, scene_material );
+    scene_mesh.name = 'sphere_scene';
+    scene_mesh.material.side = THREE.DoubleSide;
 
-    selectableObjs.push(mesh);
-    scene.add(mesh);
+    selectableObjs.push(scene_mesh);
+    scene.add(scene_mesh);
 }
 
 function meshloader(fileName, position_x, position_y, position_z, rotation, title, warpTo){
@@ -203,6 +217,8 @@ function meshloader(fileName, position_x, position_y, position_z, rotation, titl
         geometry.position.y = position_y;
         geometry.position.x = position_x;
         geometry.rotation.y = rotation;
+        geometry.visible = false;
+
         selectableObjs.push(geometry);
 
         geometry.userData = {
@@ -231,28 +247,59 @@ function meshloader(fileName, position_x, position_y, position_z, rotation, titl
 }
 
 function drawShapes() {
-    let manager = new THREE.LoadingManager();
-    manager.onProgress = function ( item, loaded, total ) {
-        console.log( item, loaded, total );
-    };
+    manager = new THREE.LoadingManager();
+
+    // manager.onProgress = function ( item, loaded, total ) {
+    //     // console.log( item, loaded, total );
+    // };
 
     let objLoader = new THREE.OBJLoader(manager);
 
-    scene_objects[current_scene].forEach( (obj) => {
-        objLoader.load( "models/star_charm.obj", meshloader("models/star_charm.obj", obj.x, obj.y, obj.z, 0.5, obj.name, obj.scene));
-    });
-    // objLoader.load( "models/star_charm.obj", meshloader("models/star_charm.obj", -28, -2.7, -40, 0.5, "warp_1"));
-    // objLoader.load( "models/star_charm.obj", meshloader("models/star_charm.obj", -40, -8, -11, 0.5, "warp_2"));
-
-    // objLoader.load( "models/star_charm.obj", meshloader("models/star_charm.obj", -35, 5, -15, 0.5, "objStar"));
+    for (let i = 1; i <= scene_objects.length - 1; i++) {
+        scene_objects[i].forEach( (obj) => {
+            objLoader.load( "models/star_charm.obj", meshloader("models/star_charm.obj", obj.x, obj.y, obj.z, obj.rotate, obj.name, obj.scene));
+        });
+    }
 }
 
-// Clean up the objects with the name 'warp'
+// Clean up the objects with the name 'warp' by turning it into false visibility
 function cleanWarpObjects() {
+    left_bar.set(0.0);
+    right_bar.set(0.0);
+
     scene.children.forEach( (object) => {
-        if(object.userData.name == 'warp') {
-            scene.remove(object);
+        // if(object.name == 'sphere_scene') {
+        //     // console.log('removed sphere');
+        //     scene.remove(object);
+        // }
+
+        if(object instanceof THREE.Group) {
+            object.userData.touched = false;
+            object.visible = false;
+            // scene.remove(object);
         }
+    });
+
+   //  for (let i = scene.children.length - 1; i >= 0 ; i--) {
+   //     if(scene.children[i] instanceof THREE.Group) {
+   //         var object = scene.children[i];
+   //         object.visible = false;
+   //         // scene.remove(object);
+   //     }
+   // }
+}
+
+function showWarpObjects() {
+    scene.children.forEach( (object) => {
+        // console.log(object);
+        if(object instanceof THREE.Group) {
+            scene_objects[current_scene].forEach( (warpObject) => {
+                if(object.position.x == warpObject.x && object.position.y == warpObject.y && object.position.z == warpObject.z) {
+                    object.visible = true;
+                }
+            });
+        }
+        // console.log(object.userData);
     });
 }
 
@@ -266,7 +313,8 @@ function postSelectAction(selectedObjectName, selectedObjectWarpNumber) {
             cleanWarpObjects();
 
             current_scene = selectedObjectWarpNumber;
-            drawShapes();
+            showWarpObjects();
+            // drawShapes();
             drawScene('./images/room_'+ selectedObjectWarpNumber +'.jpg');
             resetCamera();
         }
@@ -276,12 +324,9 @@ function postSelectAction(selectedObjectName, selectedObjectWarpNumber) {
 
 function getIntersections(objects){
     let raycaster = new THREE.Raycaster();
-
     let vector = new THREE.Vector3( 0, 0, - 1 );
-        vector.applyQuaternion( camera.quaternion );
-
+    vector.applyQuaternion( camera.quaternion );
     raycaster.set( camera.position, vector );
-
     return raycaster.intersectObjects( objects, true );
 }
 
@@ -315,6 +360,8 @@ function update(dt) {
     // check camera positioning
     // console.log(camera.position);
     controls.update(dt);
+    reset_able_time++;
+    current_time = clock.getElapsedTime();
 }
 
 function render(dt) {
@@ -323,39 +370,54 @@ function render(dt) {
     intersects = getIntersections(selectableObjs);
     // console.log(intersects);
 
-    if (intersects.length == 0){//nothing being "touched"
-        left_bar.set(0.0);//reset any active progress bars to 0
+    //Set the touched touch flag to true, so we can give it special treatment in the animation function
+    if(intersects.length >= 3) {
+        var userData = intersects[0].object.parent.userData;
+        if(userData.name == 'warp') {
+            userData.touched = true;
+        }
+        msg = getTouchMsg(intersects[0].object.parent.userData.name); //update HUD text to register the touch
+        updateHUDTxt(msg);
+    }else{
+        left_bar.set(0.0); //reset any active progress bars to 0
         right_bar.set(0.0);
 
-        //Loop over all OBJ objects
+        // Reset all the warp objects to false so the animation will stop
         scene.traverse (function (object)
         {
-            //Set all touch flag to false as nothing is selected.
-            if (object instanceof THREE.Group){
-                if (intersects.length == 0){
-                    object.userData.touched = false;
-                }
+            if (object instanceof THREE.Group) {
+                object.userData.touched = false;
             }
         });
-    } else {//something being touched
-        // console.log(intersects[0].point);
+
+        if(DEBUG) {
+            // console.log(intersects[0].point);
+        }
+
         let point_x = intersects[0].point.x;
         let point_y = intersects[0].point.y;
         let point_z = intersects[0].point.z;
 
         // translucent blue sphere with additive blending for "glow" effect
-        var sphereGeom =  new THREE.SphereGeometry( 2, 10, 10 );
-        var darkMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00,  transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending } );
-        var sphere = new THREE.Mesh( sphereGeom.clone(), darkMaterial );
-        sphere.position.set(point_x, point_y, point_z);
-        scene.add( sphere );
 
-        //Set the touched touch flag to true, so we can give it special treatment in the animation function
-        intersects[0].object.parent.userData.touched = true;
-        msg = getTouchMsg(intersects[0].object.parent.userData.name); //update HUD text to register the touch
-        updateHUDTxt(msg);
+        if(reset_able_time > 10) {
+            heatmap_trail.forEach( (object) => {
+                if(intersects[0].point.x == object.position.x && intersects[0].point.y == object.position.y && intersects[0].point.z == object.position.z) {
+                    console.log('found in the trail');
+                    console.log(object);
+                }
+            });
+            let sphereGeom =  new THREE.SphereGeometry( 2, 10, 10 );
+            let darkMaterial = new THREE.MeshBasicMaterial( { color: 0xEDE7B4,  transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending } );
+            let sphere = new THREE.Mesh( sphereGeom.clone(), darkMaterial );
+            sphere.name = 'heatmap_trail';
+
+            sphere.position.set(point_x, point_y, point_z);
+            heatmap_trail.push(sphere);
+            scene.add(sphere);
+            reset_able_time = 0;
+        }
     }
-
     effect.render(scene, camera);
 }
 
@@ -376,7 +438,6 @@ function animate(t) {
                 object.scale.x = animScale.x/1.5;
                 object.scale.y = animScale.y/1.5;
                 object.scale.z = animScale.z/1.5;
-
 
                 if(left_bar.value() == 0){//don't restart progress bar if already progress
                     left_bar.animate(1.0, {
@@ -404,9 +465,14 @@ function initialize_vr() {
     create_guide_circles();
     create_stereo_scene();
 
-    generateWarpObjects();
+    drawScene('./images/room_'+ current_scene +'.jpg');
+
+    generateWarpObjectsCoords();
     drawShapes();
-    drawScene('./images/room_1.jpg');
+
+    manager.onLoad = () => {
+        showWarpObjects();
+    }
 
     window.addEventListener('resize', resize, false);
     setTimeout(resize, 1);
