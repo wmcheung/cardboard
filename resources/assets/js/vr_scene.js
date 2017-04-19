@@ -424,6 +424,8 @@ function render(dt) {
             // console.log(heatmap_trail_radius_max);
             if(heatmap_trail.length > 0) {
                 heatmap_trail.forEach( (object) => {
+                    console.log('OBJECT: ' + object.position);
+                    console.log('INTERSECT: ' + intersects[0].point);
                     if(intersects[0].point.x == object.position.x && intersects[0].point.y == object.position.y && intersects[0].point.z == object.position.z) {
                         prev_point_x = point_x;
                         prev_point_y = point_y;
