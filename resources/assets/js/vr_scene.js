@@ -418,6 +418,7 @@ function render(dt) {
         let point_z = intersects[0].point.z;
 
         // translucent blue sphere with additive blending for "glow" effect
+        console.log(heatmap_trail.length);
 
         if(reset_able_time >= 10) {
             // console.log(heatmap_trail_radius_max);
