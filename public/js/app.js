@@ -3363,6 +3363,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__third_party_Tween___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__third_party_Tween__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__third_party_progressbar__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__third_party_progressbar___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__third_party_progressbar__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__promise__ = __webpack_require__(82);
 // import * as THREE from './third-party/threejs/three';
 
 /**
@@ -3376,6 +3377,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /*******************************************
  * IMPORTS
  ******************************************/
+
 
 
 
@@ -3402,14 +3404,17 @@ var camera = void 0,
     intersects = void 0,
     animScale = void 0,
     msg = void 0,
-    buttonState = void 0;
+    buttonState = void 0,
+    trail_opacity = void 0;
 
 var selectableObjs = [];
 var current_scene = 1;
 var scene_objects = [];
 var heatmap_trail = [];
 var heatmap_trail_radius_max = false;
-var heatmap_sphere_created = false;
+var creating_heatmap = false;
+var sending_to_database = false;
+
 var radius = 2;
 // let previousRaycastCoords;
 
@@ -3429,6 +3434,10 @@ var max = { x: 120, y: 120, z: 120 };
 var color_red = 0xCB5F5F;
 var color_white = 0xEDE7B4;
 
+// This is a hack since .toString() does not save the correct value in the database.
+var color_red_string = '0xCB5F5F';
+var color_white_string = '0xEDE7B4';
+
 var reset_able_time = 0;
 var database_send_time = 0;
 var current_time = 0;
@@ -3443,6 +3452,13 @@ touchTweenTo.start();
 var SELECTION_TIME = 2000;
 
 var DEBUG = false;
+var DEBUG_COORDS = false;
+
+if (DEBUG) {
+    trail_opacity = 0.2;
+} else {
+    trail_opacity = 0.0;
+}
 
 // Full screen
 var goFS = document.getElementById("goFS");
@@ -3560,7 +3576,59 @@ function generateWarpObjectsCoords() {
     scene_objects[4] = new Array({ x: 37, y: -7, z: 29, rotate: 1.4, name: 'warp', scene: '3' });
 }
 
-function drawScene(load_image) {
+function getHeatmapByScene(scene_number) {
+    var API_URI = 'api/heatmap';
+    var payload = {
+        'scene': scene_number
+    };
+
+    var callback = {
+        success: function success(data) {
+            var parsed_data = JSON.parse(data);
+
+            parsed_data.result.forEach(function (object) {
+                console.log(object);
+            });
+        },
+        error: function error(data) {
+            // console.log(2, 'error', JSON.parse(data));
+        }
+    };
+
+    // Executes the method call
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__promise__["a" /* default */])(API_URI).get(payload).then(callback.success).catch(callback.error);
+}
+
+function createHeatmapTrail(scene_number, position_x, position_y, position_z, hex_color, radius, opacity) {
+    var API_URI = 'api/heatmap';
+    var payload = {
+        'scene_number': scene_number,
+        'position_x': position_x,
+        'position_y': position_y,
+        'position_z': position_z,
+        'hex_color': hex_color,
+        'radius': radius,
+        'opacity': opacity
+    };
+
+    var callback = {
+        success: function success(data) {
+            var parsed_data = JSON.parse(data);
+
+            if (DEBUG) {
+                console.log('MESSAGE: ' + parsed_data.message);
+            }
+        },
+        error: function error(data) {
+            // console.log(2, 'error', JSON.parse(data));
+        }
+    };
+
+    // Executes the method call
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__promise__["a" /* default */])(API_URI).post(payload).then(callback.success).catch(callback.error);
+}
+
+function drawScene() {
     // Create the sphere
     var scene_geometry = new THREE.SphereGeometry(50, 30, 15);
     scene_geometry.scale(-1, 1, 1);
@@ -3680,15 +3748,11 @@ function postSelectAction(selectedObjectName, selectedObjectWarpNumber) {
         if (selectedObjectName == 'warp') {
             cleanWarpObjects();
 
-            current_scene = selectedObjectWarpNumber;
-            showWarpObjects();
+            // When creating a heatmap. Wait untill its done. Clean the heatmap_trail array
+            creating_heatmap = true;
 
             // When changing to another scene. Create a heatmap.
-            send_heatmap_to_database();
-
-            // drawShapes();
-            drawScene('./images/room_' + selectedObjectWarpNumber + '.jpg');
-            resetCamera();
+            send_heatmap_to_database(selectedObjectWarpNumber);
         }
     }, 250);
 }
@@ -3708,8 +3772,8 @@ function updateHUDTxt(msg) {
     }
 }
 
-function getTouchMsg(charm) {
-    return "Blijf naar het object kijken om naar de volgende scene te gaan.";
+function getTouchMsg(txt) {
+    return txt;
 }
 
 function resize() {
@@ -3726,7 +3790,7 @@ function resize() {
 function create_heatmap_sphere(point_x, point_y, point_z) {
     // SphereGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
     var sphereGeom = new THREE.SphereGeometry(2, 10, 10);
-    var darkMaterial = new THREE.MeshBasicMaterial({ color: color_white, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending });
+    var darkMaterial = new THREE.MeshBasicMaterial({ color: color_white, transparent: true, opacity: trail_opacity, blending: THREE.AdditiveBlending });
     var sphere = new THREE.Mesh(sphereGeom.clone(), darkMaterial);
     sphere.name = 'heatmap_trail';
 
@@ -3735,16 +3799,99 @@ function create_heatmap_sphere(point_x, point_y, point_z) {
     scene.add(sphere);
 }
 
-function send_heatmap_to_database() {
-    if (heatmap_trail.length > 0) {
-        heatmap_trail.forEach(function (object) {
-            var radius = object.geometry.boundingSphere.radius;
-            var opacity = object.material.opacity;
-            var transparent = object.material.transparent;
+function asyncFunction(object, cb) {
+    setTimeout(function () {
+        var radius = Math.round(object.geometry.boundingSphere.radius);
+        // let opacity         = object.material.opacity;
+        var opacity = 0.2;
+        // let transparent     = object.material.transparent;
 
-            // radius is bigger then 2. So colour was changed to red
-            if (radius >= 2) {} else {}
+        var color = '';
+
+        // When radius equals 2. Color needs to be white.
+        if (radius === 2) {
+            color = color_white_string;
+        } else {
+            color = color_red_string;
+        }
+
+        createHeatmapTrail(current_scene, object.position.x, object.position.y, object.position.z, color, radius, opacity);
+        if (DEBUG) {
+            console.log("MESSAGE: Sending heatmap trail to database");
+        }
+        cb();
+    }, 150);
+}
+
+function send_heatmap_to_database(selectedWarpNumber) {
+    for (var i = 0; i <= scene.children.length - 1; i++) {
+        if (scene.children[i].name === "heatmap_trail") {
+            var object = scene.children[i];
+            object.visible = false;
+
+            // Removing the object from the scene does not cleans everything completely. I assume it's a bug in THREE.js
+            // scene.remove(object);
+        }
+    }
+
+    if (heatmap_trail.length > 0) {
+        // Information on how to create an asynchronous foreach with reduce and promise
+        // URI : http://stackoverflow.com/questions/18983138/callback-after-all-asynchronous-foreach-callbacks-are-completed
+        var requests = heatmap_trail.reduce(function (promiseChain, item) {
+            return promiseChain.then(function () {
+                return new Promise(function (resolve) {
+                    asyncFunction(item, resolve);
+                });
+            });
+        }, Promise.resolve());
+
+        // When all the requests are done.
+        requests.then(function () {
+            // Reset the heatmap trails for the next scene.
+            heatmap_trail = [];
+
+            current_scene = selectedWarpNumber;
+            showWarpObjects();
+            // drawShapes();
+            drawScene();
+            resetCamera();
+
+            creating_heatmap = false;
         });
+
+        // heatmap_trail.forEach( (object, i) => {
+        //     let radius          = Math.round(object.geometry.boundingSphere.radius);
+        //     let opacity         = object.material.opacity;
+        //     // let transparent     = object.material.transparent;
+        //
+        //     let color = '';
+        //
+        //     // When radius equals 2. Color needs to be white.
+        //     if(radius == 2) {
+        //         color = color_white_string;
+        //     }else{
+        //         color = color_red_string;
+        //     }
+        //
+        //     if(!sending_to_database) {
+        //         sending_to_database = true;
+        //         createHeatmapTrail(current_scene, object.position.x, object.position.y, object.position.z, color, radius, opacity);
+        //         console.log("MESSAGE: Sending to database");
+        //     }
+        //
+        //     // if(i == heatmap_trail.length - 1) {
+        //     //     // Reset the heatmap trails for the next scene.
+        //     //     heatmap_trail = [];
+        //     //
+        //     //     current_scene = selectedWarpNumber;
+        //     //     showWarpObjects();
+        //     //     // drawShapes();
+        //     //     drawScene('./images/room_'+ selectedWarpNumber +'.jpg');
+        //     //     resetCamera();
+        //     //
+        //     //     // creating_heatmap = false;
+        //     // }
+        // });
     }
 }
 
@@ -3763,7 +3910,12 @@ function update(dt) {
     //     database_send_time++;
     // }
 
-    reset_able_time++;
+    if (!creating_heatmap) {
+        reset_able_time++;
+    } else {
+        reset_able_time = 0;
+    }
+
     current_time = clock.getElapsedTime();
 }
 
@@ -3779,7 +3931,8 @@ function render(dt) {
         if (userData.name == 'warp') {
             userData.touched = true;
         }
-        msg = getTouchMsg(intersects[0].object.parent.userData.name); //update HUD text to register the touch
+        // msg = getTouchMsg(intersects[0].object.parent.userData.name); //update HUD text to register the touch
+        msg = getTouchMsg('Blijf naar het object kijken om naar de volgende scene te gaan.');
         updateHUDTxt(msg);
     } else {
         left_bar.set(0.0); //reset any active progress bars to 0
@@ -3792,7 +3945,7 @@ function render(dt) {
             }
         });
 
-        if (DEBUG) {
+        if (DEBUG_COORDS) {
             console.log(intersects[0].point);
         }
 
@@ -3826,7 +3979,12 @@ function render(dt) {
                                 // console.log('radius not maxed');
                                 radius++;
                                 object.geometry = new THREE.SphereGeometry(radius, 10, 10);
-                                object.material = new THREE.MeshBasicMaterial({ color: color_red, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending });
+                                object.material = new THREE.MeshBasicMaterial({
+                                    color: color_red,
+                                    transparent: true,
+                                    opacity: trail_opacity,
+                                    blending: THREE.AdditiveBlending
+                                });
                             }
                         }
                     }
@@ -3847,8 +4005,6 @@ function render(dt) {
                 // console.log('empty trail');
                 create_heatmap_sphere(point_x, point_y, point_z);
             }
-
-            reset_able_time = 0;
         }
     }
     effect.render(scene, camera);
@@ -3894,7 +4050,7 @@ function initialize_vr() {
     create_guide_circles();
     create_stereo_scene();
 
-    drawScene('./images/room_' + current_scene + '.jpg');
+    drawScene();
 
     generateWarpObjectsCoords();
     drawShapes();
@@ -3902,6 +4058,8 @@ function initialize_vr() {
     manager.onLoad = function () {
         showWarpObjects();
     };
+
+    getHeatmapByScene(1);
 
     window.addEventListener('resize', resize, false);
     setTimeout(resize, 1);
@@ -84700,6 +84858,84 @@ module.exports = function(module) {
 __webpack_require__(0);
 module.exports = __webpack_require__(1);
 
+
+/***/ }),
+/* 79 */,
+/* 80 */,
+/* 81 */,
+/* 82 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = $http;
+
+
+function $http(url) {
+
+    // A small example of object
+    var core = {
+
+        // Method that performs the ajax request
+        ajax: function ajax(method, url, args) {
+
+            // Creating a promise
+            var promise = new Promise(function (resolve, reject) {
+
+                // Instantiates the XMLHttpRequest
+                var client = new XMLHttpRequest();
+                var uri = url;
+
+                if (args && (method === 'GET' || method === 'POST' || method === 'PUT')) {
+                    uri += '?';
+                    var argcount = 0;
+                    for (var key in args) {
+                        if (args.hasOwnProperty(key)) {
+                            if (argcount++) {
+                                uri += '&';
+                            }
+                            uri += encodeURIComponent(key) + '=' + encodeURIComponent(args[key]);
+                        }
+                    }
+                }
+
+                client.open(method, uri);
+                client.send();
+
+                client.onload = function () {
+                    if (this.status == 200) {
+                        // Performs the function "resolve" when this.status is equal to 200
+                        resolve(this.response);
+                    } else {
+                        // Performs the function "reject" when this.status is different than 200
+                        reject(this.statusText);
+                    }
+                };
+                client.onerror = function () {
+                    reject(this.statusText);
+                };
+            });
+
+            // Return the promise
+            return promise;
+        }
+    };
+
+    // Adapter pattern
+    return {
+        'get': function get(args) {
+            return core.ajax('GET', url, args);
+        },
+        'post': function post(args) {
+            return core.ajax('POST', url, args);
+        },
+        'put': function put(args) {
+            return core.ajax('PUT', url, args);
+        },
+        'delete': function _delete(args) {
+            return core.ajax('DELETE', url, args);
+        }
+    };
+};
 
 /***/ })
 /******/ ]);

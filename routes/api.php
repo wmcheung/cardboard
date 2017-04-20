@@ -16,3 +16,7 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// No need for authentication since we're in a prototyping process. Start using auth:api when we go through user based process
+Route::get('/heatmap', 'HeatmapController@show');
+Route::post('/heatmap', 'HeatmapController@create');
