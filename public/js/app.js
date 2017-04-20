@@ -3451,8 +3451,25 @@ touchTweenTo.start();
 // Selection time for the guiding circles
 var SELECTION_TIME = 2000;
 
-var DEBUG = true;
+var DEBUG = false;
+var SHOW_HEATMAP = false;
 var DEBUG_COORDS = false;
+
+// URI : http://stackoverflow.com/questions/827368/using-the-get-parameter-of-a-url-in-javascript
+var show_heatmap = getQueryVariable("show_heatmap");
+var show_debug = getQueryVariable("debug");
+
+if (show_heatmap) {
+    SHOW_HEATMAP = true;
+    DEBUG = true;
+} else {
+    SHOW_HEATMAP = false;
+    DEBUG = false;
+}
+
+if (show_debug) {
+    DEBUG = true;
+}
 
 if (DEBUG) {
     trail_opacity = 0.2;
@@ -3502,6 +3519,17 @@ document.getElementById("selection_confirmation_overlay").style.display = 'none'
 /*******************************************
  * FUNCTIONS FOR BUILDING THE SCENE
  ******************************************/
+function getQueryVariable(variable) {
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split("=");
+        if (pair[0] == variable) {
+            return pair[1];
+        }
+    }
+}
+
 function fullscreen(container) {
     if (container.requestFullscreen) {
         container.requestFullscreen();
@@ -3589,12 +3617,34 @@ function getHeatmapByScene(scene_number) {
             for (var key in parsed_data) {
                 var object = parsed_data[key];
                 var sphere_opacity = 0;
+                var color = object.hex_color;
+                var chosen_color = void 0;
+
                 if (DEBUG) {
                     sphere_opacity = object.opacity;
                 } else {
                     sphere_opacity = trail_opacity;
                 }
-                create_heatmap_sphere(object.position_x, object.position_y, object.position_z, object.scene_number, object.hex_color, object.opacity, object.radius, true);_;
+
+                if (color === color_red_string) {
+                    chosen_color = color_red;
+                }
+                if (color === color_white_string) {
+                    chosen_color = color_white;
+                }
+
+                var sphereGeom = new THREE.SphereGeometry(object.radius, 10, 10);
+                var darkMaterial = new THREE.MeshBasicMaterial({ color: chosen_color, transparent: true, opacity: sphere_opacity, blending: THREE.AdditiveBlending });
+                var sphere = new THREE.Mesh(sphereGeom.clone(), darkMaterial);
+                sphere.name = 'heatmap_trail';
+                sphere.userData = {
+                    scene: object.scene_number
+                };
+
+                sphere.position.set(object.position_x, object.position_y, object.position_z);
+                scene.add(sphere);
+
+                // create_heatmap_sphere(object.position_x, object.position_y, object.position_z, object.scene_number, object.hex_color, object.opacity, object.radius, true);_
             }
         },
         error: function error(data) {
@@ -3870,38 +3920,59 @@ function send_heatmap_to_database(selectedWarpNumber) {
         }
     }
 
-    if (heatmap_trail.length > 0) {
-        // Information on how to create an asynchronous foreach with reduce and promise
-        // URI : http://stackoverflow.com/questions/18983138/callback-after-all-asynchronous-foreach-callbacks-are-completed
-        var requests = heatmap_trail.reduce(function (promiseChain, item) {
-            return promiseChain.then(function () {
-                return new Promise(function (resolve) {
-                    asyncFunction(item, resolve);
+    if (!SHOW_HEATMAP) {
+        if (heatmap_trail.length > 0) {
+            // Information on how to create an asynchronous foreach with reduce and promise
+            // URI : http://stackoverflow.com/questions/18983138/callback-after-all-asynchronous-foreach-callbacks-are-completed
+            var requests = heatmap_trail.reduce(function (promiseChain, item) {
+                return promiseChain.then(function () {
+                    return new Promise(function (resolve) {
+                        asyncFunction(item, resolve);
+                    });
                 });
-            });
-        }, Promise.resolve());
+            }, Promise.resolve());
 
-        // When all the requests are done.
-        requests.then(function () {
-            // Reset the heatmap trails for the next scene.
-            heatmap_trail = [];
+            // When all the requests are done.
+            requests.then(function () {
+                // Reset the heatmap trails for the next scene.
+                heatmap_trail = [];
 
-            // Making all the sphere scenes invisible. Reduces lagg and fixes the issue with warping.
-            for (var _i = 0; _i <= scene.children.length - 1; _i++) {
-                if (scene.children[_i].name === "sphere_scene") {
-                    var _object = scene.children[_i];
-                    _object.visible = false;
+                // Making all the sphere scenes invisible. Reduces lagg and fixes the issue with warping.
+                for (var _i = 0; _i <= scene.children.length - 1; _i++) {
+                    if (scene.children[_i].name === "sphere_scene") {
+                        var _object = scene.children[_i];
+                        _object.visible = false;
+                    }
                 }
+
+                current_scene = selectedWarpNumber;
+                showWarpObjects();
+                // drawShapes();
+                drawScene();
+                resetCamera();
+
+                creating_heatmap = false;
+            });
+        }
+    } else {
+        // Reset the heatmap trails for the next scene.
+        heatmap_trail = [];
+
+        // Making all the sphere scenes invisible. Reduces lagg and fixes the issue with warping.
+        for (var _i2 = 0; _i2 <= scene.children.length - 1; _i2++) {
+            if (scene.children[_i2].name === "sphere_scene") {
+                var _object2 = scene.children[_i2];
+                _object2.visible = false;
             }
+        }
 
-            current_scene = selectedWarpNumber;
-            showWarpObjects();
-            // drawShapes();
-            drawScene();
-            resetCamera();
+        current_scene = selectedWarpNumber;
+        showWarpObjects();
+        // drawShapes();
+        drawScene();
+        resetCamera();
 
-            creating_heatmap = false;
-        });
+        creating_heatmap = false;
     }
 }
 
@@ -3920,10 +3991,12 @@ function update(dt) {
     //     database_send_time++;
     // }
 
-    if (!creating_heatmap) {
-        reset_able_time++;
-    } else {
-        reset_able_time = 0;
+    if (!SHOW_HEATMAP) {
+        if (!creating_heatmap) {
+            reset_able_time++;
+        } else {
+            reset_able_time = 0;
+        }
     }
 
     current_time = clock.getElapsedTime();
@@ -4010,6 +4083,7 @@ function render(dt) {
             }
         }
     }
+
     effect.render(scene, camera);
 }
 
