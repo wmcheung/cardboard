@@ -3451,7 +3451,7 @@ touchTweenTo.start();
 // Selection time for the guiding circles
 var SELECTION_TIME = 2000;
 
-var DEBUG = false;
+var DEBUG = true;
 var DEBUG_COORDS = false;
 
 if (DEBUG) {
@@ -3584,11 +3584,18 @@ function getHeatmapByScene(scene_number) {
 
     var callback = {
         success: function success(data) {
-            var parsed_data = JSON.parse(data);
+            var parsed_data = JSON.parse(data).result;
 
-            parsed_data.result.forEach(function (object) {
-                console.log(object);
-            });
+            for (var key in parsed_data) {
+                var object = parsed_data[key];
+                var sphere_opacity = 0;
+                if (DEBUG) {
+                    sphere_opacity = object.opacity;
+                } else {
+                    sphere_opacity = trail_opacity;
+                }
+                create_heatmap_sphere(object.position_x, object.position_y, object.position_z, object.scene_number, object.hex_color, object.opacity, object.radius, true);_;
+            }
         },
         error: function error(data) {
             // console.log(2, 'error', JSON.parse(data));
@@ -3643,6 +3650,8 @@ function drawScene() {
 
     selectableObjs.push(scene_mesh);
     scene.add(scene_mesh);
+
+    getHeatmapByScene(current_scene);
 }
 
 function meshloader(fileName, position_x, position_y, position_z, rotation, title, warpTo) {
@@ -3787,15 +3796,42 @@ function resize() {
     effect.setSize(width, height);
 }
 
-function create_heatmap_sphere(point_x, point_y, point_z) {
+function create_heatmap_sphere(point_x, point_y, point_z, scene_number) {
+    var color = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : color_white_string;
+    var radius = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 2;
+    var opacity = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : null;
+    var is_old_heatmap = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : false;
+
     // SphereGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
-    var sphereGeom = new THREE.SphereGeometry(2, 10, 10);
-    var darkMaterial = new THREE.MeshBasicMaterial({ color: color_white, transparent: true, opacity: trail_opacity, blending: THREE.AdditiveBlending });
+    var sphere_opacity = 0;
+    if (opacity != null) {
+        sphere_opacity = opacity;
+    } else {
+        sphere_opacity = trail_opacity;
+    }
+
+    var chosen_color = void 0;
+    if (color === color_red_string) {
+        chosen_color = color_red;
+    }
+    if (color === color_white_string) {
+        chosen_color = color_white;
+    }
+
+    var sphereGeom = new THREE.SphereGeometry(radius, 10, 10);
+    var darkMaterial = new THREE.MeshBasicMaterial({ color: chosen_color, transparent: true, opacity: sphere_opacity, blending: THREE.AdditiveBlending });
     var sphere = new THREE.Mesh(sphereGeom.clone(), darkMaterial);
     sphere.name = 'heatmap_trail';
+    sphere.userData = {
+        scene: scene_number
+    };
 
     sphere.position.set(point_x, point_y, point_z);
-    heatmap_trail.push(sphere);
+
+    if (!is_old_heatmap) {
+        heatmap_trail.push(sphere);
+    }
+
     scene.add(sphere);
 }
 
@@ -3850,6 +3886,14 @@ function send_heatmap_to_database(selectedWarpNumber) {
             // Reset the heatmap trails for the next scene.
             heatmap_trail = [];
 
+            // Making all the sphere scenes invisible. Reduces lagg and fixes the issue with warping.
+            for (var _i = 0; _i <= scene.children.length - 1; _i++) {
+                if (scene.children[_i].name === "sphere_scene") {
+                    var _object = scene.children[_i];
+                    _object.visible = false;
+                }
+            }
+
             current_scene = selectedWarpNumber;
             showWarpObjects();
             // drawShapes();
@@ -3858,40 +3902,6 @@ function send_heatmap_to_database(selectedWarpNumber) {
 
             creating_heatmap = false;
         });
-
-        // heatmap_trail.forEach( (object, i) => {
-        //     let radius          = Math.round(object.geometry.boundingSphere.radius);
-        //     let opacity         = object.material.opacity;
-        //     // let transparent     = object.material.transparent;
-        //
-        //     let color = '';
-        //
-        //     // When radius equals 2. Color needs to be white.
-        //     if(radius == 2) {
-        //         color = color_white_string;
-        //     }else{
-        //         color = color_red_string;
-        //     }
-        //
-        //     if(!sending_to_database) {
-        //         sending_to_database = true;
-        //         createHeatmapTrail(current_scene, object.position.x, object.position.y, object.position.z, color, radius, opacity);
-        //         console.log("MESSAGE: Sending to database");
-        //     }
-        //
-        //     // if(i == heatmap_trail.length - 1) {
-        //     //     // Reset the heatmap trails for the next scene.
-        //     //     heatmap_trail = [];
-        //     //
-        //     //     current_scene = selectedWarpNumber;
-        //     //     showWarpObjects();
-        //     //     // drawShapes();
-        //     //     drawScene('./images/room_'+ selectedWarpNumber +'.jpg');
-        //     //     resetCamera();
-        //     //
-        //     //     // creating_heatmap = false;
-        //     // }
-        // });
     }
 }
 
@@ -3963,13 +3973,6 @@ function render(dt) {
                         prev_point_y = point_y;
                         prev_point_z = point_z;
 
-                        // object.geometry.boundingSphere.radius
-                        // object.material.color
-                        // object.material.transparent
-                        // object.material.opacity
-
-                        // console.log('found trail');
-                        // console.log(heatmap_sphere_created);
                         if (!heatmap_trail_radius_max) {
                             if (radius >= 10) {
                                 // console.log('radius maxed');
@@ -3995,7 +3998,7 @@ function render(dt) {
                         if (reset_able_time >= 3) {
                             // heatmap_sphere_created = true;
                             heatmap_trail_radius_max = false;
-                            create_heatmap_sphere(point_x, point_y, point_z);
+                            create_heatmap_sphere(point_x, point_y, point_z, current_scene);
                         }
                     }
 
@@ -4003,7 +4006,7 @@ function render(dt) {
                 });
             } else {
                 // console.log('empty trail');
-                create_heatmap_sphere(point_x, point_y, point_z);
+                create_heatmap_sphere(point_x, point_y, point_z, current_scene);
             }
         }
     }
@@ -4058,8 +4061,6 @@ function initialize_vr() {
     manager.onLoad = function () {
         showWarpObjects();
     };
-
-    getHeatmapByScene(1);
 
     window.addEventListener('resize', resize, false);
     setTimeout(resize, 1);
