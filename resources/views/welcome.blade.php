@@ -23,7 +23,9 @@
             <div id="bottom_hud_text_area"><p class="info_text"></p></div>
         </div>
 
-        <div id="scene"><button id="goFS">Go fullscreen</button></div>
+        <div id="scene">
+            <button id="goFS">Go fullscreen</button>
+        </div>
         <div id="selection_confirmation_overlay"></div>
 
         {{--<script src="{{ url('js/plugins.js') }}"></script>--}}

@@ -3479,7 +3479,8 @@ if (DEBUG) {
 
 // Full screen
 var goFS = document.getElementById("goFS");
-document.getElementById("goFS").style.display = 'block';
+document.getElementById("goFS").style.display = 'none';
+
 var doc = window.document;
 var docEl = doc.documentElement;
 

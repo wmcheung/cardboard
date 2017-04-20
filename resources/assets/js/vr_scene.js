@@ -97,7 +97,8 @@ if(DEBUG) {
 
 // Full screen
 let goFS    =   document.getElementById("goFS");
-                document.getElementById("goFS").style.display = 'block';
+                document.getElementById("goFS").style.display = 'none';
+                
 let doc     =   window.document;
 let docEl   =   doc.documentElement;
 
