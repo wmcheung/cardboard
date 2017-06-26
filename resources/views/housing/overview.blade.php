@@ -79,6 +79,11 @@
 
         <div class="row">
             <div class="col-md-12"><h1>WoningVR opzet</h1><hr></div>
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    <p>De afbeeldingen hier zijn niet klikbaar, het is er om duidelijk te maken welke afbeelding bij welke scene hoort.</p>
+                </div>
+            </div>
         </div>
 
         <div class="row">
@@ -94,13 +99,17 @@
         </div>
 
         <div class="row">
-            <div class="col-md-12"><h1>Bezoekers</h1><hr></div>
+            <div class="col-md-12">
+                <h1>Bezoekers</h1>
+                <a target="_blank" href="{{ url('/?show_heatmap=true&user=all') }}" class="btn btn-primary">Bekijk heatmap van alle bezoekers</a>
+                <hr>
+            </div>
         </div>
 
         <div class="row">
             @for($i = 1; $i <= $data_users; $i++)
                 <div class="col-md-4" style="margin-bottom: 50px;">
-                    <img class="img-responsive" src="https://image.prntscr.com/image/Z3N1pCZKTDG1yNZdSX1Fig.png"/>
+                    <a target="_blank" href="{{ url('/?show_heatmap=true&user='.$i) }}"><img class="img-responsive" src="https://image.prntscr.com/image/Z3N1pCZKTDG1yNZdSX1Fig.png"/></a>
                     <hr>
                     <div class="row">
                         <div class="col-md-7">

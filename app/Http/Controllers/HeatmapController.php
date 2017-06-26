@@ -13,9 +13,14 @@ class HeatmapController extends Controller
      * Get all the heatmap data for specific scene
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(Request $request) {
-        $heatmap_trails = Heatmap::all()->where('user_number', $request->user_number)
-                                        ->where('scene_number', $request->scene);
+    public function show(Request $request)
+    {
+        if ($request->user_number == 'all') {
+            $heatmap_trails = Heatmap::all()->where('scene_number', $request->scene);
+        }else{
+            $heatmap_trails = Heatmap::all()->where('user_number', $request->user_number)
+                                            ->where('scene_number', $request->scene);
+        }
 
         return response()->json([
             'result' => $heatmap_trails
