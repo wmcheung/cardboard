@@ -17,6 +17,34 @@ import * as ProgressBar from './third-party/progressbar';
 import $http from './promise';
 
 /*******************************************
+ * Retrieve next user id
+ ******************************************/
+let next_user_id = 0;
+
+function getNextHousingID() {
+    let API_URI = 'api/next-housing-user';
+    let callback = {
+        success: function (data) {
+            let parsed_data = JSON.parse(data);
+
+            next_user_id = parsed_data.value;
+        },
+
+        error: function (data) {
+            // console.log(2, 'error', JSON.parse(data));
+        }
+    }
+
+    // Executes the method call
+    $http(API_URI)
+        .get()
+        .then(callback.success)
+        .catch(callback.error);
+}
+
+getNextHousingID();
+
+/*******************************************
  * VARIABLES
  ******************************************/
 let THREE = THREELib(["OBJLoader", "OrbitControls"]);
@@ -61,6 +89,8 @@ let reset_able_time = 0;
 let database_send_time = 0;
 let current_time = 0;
 
+let startTime, endTime;
+
 // Set up animation cycle used on touched objects
 touchTweenTo.to(max, 200);
 touchTweenTo.easing(TWEEN.Easing.Bounce.InOut);
@@ -70,7 +100,7 @@ touchTweenTo.start();
 // Selection time for the guiding circles
 let SELECTION_TIME = 2000;
 
-let DEBUG = false;
+let DEBUG = true;
 let SHOW_HEATMAP = false;
 const DEBUG_COORDS = false;
 
@@ -78,10 +108,12 @@ const DEBUG_COORDS = false;
 // URI : http://stackoverflow.com/questions/827368/using-the-get-parameter-of-a-url-in-javascript
 let show_heatmap = getQueryVariable("show_heatmap");
 let show_debug = getQueryVariable("debug");
+let show_heatmap_user_id = 0;
 
 if(show_heatmap) {
     SHOW_HEATMAP = true;
     DEBUG = true;
+    show_heatmap_user_id = getQueryVariable("user");
 }else{
     SHOW_HEATMAP = false;
     DEBUG = false;
@@ -98,7 +130,7 @@ if(DEBUG) {
 // Full screen
 let goFS    =   document.getElementById("goFS");
                 document.getElementById("goFS").style.display = 'none';
-                
+
 let doc     =   window.document;
 let docEl   =   doc.documentElement;
 
@@ -138,6 +170,55 @@ document.getElementById("selection_confirmation_overlay").style.display = 'none'
 /*******************************************
  * FUNCTIONS FOR BUILDING THE SCENE
  ******************************************/
+function start_time() {
+    startTime = new Date();
+};
+
+function end_time() {
+    endTime = new Date();
+    var timeDiff = endTime - startTime; //in ms
+    // strip the ms
+    timeDiff /= 1000;
+
+    // get seconds
+    var seconds = Math.round(timeDiff % 60);
+
+    // save the scene
+    save_time_in_scene(seconds);
+
+    console.log(seconds + " sec");
+}
+
+function save_time_in_scene(seconds) {
+    let API_URI = 'api/time';
+    let payload = {
+        'user_number': next_user_id,
+        'scene_number': current_scene,
+        'time' : seconds
+    };
+
+    let callback = {
+        success : function(data){
+            let parsed_data = JSON.parse(data);
+
+            startTime = new Date();
+
+            if(DEBUG) {
+                console.log('MESSAGE: ' + parsed_data.message);
+            }
+        },
+        error : function(data){
+            // console.log(2, 'error', JSON.parse(data));
+        }
+    };
+
+    // Executes the method call
+    $http(API_URI)
+        .post(payload)
+        .then(callback.success)
+        .catch(callback.error);
+}
+
 function getQueryVariable(variable) {
     let query = window.location.search.substring(1);
     let vars = query.split("&");
@@ -245,6 +326,7 @@ function generateWarpObjectsCoords() {
 function getHeatmapByScene(scene_number) {
     let API_URI = 'api/heatmap';
     let payload = {
+        'user_number' : show_heatmap_user_id,
         'scene' : scene_number,
     };
 
@@ -296,6 +378,7 @@ function getHeatmapByScene(scene_number) {
 function createHeatmapTrail(scene_number, position_x, position_y, position_z, hex_color, radius, opacity) {
     let API_URI = 'api/heatmap';
     let payload = {
+        'user_number': next_user_id,
         'scene_number': scene_number,
         'position_x': position_x,
         'position_y': position_y,
@@ -450,10 +533,15 @@ function postSelectAction(selectedObjectName, selectedObjectWarpNumber) {
         if(selectedObjectName == 'warp') {
             cleanWarpObjects();
 
-            // When creating a heatmap. Wait untill its done. Clean the heatmap_trail array
+            // When creating a heatmap. Wait until its done. Clean the heat map_trail array
             creating_heatmap = true;
 
-            // When changing to another scene. Create a heatmap.
+            if(!SHOW_HEATMAP) {
+                // Stop the time and save the end time
+                end_time();
+            }
+
+            // When changing to another scene. Create a heat map.
             send_heatmap_to_database(selectedObjectWarpNumber);
         }
     }, 250);
@@ -770,6 +858,9 @@ function initialize_vr() {
 
     generateWarpObjectsCoords();
     drawShapes();
+
+    // Start time of the current room
+    start_time();
 
     manager.onLoad = () => {
         showWarpObjects();

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateHeatmapsTable extends Migration
+class CreateHeatmapsTimeTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,11 @@ class CreateHeatmapsTable extends Migration
      */
     public function up()
     {
-        Schema::create('heatmaps', function (Blueprint $table) {
+        Schema::create('heatmaps_time', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('scene_number');
             $table->integer('user_number');
-            $table->string('position_x');
-            $table->string('position_y');
-            $table->string('position_z');
-            $table->string('hex_color');
-            $table->integer('radius');
-            $table->string('opacity');
+            $table->integer('scene_number');
+            $table->integer('time');
             $table->timestamps();
         });
     }
@@ -34,6 +29,6 @@ class CreateHeatmapsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('heatmaps');
+        Schema::dropIfExists('heatmaps_time');
     }
 }

@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "./";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 78);
+/******/ 	return __webpack_require__(__webpack_require__.s = 79);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -78,7 +78,7 @@
  */
 
 __webpack_require__(2);
-__webpack_require__(5);
+__webpack_require__(6);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -103,7 +103,7 @@ __webpack_require__(5);
 /***/ (function(module, exports, __webpack_require__) {
 
 
-window._ = __webpack_require__(7);
+window._ = __webpack_require__(8);
 
 /**
  * We'll load jQuery and the Bootstrap jQuery plugin which provides support
@@ -111,7 +111,7 @@ window._ = __webpack_require__(7);
  * code may be modified to fit the specific needs of your application.
  */
 
-window.$ = window.jQuery = __webpack_require__(6);
+window.$ = window.jQuery = __webpack_require__(7);
 
 // require('bootstrap-sass');
 
@@ -153,6 +153,81 @@ window.$ = window.jQuery = __webpack_require__(6);
 
 /***/ }),
 /* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = $http;
+
+
+function $http(url) {
+
+    // A small example of object
+    var core = {
+
+        // Method that performs the ajax request
+        ajax: function ajax(method, url, args) {
+
+            // Creating a promise
+            var promise = new Promise(function (resolve, reject) {
+
+                // Instantiates the XMLHttpRequest
+                var client = new XMLHttpRequest();
+                var uri = url;
+
+                if (args && (method === 'GET' || method === 'POST' || method === 'PUT')) {
+                    uri += '?';
+                    var argcount = 0;
+                    for (var key in args) {
+                        if (args.hasOwnProperty(key)) {
+                            if (argcount++) {
+                                uri += '&';
+                            }
+                            uri += encodeURIComponent(key) + '=' + encodeURIComponent(args[key]);
+                        }
+                    }
+                }
+
+                client.open(method, uri);
+                client.send();
+
+                client.onload = function () {
+                    if (this.status == 200) {
+                        // Performs the function "resolve" when this.status is equal to 200
+                        resolve(this.response);
+                    } else {
+                        // Performs the function "reject" when this.status is different than 200
+                        reject(this.statusText);
+                    }
+                };
+                client.onerror = function () {
+                    reject(this.statusText);
+                };
+            });
+
+            // Return the promise
+            return promise;
+        }
+    };
+
+    // Adapter pattern
+    return {
+        'get': function get(args) {
+            return core.ajax('GET', url, args);
+        },
+        'post': function post(args) {
+            return core.ajax('POST', url, args);
+        },
+        'put': function put(args) {
+            return core.ajax('PUT', url, args);
+        },
+        'delete': function _delete(args) {
+            return core.ajax('DELETE', url, args);
+        }
+    };
+};
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -961,10 +1036,10 @@ TWEEN.Interpolation = {
 		root.TWEEN = TWEEN;
 	}
 })(this);
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;var require;var require;var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -3352,18 +3427,18 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 });
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_three_js__ = __webpack_require__(70);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_three_js__ = __webpack_require__(71);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_three_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_three_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__third_party_Tween__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__third_party_Tween__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__third_party_Tween___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__third_party_Tween__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__third_party_progressbar__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__third_party_progressbar__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__third_party_progressbar___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__third_party_progressbar__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__promise__ = __webpack_require__(82);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__promise__ = __webpack_require__(3);
 // import * as THREE from './third-party/threejs/three';
 
 /**
@@ -3383,10 +3458,35 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /*******************************************
+ * Retrieve next user id
+ ******************************************/
+var next_user_id = 0;
+
+function getNextHousingID() {
+    var API_URI = 'api/next-housing-user';
+    var callback = {
+        success: function success(data) {
+            var parsed_data = JSON.parse(data);
+
+            next_user_id = parsed_data.value;
+        },
+
+        error: function error(data) {
+            // console.log(2, 'error', JSON.parse(data));
+        }
+    };
+
+    // Executes the method call
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__promise__["a" /* default */])(API_URI).get().then(callback.success).catch(callback.error);
+}
+
+getNextHousingID();
+
+/*******************************************
  * VARIABLES
  ******************************************/
 var THREE = __WEBPACK_IMPORTED_MODULE_0_three_js___default()(["OBJLoader", "OrbitControls"]);
-var StereoEffect = __webpack_require__(72)(THREE);
+var StereoEffect = __webpack_require__(73)(THREE);
 
 var camera = void 0,
     scene = void 0,
@@ -3442,6 +3542,9 @@ var reset_able_time = 0;
 var database_send_time = 0;
 var current_time = 0;
 
+var startTime = void 0,
+    endTime = void 0;
+
 // Set up animation cycle used on touched objects
 touchTweenTo.to(max, 200);
 touchTweenTo.easing(__WEBPACK_IMPORTED_MODULE_1__third_party_Tween__["Easing"].Bounce.InOut);
@@ -3451,17 +3554,19 @@ touchTweenTo.start();
 // Selection time for the guiding circles
 var SELECTION_TIME = 2000;
 
-var DEBUG = false;
+var DEBUG = true;
 var SHOW_HEATMAP = false;
 var DEBUG_COORDS = false;
 
 // URI : http://stackoverflow.com/questions/827368/using-the-get-parameter-of-a-url-in-javascript
 var show_heatmap = getQueryVariable("show_heatmap");
 var show_debug = getQueryVariable("debug");
+var show_heatmap_user_id = 0;
 
 if (show_heatmap) {
     SHOW_HEATMAP = true;
     DEBUG = true;
+    show_heatmap_user_id = getQueryVariable("user");
 } else {
     SHOW_HEATMAP = false;
     DEBUG = false;
@@ -3506,7 +3611,7 @@ function setOrientationControls(e) {
         return;
     }
 
-    controls = __webpack_require__(73)(THREE, camera);
+    controls = __webpack_require__(74)(THREE, camera);
     controls.connect();
     controls.update();
 
@@ -3520,6 +3625,52 @@ document.getElementById("selection_confirmation_overlay").style.display = 'none'
 /*******************************************
  * FUNCTIONS FOR BUILDING THE SCENE
  ******************************************/
+function start_time() {
+    startTime = new Date();
+};
+
+function end_time() {
+    endTime = new Date();
+    var timeDiff = endTime - startTime; //in ms
+    // strip the ms
+    timeDiff /= 1000;
+
+    // get seconds
+    var seconds = Math.round(timeDiff % 60);
+
+    // save the scene
+    save_time_in_scene(seconds);
+
+    console.log(seconds + " sec");
+}
+
+function save_time_in_scene(seconds) {
+    var API_URI = 'api/time';
+    var payload = {
+        'user_number': next_user_id,
+        'scene_number': current_scene,
+        'time': seconds
+    };
+
+    var callback = {
+        success: function success(data) {
+            var parsed_data = JSON.parse(data);
+
+            startTime = new Date();
+
+            if (DEBUG) {
+                console.log('MESSAGE: ' + parsed_data.message);
+            }
+        },
+        error: function error(data) {
+            // console.log(2, 'error', JSON.parse(data));
+        }
+    };
+
+    // Executes the method call
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__promise__["a" /* default */])(API_URI).post(payload).then(callback.success).catch(callback.error);
+}
+
 function getQueryVariable(variable) {
     var query = window.location.search.substring(1);
     var vars = query.split("&");
@@ -3608,6 +3759,7 @@ function generateWarpObjectsCoords() {
 function getHeatmapByScene(scene_number) {
     var API_URI = 'api/heatmap';
     var payload = {
+        'user_number': show_heatmap_user_id,
         'scene': scene_number
     };
 
@@ -3660,6 +3812,7 @@ function getHeatmapByScene(scene_number) {
 function createHeatmapTrail(scene_number, position_x, position_y, position_z, hex_color, radius, opacity) {
     var API_URI = 'api/heatmap';
     var payload = {
+        'user_number': next_user_id,
         'scene_number': scene_number,
         'position_x': position_x,
         'position_y': position_y,
@@ -3808,10 +3961,15 @@ function postSelectAction(selectedObjectName, selectedObjectWarpNumber) {
         if (selectedObjectName == 'warp') {
             cleanWarpObjects();
 
-            // When creating a heatmap. Wait untill its done. Clean the heatmap_trail array
+            // When creating a heatmap. Wait until its done. Clean the heat map_trail array
             creating_heatmap = true;
 
-            // When changing to another scene. Create a heatmap.
+            if (!SHOW_HEATMAP) {
+                // Stop the time and save the end time
+                end_time();
+            }
+
+            // When changing to another scene. Create a heat map.
             send_heatmap_to_database(selectedObjectWarpNumber);
         }
     }, 250);
@@ -4133,6 +4291,9 @@ function initialize_vr() {
     generateWarpObjectsCoords();
     drawShapes();
 
+    // Start time of the current room
+    start_time();
+
     manager.onLoad = function () {
         showWarpObjects();
     };
@@ -4148,7 +4309,7 @@ initialize_vr();
 animate();
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -14408,7 +14569,7 @@ return jQuery;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -31497,10 +31658,10 @@ return jQuery;
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(76), __webpack_require__(77)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(77), __webpack_require__(78)(module)))
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -31686,70 +31847,70 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./AdaptiveToneMappingPass.js": 10,
-	"./BasicShader.js": 11,
-	"./BleachBypassShader.js": 12,
-	"./BlendShader.js": 13,
-	"./BloomPass.js": 14,
-	"./BokehPass.js": 15,
-	"./BokehShader.js": 16,
-	"./BokehShader2.js": 17,
-	"./BrightnessContrastShader.js": 18,
-	"./CanvasRenderer.js": 19,
-	"./ColorCorrectionShader.js": 20,
-	"./ColorifyShader.js": 21,
-	"./ConvolutionShader.js": 22,
-	"./CopyShader.js": 23,
-	"./DDSLoader.js": 24,
-	"./DOFMipMapShader.js": 25,
-	"./DigitalGlitch.js": 26,
-	"./DotScreenPass.js": 27,
-	"./DotScreenShader.js": 28,
-	"./EdgeShader.js": 29,
-	"./EdgeShader2.js": 30,
-	"./EffectComposer.js": 31,
-	"./FXAAShader.js": 32,
-	"./FilmPass.js": 33,
-	"./FilmShader.js": 34,
-	"./FocusShader.js": 35,
-	"./FresnelShader.js": 36,
-	"./GammaCorrectionShader.js": 37,
-	"./GlitchPass.js": 38,
-	"./HorizontalBlurShader.js": 39,
-	"./HorizontalTiltShiftShader.js": 40,
-	"./HueSaturationShader.js": 41,
-	"./JSONLoader.js": 42,
-	"./KaleidoShader.js": 43,
-	"./LuminosityShader.js": 44,
-	"./MTLLoader.js": 45,
-	"./MarchingCubes.js": 46,
-	"./MaskPass.js": 47,
-	"./MirrorShader.js": 48,
-	"./NormalMapShader.js": 49,
-	"./OBJLoader.js": 50,
-	"./OceanShaders.js": 51,
-	"./OrbitControls.js": 52,
-	"./ParallaxShader.js": 53,
-	"./Projector.js": 54,
-	"./RGBShiftShader.js": 55,
-	"./RenderPass.js": 56,
-	"./SSAOShader.js": 57,
-	"./SVGLoader.js": 58,
-	"./SavePass.js": 59,
-	"./SepiaShader.js": 60,
-	"./ShaderPass.js": 61,
-	"./TechnicolorShader.js": 62,
-	"./TexturePass.js": 63,
-	"./ToneMapShader.js": 64,
-	"./TriangleBlurShader.js": 65,
-	"./UnpackDepthRGBAShader.js": 66,
-	"./VerticalBlurShader.js": 67,
-	"./VerticalTiltShiftShader.js": 68,
-	"./VignetteShader.js": 69
+	"./AdaptiveToneMappingPass.js": 11,
+	"./BasicShader.js": 12,
+	"./BleachBypassShader.js": 13,
+	"./BlendShader.js": 14,
+	"./BloomPass.js": 15,
+	"./BokehPass.js": 16,
+	"./BokehShader.js": 17,
+	"./BokehShader2.js": 18,
+	"./BrightnessContrastShader.js": 19,
+	"./CanvasRenderer.js": 20,
+	"./ColorCorrectionShader.js": 21,
+	"./ColorifyShader.js": 22,
+	"./ConvolutionShader.js": 23,
+	"./CopyShader.js": 24,
+	"./DDSLoader.js": 25,
+	"./DOFMipMapShader.js": 26,
+	"./DigitalGlitch.js": 27,
+	"./DotScreenPass.js": 28,
+	"./DotScreenShader.js": 29,
+	"./EdgeShader.js": 30,
+	"./EdgeShader2.js": 31,
+	"./EffectComposer.js": 32,
+	"./FXAAShader.js": 33,
+	"./FilmPass.js": 34,
+	"./FilmShader.js": 35,
+	"./FocusShader.js": 36,
+	"./FresnelShader.js": 37,
+	"./GammaCorrectionShader.js": 38,
+	"./GlitchPass.js": 39,
+	"./HorizontalBlurShader.js": 40,
+	"./HorizontalTiltShiftShader.js": 41,
+	"./HueSaturationShader.js": 42,
+	"./JSONLoader.js": 43,
+	"./KaleidoShader.js": 44,
+	"./LuminosityShader.js": 45,
+	"./MTLLoader.js": 46,
+	"./MarchingCubes.js": 47,
+	"./MaskPass.js": 48,
+	"./MirrorShader.js": 49,
+	"./NormalMapShader.js": 50,
+	"./OBJLoader.js": 51,
+	"./OceanShaders.js": 52,
+	"./OrbitControls.js": 53,
+	"./ParallaxShader.js": 54,
+	"./Projector.js": 55,
+	"./RGBShiftShader.js": 56,
+	"./RenderPass.js": 57,
+	"./SSAOShader.js": 58,
+	"./SVGLoader.js": 59,
+	"./SavePass.js": 60,
+	"./SepiaShader.js": 61,
+	"./ShaderPass.js": 62,
+	"./TechnicolorShader.js": 63,
+	"./TexturePass.js": 64,
+	"./ToneMapShader.js": 65,
+	"./TriangleBlurShader.js": 66,
+	"./UnpackDepthRGBAShader.js": 67,
+	"./VerticalBlurShader.js": 68,
+	"./VerticalTiltShiftShader.js": 69,
+	"./VignetteShader.js": 70
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -31765,10 +31926,10 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 9;
+webpackContext.id = 10;
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -32093,7 +32254,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -32133,7 +32294,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -32206,7 +32367,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -32265,7 +32426,7 @@ module.exports = function( THREE ){
 }
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -32390,7 +32551,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -32502,7 +32663,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -32627,7 +32788,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -33006,7 +33167,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -33073,7 +33234,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -34196,7 +34357,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -34255,7 +34416,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -34313,7 +34474,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -34423,7 +34584,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -34478,7 +34639,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -34756,7 +34917,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -34823,7 +34984,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -34935,7 +35096,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -35005,7 +35166,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -35082,7 +35243,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -35184,7 +35345,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -35266,7 +35427,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -35413,7 +35574,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -35441,7 +35602,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -35512,7 +35673,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -35625,7 +35786,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -35725,7 +35886,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -35808,7 +35969,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -35867,7 +36028,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -35989,7 +36150,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -36060,7 +36221,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -36134,7 +36295,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -36212,7 +36373,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -36776,7 +36937,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -36845,7 +37006,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -36904,7 +37065,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -37330,7 +37491,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -38396,7 +38557,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -38492,7 +38653,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -38559,7 +38720,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -38621,7 +38782,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -39033,7 +39194,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports) {
 
 ﻿module.exports = function( THREE ){
@@ -39430,7 +39591,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -40476,7 +40637,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -40669,7 +40830,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -41599,7 +41760,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -41664,7 +41825,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -41724,7 +41885,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -41958,7 +42119,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -42000,7 +42161,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -42072,7 +42233,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 60 */
+/* 61 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -42135,7 +42296,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 61 */
+/* 62 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -42204,7 +42365,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 62 */
+/* 63 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -42260,7 +42421,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 63 */
+/* 64 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -42316,7 +42477,7 @@ module.exports = function( THREE ){
 };
 
 /***/ }),
-/* 64 */
+/* 65 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -42400,7 +42561,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 65 */
+/* 66 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -42487,7 +42648,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 66 */
+/* 67 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -42553,7 +42714,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 67 */
+/* 68 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -42624,7 +42785,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 68 */
+/* 69 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -42698,7 +42859,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 69 */
+/* 70 */
 /***/ (function(module, exports) {
 
 module.exports = function( THREE ){
@@ -42770,12 +42931,12 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 70 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function( self ){
 
-	var THREE = __webpack_require__(71);
+	var THREE = __webpack_require__(72);
 
 	module.exports = function( addons ){
 
@@ -42792,7 +42953,7 @@ module.exports = function( THREE ){
 				}
 				else if( typeof addon === "string" ){
 
-					__webpack_require__(9)("./" + addon + ".js")(THREE);
+					__webpack_require__(10)("./" + addon + ".js")(THREE);
 
 				}
 				else {
@@ -42813,7 +42974,7 @@ module.exports = function( THREE ){
 
 
 /***/ }),
-/* 71 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;(function( self ){
@@ -84565,7 +84726,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;(function( self ){
 
 	};
 
-	if( "function" !== "undefined" && __webpack_require__(74) instanceof Function && __webpack_require__(75) != undefined ){
+	if( "function" !== "undefined" && __webpack_require__(75) instanceof Function && __webpack_require__(76) != undefined ){
 
 		!(__WEBPACK_AMD_DEFINE_RESULT__ = function(){
 
@@ -84589,7 +84750,7 @@ var __WEBPACK_AMD_DEFINE_RESULT__;(function( self ){
 })(this || {});
 
 /***/ }),
-/* 72 */
+/* 73 */
 /***/ (function(module, exports) {
 
 /**
@@ -84753,7 +84914,7 @@ module.exports = function(THREE, renderer) {
 
 
 /***/ }),
-/* 73 */
+/* 74 */
 /***/ (function(module, exports) {
 
 /* globals THREE, window */
@@ -84855,7 +85016,7 @@ function orientationControl(THREE, object) {
 
 
 /***/ }),
-/* 74 */
+/* 75 */
 /***/ (function(module, exports) {
 
 module.exports = function() {
@@ -84864,7 +85025,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 75 */
+/* 76 */
 /***/ (function(module, exports) {
 
 /* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {/* globals __webpack_amd_options__ */
@@ -84873,7 +85034,7 @@ module.exports = __webpack_amd_options__;
 /* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ }),
-/* 76 */
+/* 77 */
 /***/ (function(module, exports) {
 
 var g;
@@ -84900,7 +85061,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 77 */
+/* 78 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -84928,90 +85089,12 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 78 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(0);
 module.exports = __webpack_require__(1);
 
-
-/***/ }),
-/* 79 */,
-/* 80 */,
-/* 81 */,
-/* 82 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = $http;
-
-
-function $http(url) {
-
-    // A small example of object
-    var core = {
-
-        // Method that performs the ajax request
-        ajax: function ajax(method, url, args) {
-
-            // Creating a promise
-            var promise = new Promise(function (resolve, reject) {
-
-                // Instantiates the XMLHttpRequest
-                var client = new XMLHttpRequest();
-                var uri = url;
-
-                if (args && (method === 'GET' || method === 'POST' || method === 'PUT')) {
-                    uri += '?';
-                    var argcount = 0;
-                    for (var key in args) {
-                        if (args.hasOwnProperty(key)) {
-                            if (argcount++) {
-                                uri += '&';
-                            }
-                            uri += encodeURIComponent(key) + '=' + encodeURIComponent(args[key]);
-                        }
-                    }
-                }
-
-                client.open(method, uri);
-                client.send();
-
-                client.onload = function () {
-                    if (this.status == 200) {
-                        // Performs the function "resolve" when this.status is equal to 200
-                        resolve(this.response);
-                    } else {
-                        // Performs the function "reject" when this.status is different than 200
-                        reject(this.statusText);
-                    }
-                };
-                client.onerror = function () {
-                    reject(this.statusText);
-                };
-            });
-
-            // Return the promise
-            return promise;
-        }
-    };
-
-    // Adapter pattern
-    return {
-        'get': function get(args) {
-            return core.ajax('GET', url, args);
-        },
-        'post': function post(args) {
-            return core.ajax('POST', url, args);
-        },
-        'put': function put(args) {
-            return core.ajax('PUT', url, args);
-        },
-        'delete': function _delete(args) {
-            return core.ajax('DELETE', url, args);
-        }
-    };
-};
 
 /***/ })
 /******/ ]);

@@ -14,3 +14,9 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::prefix('housing')->group(function () {
+    Route::get('create', 'HousingController@create');
+    Route::get('tour', 'HousingController@tour');
+    Route::get('dashboard', 'HousingController@overview');
+});
